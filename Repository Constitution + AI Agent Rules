@@ -1,0 +1,2420 @@
+# AEGIS
+
+# Document 18 — Repository Constitution + AI Agent Rules
+
+**System:** AEGIS  
+**Document:** 18 — Repository Constitution + AI Agent Rules  
+**Version:** 1.0  
+**Status:** Master Repository Governance Specification  
+**Purpose:** Establish the mandatory engineering laws, repository structure, ownership boundaries, AI agent permissions, implementation constraints, quality standards, and enforcement rules governing the AEGIS codebase.
+
+---
+
+# 01. Constitution
+
+AEGIS is a high-stakes healthcare and biosecurity decision-support system.
+
+The repository must therefore be treated as an engineered system, not as a collection of screens.
+
+Every implementation decision must preserve:
+
+```text
+Domain Integrity
++
+State Integrity
++
+Data Integrity
++
+Security
++
+Auditability
++
+Observability
++
+Testability
++
+Maintainability
+```
+
+The repository exists to implement the approved AEGIS architecture.
+
+It does not exist to redefine it.
+
+---
+
+# 02. Supreme Repository Principle
+
+> **Code must conform to architecture. Architecture must not be silently rewritten to accommodate code.**
+
+If implementation reveals that an architectural decision is wrong, the architecture must be reviewed and explicitly changed before the codebase is allowed to drift.
+
+---
+
+# 03. Authority Hierarchy
+
+The repository follows this authority order:
+
+```text
+1. Human-approved product decisions
+2. Approved AEGIS architecture documents
+3. Approved requirements and contracts
+4. Repository constitution
+5. Automated tests
+6. Existing implementation
+7. AI-generated proposals
+```
+
+Existing code does not automatically outrank architecture.
+
+AI suggestions do not outrank requirements.
+
+---
+
+# 04. Repository Must Contain the Truth
+
+Important project knowledge must not exist exclusively inside:
+
+```text
+ChatGPT conversations
+Claude conversations
+v0 conversations
+OpenCode conversations
+personal notes
+temporary prompts
+```
+
+Important decisions must eventually become repository artifacts.
+
+The repository is the durable memory of AEGIS.
+
+---
+
+# 05. Repository Structure
+
+The repository should use a clear separation between:
+
+```text
+application
+architecture
+domain
+data
+services
+UI
+testing
+infrastructure
+documentation
+AI configuration
+```
+
+A recommended structure is:
+
+```text
+aegis/
+│
+├── app/
+│   ├── routes/
+│   ├── screens/
+│   ├── layouts/
+│   └── providers/
+│
+├── components/
+│   ├── ui/
+│   ├── domain/
+│   ├── dashboard/
+│   └── feedback/
+│
+├── domain/
+│   ├── entities/
+│   ├── value-objects/
+│   ├── events/
+│   ├── states/
+│   └── policies/
+│
+├── data/
+│   ├── schemas/
+│   ├── repositories/
+│   ├── fixtures/
+│   └── adapters/
+│
+├── services/
+│   ├── api/
+│   ├── intelligence/
+│   ├── monitoring/
+│   ├── response/
+│   └── audit/
+│
+├── lib/
+│   ├── validation/
+│   ├── utilities/
+│   └── configuration/
+│
+├── styles/
+│   ├── tokens/
+│   └── global/
+│
+├── tests/
+│   ├── unit/
+│   ├── integration/
+│   ├── e2e/
+│   ├── accessibility/
+│   └── intelligence/
+│
+├── infrastructure/
+│   ├── deployment/
+│   ├── observability/
+│   └── security/
+│
+├── docs/
+│   ├── architecture/
+│   ├── requirements/
+│   ├── decisions/
+│   ├── ai/
+│   ├── testing/
+│   └── project-state/
+│
+├── prompts/
+│
+├── scripts/
+│
+└── README.md
+```
+
+The exact framework-specific implementation may differ, but the architectural separation must remain.
+
+---
+
+# 06. Repository Structure Is Not Decoration
+
+Directories must represent meaningful ownership boundaries.
+
+Do not create folders merely because:
+
+```text
+"it looks organized"
+```
+
+Every major directory should answer:
+
+> What responsibility belongs here?
+
+---
+
+# 07. Ownership Principle
+
+Every important artifact must have an identifiable owner.
+
+Examples:
+
+```text
+domain/
+→ Domain architecture
+
+components/
+→ UI implementation
+
+services/
+→ Application/service behavior
+
+data/
+→ Data persistence and contracts
+
+tests/
+→ Verification
+
+docs/
+→ System knowledge
+```
+
+---
+
+# 08. Dependency Direction
+
+Dependencies should generally flow inward toward stable domain concepts.
+
+Conceptually:
+
+```text
+UI
+ ↓
+Application
+ ↓
+Domain
+ ↓
+Infrastructure
+```
+
+Infrastructure should not dictate domain behavior.
+
+UI should not define business rules.
+
+---
+
+# 09. Domain Independence
+
+The domain model must remain as independent as reasonably practical from:
+
+```text
+React
+Next.js
+database vendor
+AI provider
+UI component library
+deployment provider
+```
+
+The domain should represent AEGIS concepts, not framework-specific implementation details.
+
+---
+
+# 10. UI Boundary
+
+UI components are responsible for:
+
+```text
+presentation
+interaction
+visual state
+accessibility
+user feedback
+navigation
+```
+
+UI components must not independently invent:
+
+```text
+business rules
+threat classification logic
+clinical rules
+security policy
+database queries
+AI decision logic
+```
+
+---
+
+# 11. Component Responsibility
+
+A component should have one primary responsibility.
+
+Avoid components that simultaneously perform:
+
+```text
+data fetching
+domain calculations
+AI calls
+database mutations
+navigation
+visual rendering
+audit logging
+```
+
+unless there is a clear architectural reason.
+
+---
+
+# 12. Domain Logic Rule
+
+Critical domain behavior belongs in domain/application services rather than scattered throughout UI components.
+
+Bad:
+
+```text
+Button
+ ↓
+complex threat classification
+```
+
+Preferred:
+
+```text
+Button
+ ↓
+application action
+ ↓
+domain service
+ ↓
+validated result
+ ↓
+UI update
+```
+
+---
+
+# 13. Screen Rule
+
+A screen is a composition of capabilities.
+
+A screen must not become a dumping ground for:
+
+```text
+API logic
+database logic
+AI prompts
+domain rules
+authentication rules
+```
+
+---
+
+# 14. 13-Screen Integrity Rule
+
+The approved AEGIS 13-screen registry is authoritative.
+
+No AI agent may:
+
+```text
+rename screens
+merge screens
+split screens
+remove screens
+add screens
+change screen responsibilities
+```
+
+without an explicit approved change.
+
+---
+
+# 15. Screen Naming
+
+Screen names must match the approved registry.
+
+Do not create alternative terminology merely for convenience.
+
+The following should not happen:
+
+```text
+Global Monitoring
+Global Monitor
+Monitoring Dashboard
+Command Dashboard
+Global Threat View
+```
+
+if they all refer to the same approved screen.
+
+---
+
+# 16. Route Integrity
+
+Routes must map predictably to approved screen identities.
+
+Do not create hidden duplicate routes for the same screen unless explicitly required.
+
+---
+
+# 17. State Ownership
+
+Every state variable must have a clear owner.
+
+State should be classified as:
+
+```text
+Local UI State
+Application State
+Domain State
+Server State
+Session State
+Persistent State
+```
+
+Do not place all state into a single global store merely because it is convenient.
+
+---
+
+# 18. Global State Rule
+
+Global state must only contain information that genuinely needs global accessibility.
+
+Do not put:
+
+```text
+temporary modal state
+hover state
+input text
+button loading state
+local animation state
+```
+
+into global state without justification.
+
+---
+
+# 19. Domain State Rule
+
+Domain state must follow Document 02 and Document 05.
+
+Agents must not create new state transitions simply because a UI interaction needs one.
+
+---
+
+# 20. State Transition Rule
+
+Critical state transitions must be explicit.
+
+Conceptually:
+
+```text
+CURRENT STATE
+      +
+VALID EVENT
+      ↓
+VALID TRANSITION
+      ↓
+NEW STATE
+      ↓
+SIDE EFFECTS
+      ↓
+AUDIT / OBSERVABILITY
+```
+
+Invalid transitions must be rejected or handled according to the approved specification.
+
+---
+
+# 21. Data Ownership
+
+Data must have a clear source of truth.
+
+Do not maintain conflicting copies of important domain data.
+
+Example:
+
+```text
+Server
+   ↓
+authoritative threat state
+
+UI
+   ↓
+presentation of threat state
+```
+
+The UI should not silently invent a different threat state.
+
+---
+
+# 22. Mock Data Rule
+
+Mock data is permitted during development.
+
+But mock data must be clearly identifiable.
+
+Recommended:
+
+```text
+data/fixtures/
+```
+
+Never hide production-like fake data inside application logic.
+
+---
+
+# 23. Mock Data Must Match Contracts
+
+Mock data must conform to the same schemas as real data.
+
+This is mandatory.
+
+The following is prohibited:
+
+```text
+mock shape ≠ production shape
+```
+
+because it creates false confidence.
+
+---
+
+# 24. Hardcoded Data Rule
+
+Hardcoded domain data inside UI components is prohibited when the data should originate from:
+
+```text
+API
+domain state
+configuration
+database
+service
+```
+
+---
+
+# 25. API Rule
+
+Frontend code must consume approved API/service contracts.
+
+Do not invent endpoints because a component needs data.
+
+---
+
+# 26. API Client Rule
+
+API access should be centralized through appropriate service/client abstractions.
+
+Avoid scattered:
+
+```text
+fetch(...)
+fetch(...)
+fetch(...)
+```
+
+throughout unrelated UI components.
+
+---
+
+# 27. Error Handling
+
+Every network operation must account for:
+
+```text
+loading
+success
+empty
+failure
+timeout
+unauthorized
+forbidden
+validation failure
+unexpected response
+```
+
+where applicable.
+
+---
+
+# 28. No Silent Failures
+
+Errors must not disappear silently.
+
+At minimum, the system should:
+
+```text
+detect
+record
+surface appropriately
+recover or fail safely
+```
+
+according to the relevant architecture.
+
+---
+
+# 29. Security Boundary
+
+Security-sensitive logic must not live exclusively in the client.
+
+Never rely on:
+
+```text
+hidden UI elements
+disabled buttons
+frontend route guards
+client-side role checks
+```
+
+as the sole security mechanism.
+
+---
+
+# 30. Authorization Rule
+
+Authorization must be enforced at the appropriate backend/service boundary.
+
+UI authorization exists for user experience.
+
+Backend authorization exists for security.
+
+Both should be consistent.
+
+---
+
+# 31. Authentication Rule
+
+Authentication behavior must follow Document 10.
+
+AI agents may not replace authentication mechanisms with improvised implementations.
+
+---
+
+# 32. Secrets Rule
+
+Never commit:
+
+```text
+API keys
+tokens
+passwords
+private credentials
+certificates
+private keys
+production secrets
+```
+
+to the repository.
+
+---
+
+# 33. Environment Variables
+
+Environment-specific configuration should use appropriate environment configuration.
+
+Never hardcode environment-specific secrets.
+
+---
+
+# 34. AI Provider Rule
+
+AI provider credentials must never appear in:
+
+```text
+frontend bundles
+client-side code
+UI configuration
+Git history
+screenshots
+prompts
+```
+
+---
+
+# 35. AI Integration Boundary
+
+AI must be accessed through an explicit application boundary.
+
+Conceptually:
+
+```text
+AEGIS Application
+      ↓
+Intelligence Service
+      ↓
+AI Provider Adapter
+      ↓
+Model
+```
+
+Do not scatter provider-specific calls across components.
+
+---
+
+# 36. AI Provider Independence
+
+Business logic should not depend directly on a specific model provider.
+
+The application should be able to replace or disable an AI provider without rewriting the entire domain.
+
+---
+
+# 37. AI Output Validation
+
+Never trust AI output merely because it is syntactically valid text.
+
+Where AI output feeds application logic:
+
+```text
+AI output
+ ↓
+schema validation
+ ↓
+semantic validation
+ ↓
+policy validation
+ ↓
+application
+```
+
+---
+
+# 38. AI Hallucination Rule
+
+AI agents must not fabricate:
+
+```text
+API endpoints
+database fields
+domain entities
+clinical recommendations
+security policies
+requirements
+screen behavior
+architecture decisions
+```
+
+If something is unknown:
+
+```text
+STOP
+REPORT
+ASK
+```
+
+---
+
+# 39. AI Agent Operating Modes
+
+Agents operate in one of three modes:
+
+### READ
+
+Agent may inspect but not modify.
+
+### PLAN
+
+Agent may analyze and propose changes but not implement.
+
+### WRITE
+
+Agent may modify approved files within defined scope.
+
+---
+
+# 40. Default AI Permission
+
+The default mode should be:
+
+```text
+READ
+```
+
+Agents should receive write authority only when a task explicitly requires it.
+
+---
+
+# 41. Scope Rule
+
+Every implementation task should define:
+
+```text
+IN SCOPE
+OUT OF SCOPE
+```
+
+An agent must not modify unrelated areas.
+
+---
+
+# 42. File Ownership
+
+If a task concerns:
+
+```text
+components/threat/
+```
+
+the agent should not casually rewrite:
+
+```text
+services/auth/
+infrastructure/
+database/
+```
+
+unless the dependency requires it and the change is explicitly reported.
+
+---
+
+# 43. Unrelated Change Rule
+
+If an agent discovers an unrelated issue:
+
+```text
+record it
+```
+
+Do not automatically fix it during the current task.
+
+This prevents scope explosion.
+
+---
+
+# 44. Dependency Rule
+
+Adding a dependency requires justification.
+
+Before adding:
+
+```text
+npm package
+library
+framework
+service
+SDK
+```
+
+the agent must determine:
+
+```text
+Why is it needed?
+Does AEGIS already have an equivalent?
+What is the maintenance cost?
+What security implications exist?
+Does it affect bundle size?
+Does it conflict with architecture?
+```
+
+---
+
+# 45. Dependency Minimization
+
+AEGIS should prefer:
+
+```text
+existing dependency
+```
+
+over:
+
+```text
+new dependency
+```
+
+when both provide an adequate solution.
+
+---
+
+# 46. No Dependency Duplication
+
+Do not install multiple libraries for the same fundamental purpose without explicit justification.
+
+Examples:
+
+```text
+multiple date libraries
+multiple state libraries
+multiple animation libraries
+multiple HTTP clients
+multiple validation libraries
+```
+
+---
+
+# 47. Design System Rule
+
+All production UI must use the approved AEGIS design system.
+
+Agents must not independently invent:
+
+```text
+colors
+spacing
+typography
+border radii
+shadows
+buttons
+cards
+status indicators
+```
+
+when an approved token/component exists.
+
+---
+
+# 48. Visual Direction
+
+AEGIS visual identity is:
+
+```text
+Minimalist
+HUD-inspired
+High-density telemetry
+Clinical authority
+Deep Obsidian
+Surgical White
+Antigen Amber for alerts
+```
+
+The following are prohibited unless explicitly approved:
+
+```text
+gaming aesthetics
+cyberpunk decoration
+unnecessary neon
+excessive gradients
+consumer-dashboard styling
+visual noise
+decorative 3D that reduces clarity
+```
+
+---
+
+# 49. Accessibility
+
+Accessibility is a system requirement.
+
+Production interfaces must consider:
+
+```text
+keyboard navigation
+focus management
+semantic HTML
+screen-reader compatibility
+contrast
+motion preferences
+error communication
+touch targets
+```
+
+---
+
+# 50. Responsive Rule
+
+Responsive behavior must follow the approved application architecture.
+
+Do not simply shrink desktop layouts until they technically fit.
+
+The information hierarchy must remain usable.
+
+---
+
+# 51. Animation Rule
+
+Motion must communicate:
+
+```text
+state
+transition
+priority
+feedback
+system activity
+```
+
+Motion must not exist merely because a library makes animation easy.
+
+---
+
+# 52. Telemetry Rule
+
+Operationally important events must follow Document 12.
+
+Do not create arbitrary analytics events with inconsistent naming.
+
+---
+
+# 53. Audit Rule
+
+Security-sensitive and operationally important actions must follow Document 10.
+
+Agents must not introduce hidden actions that bypass the audit model.
+
+---
+
+# 54. Logging Rule
+
+Logs must:
+
+```text
+be structured
+contain useful context
+avoid secrets
+avoid unnecessary sensitive information
+support investigation
+```
+
+---
+
+# 55. Error Logging
+
+Errors should preserve enough context to diagnose failures without exposing unnecessary sensitive information.
+
+---
+
+# 56. Testing Constitution
+
+No significant feature is considered complete until its required tests exist and pass.
+
+Testing must cover appropriate levels:
+
+```text
+unit
+integration
+contract
+end-to-end
+accessibility
+security
+AI evaluation
+```
+
+as applicable.
+
+---
+
+# 57. Test Placement
+
+Tests should live in predictable locations.
+
+Recommended:
+
+```text
+tests/
+├── unit/
+├── integration/
+├── e2e/
+├── accessibility/
+├── security/
+└── intelligence/
+```
+
+---
+
+# 58. Test Naming
+
+Tests must describe behavior rather than implementation details.
+
+Prefer:
+
+```text
+should classify an anomaly as requiring investigation
+```
+
+over:
+
+```text
+should call function xyz()
+```
+
+when behavior is the actual requirement.
+
+---
+
+# 59. Test Isolation
+
+Tests should not depend unnecessarily on:
+
+```text
+production
+external AI provider
+live healthcare data
+uncontrolled external services
+```
+
+Use mocks, fixtures, adapters, or controlled environments where appropriate.
+
+---
+
+# 60. End-to-End Requirement
+
+The core AEGIS operational journey must eventually have end-to-end coverage:
+
+```text
+Detection
+ ↓
+Investigation
+ ↓
+Threat Assessment
+ ↓
+Classification
+ ↓
+Recommendation
+ ↓
+Human Decision
+ ↓
+Response
+ ↓
+Monitoring
+ ↓
+Recovery
+ ↓
+Learning
+```
+
+---
+
+# 61. AI Testing
+
+AI behavior requires more than ordinary unit testing.
+
+Tests should include:
+
+```text
+expected output
+invalid output
+missing context
+ambiguous evidence
+contradictory evidence
+provider failure
+timeout
+low-confidence scenario
+adversarial input
+```
+
+---
+
+# 62. Build Rule
+
+The repository must build successfully before a change is accepted.
+
+A change that:
+
+```text
+looks correct
+```
+
+but:
+
+```text
+breaks the build
+```
+
+is not complete.
+
+---
+
+# 63. Type Safety
+
+Where the selected stack supports strong typing, domain and service contracts should be strongly typed.
+
+Avoid unnecessary:
+
+```text
+any
+unknown
+unvalidated casts
+```
+
+especially around critical domain data.
+
+---
+
+# 64. Validation Boundary
+
+External data must be validated before entering trusted application logic.
+
+Conceptually:
+
+```text
+External Input
+      ↓
+Validation
+      ↓
+Normalization
+      ↓
+Trusted Domain
+```
+
+---
+
+# 65. Input Validation
+
+Validate:
+
+```text
+API input
+forms
+URL parameters
+query parameters
+external service responses
+AI outputs
+uploaded data
+```
+
+where applicable.
+
+---
+
+# 66. No Trust Boundary Leakage
+
+Do not allow raw external data to flow directly into:
+
+```text
+critical domain decisions
+database writes
+security-sensitive operations
+AI prompts
+```
+
+without appropriate validation and handling.
+
+---
+
+# 67. Database Rule
+
+Database access must follow the approved data architecture.
+
+Do not let UI components query the database directly.
+
+---
+
+# 68. Migration Rule
+
+Database schema changes must be explicit and versioned.
+
+Never manually change production structure without a controlled migration process.
+
+---
+
+# 69. Data Integrity
+
+Important domain records should preserve appropriate:
+
+```text
+identity
+timestamps
+relationships
+status
+history
+audit information
+```
+
+according to Document 06.
+
+---
+
+# 70. Time Rule
+
+Time-dependent domain events should use consistent time representation.
+
+Avoid mixing:
+
+```text
+local browser time
+server time
+database time
+```
+
+without explicit normalization.
+
+---
+
+# 71. ID Rule
+
+Identifiers must be generated and managed according to the data architecture.
+
+Do not create ad-hoc IDs in UI code for persistent entities.
+
+---
+
+# 72. Event Rule
+
+Domain events should represent meaningful system events.
+
+Do not create events merely because a button was clicked unless the click itself represents meaningful domain behavior.
+
+---
+
+# 73. Side Effect Rule
+
+Critical side effects must be explicit.
+
+Examples:
+
+```text
+notification
+audit event
+external API call
+state mutation
+response action
+```
+
+must not be hidden inside unrelated presentation code.
+
+---
+
+# 74. Transaction Rule
+
+Where multiple operations must succeed together, use the appropriate transactional or consistency strategy defined by the architecture.
+
+Do not assume sequential frontend requests are equivalent to a transaction.
+
+---
+
+# 75. Caching Rule
+
+Caching must not create stale or contradictory critical state.
+
+Cache strategy must respect the distinction between:
+
+```text
+authoritative server state
+temporary UI state
+derived state
+```
+
+---
+
+# 76. Offline / Failure Behavior
+
+Where applicable, the application must define what happens when:
+
+```text
+network fails
+API fails
+AI unavailable
+database unavailable
+telemetry unavailable
+```
+
+Agents must not invent fallback behavior.
+
+---
+
+# 77. Graceful Degradation
+
+When a non-critical subsystem fails, AEGIS should degrade according to approved architecture rather than collapsing unnecessarily.
+
+However:
+
+> Safety-critical uncertainty must never be hidden behind a fake successful state.
+
+---
+
+# 78. No Fake Success
+
+Never show:
+
+```text
+Action successful
+Threat resolved
+Response executed
+Analysis complete
+```
+
+unless the underlying operation actually succeeded according to its contract.
+
+---
+
+# 79. Simulation Rule
+
+If an operation is simulated:
+
+```text
+SIMULATED
+```
+
+must remain distinguishable from:
+
+```text
+EXECUTED
+```
+
+This is especially important during MVP development.
+
+---
+
+# 80. Clinical / Operational Boundary
+
+AEGIS is decision support.
+
+The repository must preserve the distinction between:
+
+```text
+system observation
+system analysis
+AI recommendation
+human decision
+actual operational execution
+```
+
+Do not collapse them into one state.
+
+---
+
+# 81. No Autonomous High-Stakes Action
+
+Unless explicitly authorized and architecturally defined, AI must not independently execute consequential real-world healthcare or biosecurity actions.
+
+The system should support human-controlled workflows.
+
+---
+
+# 82. Auditability
+
+Important actions must be traceable.
+
+A reviewer should eventually be able to determine:
+
+```text
+what happened
+when
+who initiated it
+what data informed it
+what recommendation existed
+what decision was made
+what action occurred
+what result followed
+```
+
+where required by the architecture.
+
+---
+
+# 83. Reproducibility
+
+Important system behavior should be reproducible enough for debugging and investigation.
+
+Record appropriate:
+
+```text
+version
+configuration
+model
+prompt version
+input reference
+output
+timestamp
+```
+
+where applicable and safe.
+
+---
+
+# 84. AI Prompt Repository
+
+Important production AI prompts belong in:
+
+```text
+prompts/
+```
+
+and should be version-controlled.
+
+---
+
+# 85. Prompt Naming
+
+Use predictable names:
+
+```text
+threat-assessment.v1.md
+anomaly-analysis.v1.md
+incident-summary.v1.md
+response-support.v1.md
+feedback-analysis.v1.md
+```
+
+---
+
+# 86. Prompt Changes
+
+Never silently edit a production-critical prompt.
+
+A meaningful change should result in:
+
+```text
+new version
+evaluation
+review
+approval
+```
+
+when appropriate.
+
+---
+
+# 87. Agent Rules File
+
+The repository should contain a machine-readable or machine-readable-friendly agent instruction file.
+
+Examples depending on the selected development environment may include:
+
+```text
+AGENTS.md
+```
+
+or equivalent agent configuration supported by the chosen toolchain.
+
+The file should point agents toward:
+
+```text
+architecture
+repository structure
+coding standards
+testing requirements
+security rules
+AI boundaries
+```
+
+---
+
+# 88. AGENTS.md Principle
+
+The agent instruction file should be concise.
+
+It should not duplicate every architecture document.
+
+Instead:
+
+```text
+AGENTS.md
+ ↓
+rules
+ ↓
+architecture references
+```
+
+---
+
+# 89. Agent Startup Procedure
+
+Every AI coding agent should begin with:
+
+```text
+1. Read repository instructions.
+2. Read project state.
+3. Identify relevant architecture documents.
+4. Inspect repository.
+5. Confirm task scope.
+6. Plan.
+7. Implement.
+8. Test.
+9. Review diff.
+10. Report.
+```
+
+---
+
+# 90. Agent Shutdown Procedure
+
+Before finishing:
+
+```text
+1. Run relevant tests.
+2. Run build/type checks.
+3. Inspect changed files.
+4. Confirm no unrelated changes.
+5. Update documentation if necessary.
+6. Update project state.
+7. Report unresolved issues.
+```
+
+---
+
+# 91. Agent Report Format
+
+Every significant implementation task should end with:
+
+```text
+IMPLEMENTED
+
+Summary:
+...
+
+Files changed:
+...
+
+Architecture affected:
+...
+
+Tests:
+...
+
+Validation:
+...
+
+Known issues:
+...
+
+Documentation updated:
+...
+
+Recommended next task:
+...
+```
+
+---
+
+# 92. Forbidden Agent Behaviors
+
+AI agents must never:
+
+```text
+invent requirements
+invent APIs
+invent domain entities
+invent security policies
+invent clinical protocols
+delete architecture documents
+rewrite unrelated subsystems
+remove tests merely to make builds pass
+disable security checks
+hide errors
+commit secrets
+silently add dependencies
+silently change global state architecture
+silently rename approved concepts
+```
+
+---
+
+# 93. Forbidden Shortcut
+
+This is prohibited:
+
+```text
+test fails
+ ↓
+delete test
+ ↓
+build passes
+```
+
+Correct:
+
+```text
+test fails
+ ↓
+understand failure
+ ↓
+fix implementation
+ ↓
+run test
+```
+
+---
+
+# 94. Forbidden Shortcut
+
+This is prohibited:
+
+```text
+TypeScript error
+ ↓
+cast everything to any
+```
+
+Instead:
+
+```text
+understand type mismatch
+ ↓
+fix contract
+```
+
+---
+
+# 95. Forbidden Shortcut
+
+This is prohibited:
+
+```text
+API missing
+ ↓
+hardcode fake production behavior
+```
+
+Instead:
+
+```text
+identify contract
+ ↓
+implement approved mock/adapter
+```
+
+---
+
+# 96. Forbidden Shortcut
+
+This is prohibited:
+
+```text
+UI requires data
+ ↓
+invent new database structure
+```
+
+Instead:
+
+```text
+inspect data architecture
+ ↓
+identify existing contract
+ ↓
+escalate if missing
+```
+
+---
+
+# 97. Forbidden Shortcut
+
+This is prohibited:
+
+```text
+AI output looks convincing
+ ↓
+trust it
+```
+
+Instead:
+
+```text
+validate
+ ↓
+evaluate
+ ↓
+apply policy
+```
+
+---
+
+# 98. Code Review Rule
+
+Code review should evaluate:
+
+```text
+correctness
+architecture
+security
+state
+data
+performance
+accessibility
+testing
+maintainability
+observability
+```
+
+not merely:
+
+```text
+does it run?
+```
+
+---
+
+# 99. Pull Request Rule
+
+A meaningful pull request should describe:
+
+```text
+What changed?
+Why?
+Which architecture documents are affected?
+Which requirements are satisfied?
+What tests were added?
+What remains?
+```
+
+---
+
+# 100. Commit Rule
+
+Commits should represent coherent changes.
+
+Avoid:
+
+```text
+fix stuff
+update
+changes
+AI work
+final final
+```
+
+Prefer:
+
+```text
+feat: implement threat classification state transition
+fix: handle failed anomaly ingestion
+test: add response workflow integration coverage
+refactor: isolate intelligence provider adapter
+```
+
+---
+
+# 101. Commit Size
+
+Prefer small, understandable commits.
+
+Large AI-generated commits are harder to:
+
+```text
+review
+debug
+revert
+understand
+```
+
+---
+
+# 102. Branch Rule
+
+Feature work should be isolated from stable branches according to the project's Git workflow.
+
+Do not experiment directly on the stable release branch.
+
+---
+
+# 103. Rollback Principle
+
+Every meaningful deployment must have a rollback strategy appropriate to the deployment architecture.
+
+---
+
+# 104. Documentation Synchronization
+
+Code and architecture must not permanently diverge.
+
+If code changes a documented behavior:
+
+```text
+update documentation
+```
+
+If documentation changes:
+
+```text
+identify implementation impact
+```
+
+---
+
+# 105. Architecture Drift
+
+Architecture drift occurs when:
+
+```text
+code behavior
+≠
+approved architecture
+```
+
+without an explicit decision.
+
+Architecture drift must be treated as technical debt or a defect.
+
+---
+
+# 106. Drift Detection
+
+At milestones compare:
+
+```text
+Documents
+vs
+Repository
+vs
+Tests
+vs
+Running application
+```
+
+All four should describe substantially the same system.
+
+---
+
+# 107. Definition of Done
+
+A feature is not done because:
+
+```text
+the screen looks good
+```
+
+or:
+
+```text
+the code compiles
+```
+
+A feature is done when:
+
+```text
+requirement satisfied
++
+architecture aligned
++
+state correct
++
+data correct
++
+API correct
++
+UI correct
++
+security satisfied
++
+tests passing
++
+observability appropriate
++
+documentation synchronized
+```
+
+---
+
+# 108. Feature Completion Checklist
+
+Before marking a feature complete:
+
+```text
+[ ] Requirement identified
+[ ] Architecture reviewed
+[ ] Dependencies understood
+[ ] Domain behavior implemented
+[ ] State transitions implemented
+[ ] Data contracts respected
+[ ] API contracts respected
+[ ] UI implemented
+[ ] Error states implemented
+[ ] Loading states implemented
+[ ] Empty states implemented
+[ ] Security checked
+[ ] Accessibility checked
+[ ] Tests added
+[ ] Build passes
+[ ] Diff reviewed
+[ ] Documentation updated
+```
+
+---
+
+# 109. Screen Completion Checklist
+
+Every AEGIS screen should eventually satisfy:
+
+```text
+[ ] Correct route
+[ ] Correct information hierarchy
+[ ] Correct data
+[ ] Correct components
+[ ] Correct states
+[ ] Correct interactions
+[ ] Correct navigation
+[ ] Correct API integration
+[ ] Correct global state behavior
+[ ] Error handling
+[ ] Loading behavior
+[ ] Empty behavior
+[ ] Accessibility
+[ ] Responsive behavior
+[ ] Telemetry
+[ ] Tests
+```
+
+---
+
+# 110. System Completion Checklist
+
+The system is not complete until:
+
+```text
+[ ] 13 screens implemented
+[ ] Cross-screen navigation works
+[ ] Global state works
+[ ] Domain state works
+[ ] Data contracts implemented
+[ ] APIs integrated
+[ ] Authentication works
+[ ] Authorization works
+[ ] Audit trail works
+[ ] AI intelligence boundary works
+[ ] AI evaluation exists
+[ ] Observability works
+[ ] Threat model addressed
+[ ] Test suite passes
+[ ] Deployment works
+[ ] Stakeholder workflows validated
+```
+
+---
+
+# 111. Repository Health Indicators
+
+A healthy repository should exhibit:
+
+```text
+clear boundaries
+predictable naming
+small components
+explicit state
+validated data
+centralized services
+strong tests
+minimal duplication
+documented decisions
+controlled dependencies
+```
+
+---
+
+# 112. Repository Warning Signs
+
+Immediate investigation is required if the repository develops:
+
+```text
+huge components
+duplicate domain logic
+duplicate API calls
+大量 hardcoded data
+many "temporary" files
+untyped data
+ignored test failures
+AI-generated dead code
+unused dependencies
+unclear state ownership
+screens implementing business logic
+```
+
+---
+
+# 113. The AI Agent Mental Model
+
+AI agents should be treated as:
+
+> **high-speed junior-to-senior implementation collaborators operating under architectural supervision.**
+
+They are powerful.
+
+They are not infallible.
+
+They optimize toward the prompt.
+
+Therefore:
+
+> **The quality of the constraints determines the quality of the output.**
+
+---
+
+# 114. Agent Trust Model
+
+Trust should increase according to evidence:
+
+```text
+new agent
+ ↓
+small task
+ ↓
+successful test
+ ↓
+review
+ ↓
+larger task
+ ↓
+consistent performance
+ ↓
+greater autonomy
+```
+
+Never grant maximum autonomy immediately.
+
+---
+
+# 115. Autonomy Levels
+
+### Level 0
+
+Read-only.
+
+### Level 1
+
+Plan only.
+
+### Level 2
+
+Small implementation.
+
+### Level 3
+
+Feature implementation.
+
+### Level 4
+
+Subsystem implementation.
+
+### Level 5
+
+Architecture proposal.
+
+Level 5 still requires human approval.
+
+---
+
+# 116. Production Agent Restriction
+
+AI agents should not receive unrestricted production access simply because they can technically connect to it.
+
+Production operations require controlled authorization.
+
+---
+
+# 117. Human Override
+
+A human must be able to stop AI-driven implementation.
+
+No automated loop should be allowed to continuously:
+
+```text
+modify
+test
+modify
+deploy
+```
+
+without appropriate gates.
+
+---
+
+# 118. Cost Control
+
+AI usage should be optimized.
+
+Use:
+
+```text
+small models
+for
+small bounded tasks
+```
+
+and stronger models for:
+
+```text
+architecture
+complex debugging
+cross-system reasoning
+```
+
+Do not waste expensive reasoning on trivial formatting.
+
+---
+
+# 119. Context Cost Control
+
+Do not repeatedly send enormous documents when only one section matters.
+
+Use:
+
+```text
+relevant architecture
++
+specific task
++
+repository state
+```
+
+---
+
+# 120. Tool Selection Matrix
+
+| Task | Preferred Tool |
+|---|---|
+| Research | ChatGPT |
+| Source discovery | ChatGPT |
+| Architecture synthesis | ChatGPT + Claude |
+| Architecture challenge | Claude |
+| UX exploration | v0 |
+| High-fidelity prototype | v0 |
+| Repository inspection | OpenCode |
+| Implementation | OpenCode |
+| Refactoring | OpenCode + Claude review |
+| Debugging | OpenCode + Claude |
+| Testing | OpenCode |
+| AI evaluation design | ChatGPT + Claude |
+| Final architectural decision | Human |
+| Source control | Git |
+
+---
+
+# 121. The AEGIS Build Loop
+
+For every major capability:
+
+```text
+RESEARCH
+   ↓
+SPECIFY
+   ↓
+ARCHITECT
+   ↓
+REVIEW
+   ↓
+DESIGN
+   ↓
+IMPLEMENT
+   ↓
+TEST
+   ↓
+REVIEW
+   ↓
+DOCUMENT
+   ↓
+CHECKPOINT
+```
+
+---
+
+# 122. Never Skip the Specification Layer
+
+If a capability is too vague to specify, it is too vague to implement.
+
+Therefore:
+
+```text
+vague idea
+ ↓
+clarify
+ ↓
+specification
+ ↓
+implementation
+```
+
+---
+
+# 123. Never Skip the Validation Layer
+
+If a capability cannot be tested or evaluated, the team does not yet know whether it works.
+
+Therefore:
+
+```text
+implementation
+ ↓
+validation criteria
+ ↓
+test
+```
+
+---
+
+# 124. Repository Constitution Rule
+
+When a new AI agent joins the project:
+
+```text
+AGENT
+ ↓
+READ CONSTITUTION
+ ↓
+READ AGENT RULES
+ ↓
+READ PROJECT STATE
+ ↓
+READ RELEVANT ARCHITECTURE
+ ↓
+WORK
+```
+
+---
+
+# 125. Final Repository Law
+
+The following rule overrides convenience:
+
+> **No implementation shortcut is acceptable if it creates hidden architectural debt, weakens security, corrupts state integrity, destroys auditability, or makes future reasoning harder.**
+
+---
+
+# 126. Final AI Agent Law
+
+Every AI agent working on AEGIS must follow:
+
+```text
+READ
+UNDERSTAND
+PLAN
+IMPLEMENT
+VALIDATE
+REPORT
+```
+
+Never:
+
+```text
+GUESS
+BUILD
+HIDE
+```
+
+---
+
+# 127. Final AEGIS Repository Constitution
+
+AEGIS will be built according to the following permanent principles:
+
+```text
+1. Architecture before implementation.
+
+2. Requirements before features.
+
+3. Contracts before integrations.
+
+4. Domain before UI logic.
+
+5. Explicit state before implicit state.
+
+6. Validated data before trusted data.
+
+7. Security by architecture.
+
+8. Auditability by design.
+
+9. Observability by design.
+
+10. Testing throughout development.
+
+11. AI under controlled authority.
+
+12. Human approval for consequential decisions.
+
+13. Small changes over uncontrolled rewrites.
+
+14. One source of truth per critical concept.
+
+15. No invented requirements.
+
+16. No silent architectural changes.
+
+17. No fake success.
+
+18. No hidden failures.
+
+19. No secrets in the repository.
+
+20. No production behavior without validation.
+
+21. No confusing simulation with execution.
+
+22. No treating AI output as truth without verification.
+
+23. No allowing tools to redefine the system independently.
+
+24. The repository is the durable memory of AEGIS.
+
+25. AEGIS must remain understandable by a new engineer entering the project years later.
+```
+
+---
+
+# 128. Final Statement
+
+AEGIS should not depend on one developer remembering everything.
+
+It should not depend on one AI remembering everything.
+
+It should not depend on one conversation surviving forever.
+
+The architecture, repository, tests, contracts, decisions, prompts, and implementation must collectively preserve the system's intelligence.
+
+The goal is therefore:
+
+```text
+HUMAN INTENT
+      ↓
+ARCHITECTURE
+      ↓
+REPOSITORY CONSTITUTION
+      ↓
+AI AGENTS
+      ↓
+IMPLEMENTATION
+      ↓
+TESTS
+      ↓
+VALIDATION
+      ↓
+AEGIS
+```
+
+The AI agents are replaceable.
+
+The architecture is controlled.
+
+The repository is durable.
+
+The tests provide evidence.
+
+The human remains accountable for the final system.
+
+# END OF DOCUMENT 18
