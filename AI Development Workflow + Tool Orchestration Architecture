@@ -1,0 +1,3026 @@
+# AEGIS
+
+# Document 17 — AI Development Workflow + Tool Orchestration Architecture
+
+**System:** AEGIS  
+**Document:** 17 — AI Development Workflow + Tool Orchestration Architecture  
+**Version:** 1.0  
+**Status:** Master AI Engineering Workflow  
+**Purpose:** Define exactly how humans, AI systems, development tools, design tools, documentation, testing, and source control collaborate to build AEGIS without architectural drift, hallucination, duplication, or uncontrolled implementation.
+
+---
+
+# 01. Purpose
+
+AEGIS is being developed with multiple AI tools.
+
+This creates enormous leverage.
+
+It also creates a major engineering risk.
+
+If ChatGPT, Claude, v0, OpenCode, and other tools are allowed to independently interpret the project, AEGIS can quickly become:
+
+```text
+different architectures
+different terminology
+different state models
+different components
+different assumptions
+different implementations
+```
+
+This document prevents that.
+
+The fundamental rule is:
+
+> **AEGIS has one architecture and multiple AI workers.**
+
+The AI tools do not collectively define AEGIS.
+
+The approved AEGIS architecture defines AEGIS.
+
+---
+
+# 02. Core Principle
+
+The human project owner controls the system.
+
+The architecture documents control the technical truth.
+
+AI tools accelerate specific parts of the workflow.
+
+Therefore:
+
+```text
+HUMAN
+  ↓
+ARCHITECTURE
+  ↓
+AI SPECIALISTS
+  ↓
+IMPLEMENTATION
+  ↓
+VALIDATION
+  ↓
+HUMAN APPROVAL
+```
+
+Not:
+
+```text
+CHATGPT
+CLAUDE
+v0
+OPENCODE
+    ↓
+different interpretations
+    ↓
+conflicting application
+```
+
+---
+
+# 03. AEGIS AI Operating Model
+
+AEGIS uses a **specialized AI orchestration model**.
+
+Each tool receives a bounded responsibility.
+
+| Tool | Primary Role | Authority |
+|---|---|---|
+| ChatGPT | Research, synthesis, specification, critique | Advisory |
+| Claude | Architecture reasoning, decomposition, review | Advisory |
+| v0 | High-fidelity UI exploration | Visual |
+| OpenCode | Repository implementation | Execution |
+| Git | Source control and history | Authoritative code history |
+| Automated Tests | Behavioral verification | Validation |
+| Human Owner | Final product and architecture authority | Final authority |
+
+No AI tool has unilateral authority over the project.
+
+---
+
+# 04. Human Authority
+
+The human project owner is responsible for:
+
+```text
+product direction
+stakeholder interpretation
+architecture approval
+scope approval
+risk acceptance
+AI output approval
+major technology decisions
+release approval
+```
+
+AI can recommend.
+
+AI cannot silently decide.
+
+---
+
+# 05. Architecture Authority
+
+The architecture documents are the primary technical source of truth.
+
+The approved documents are:
+
+```text
+01 — Master Architecture
+02 — Domain Model + Global State Architecture
+03 — User Flow + Operational Journey Architecture
+04 — Functional Requirements + 13 Screen Master Specification
+05 — Interaction + State Transition Specification
+06 — Data Architecture + Data Contracts
+07 — API Architecture + Service Contracts
+08 — Frontend + Application Architecture
+09 — Design System + UI Component Architecture
+10 — Security + Authentication + Authorization + Audit Architecture
+11 — AI Intelligence + Decision Support Architecture
+12 — Observability + Telemetry Architecture
+13 — Threat Modeling + Risk Architecture
+14 — Testing + Quality Assurance Architecture
+15 — Infrastructure + Deployment Architecture
+16 — Development + Implementation Architecture
+17 — AI Development Workflow + Tool Orchestration Architecture
+```
+
+---
+
+# 06. Authority Precedence
+
+If two sources disagree:
+
+```text
+Approved Architecture
+        ↓
+Approved Requirement
+        ↓
+Approved Contract
+        ↓
+Implementation
+        ↓
+AI Suggestion
+```
+
+AI-generated code has the lowest architectural authority.
+
+---
+
+# 07. The AEGIS AI Pipeline
+
+The complete workflow is:
+
+```text
+RESEARCH
+   ↓
+SYNTHESIS
+   ↓
+ARCHITECTURE
+   ↓
+SPECIFICATION
+   ↓
+VISUALIZATION
+   ↓
+IMPLEMENTATION
+   ↓
+TESTING
+   ↓
+REVIEW
+   ↓
+INTEGRATION
+   ↓
+VALIDATION
+   ↓
+RELEASE
+```
+
+Different tools operate at different stages.
+
+---
+
+# 08. Tool Orchestration Map
+
+```text
+                  HUMAN
+                    │
+                    ▼
+               CHATGPT
+        Research / Synthesis
+                    │
+                    ▼
+                CLAUDE
+      Architecture / Reasoning
+                    │
+                    ▼
+             AEGIS DOCUMENTS
+                    │
+          ┌─────────┴─────────┐
+          ▼                   ▼
+         v0               OpenCode
+    Visual Design       Engineering
+          │                   │
+          └─────────┬─────────┘
+                    ▼
+                  GIT
+                    │
+                    ▼
+                 TESTS
+                    │
+                    ▼
+          REVIEW + VALIDATION
+                    │
+                    ▼
+                 RELEASE
+```
+
+---
+
+# 09. ChatGPT Role
+
+ChatGPT functions primarily as the:
+
+> **Research, synthesis, specification, and strategic reasoning layer.**
+
+Use ChatGPT for:
+
+```text
+research
+source discovery
+comparative analysis
+requirements analysis
+stakeholder analysis
+architecture critique
+documentation
+workflow design
+UX reasoning
+system-level questioning
+risk identification
+technical investigation
+```
+
+ChatGPT should help answer:
+
+```text
+What should AEGIS do?
+Why should it do it?
+What evidence supports this?
+What are the possible approaches?
+What risks exist?
+What should be specified before implementation?
+```
+
+---
+
+# 10. ChatGPT Must Not Become
+
+ChatGPT should not become an uncontrolled:
+
+```text
+codebase generator
+architecture replacement
+clinical authority
+security authority
+regulatory authority
+```
+
+Its output must be evaluated against authoritative sources.
+
+---
+
+# 11. ChatGPT Research Protocol
+
+When research is required:
+
+```text
+QUESTION
+ ↓
+SEARCH
+ ↓
+PRIMARY / HIGH-QUALITY SOURCES
+ ↓
+CROSS-CHECK
+ ↓
+EVIDENCE
+ ↓
+INTERPRETATION
+ ↓
+AEGIS RELEVANCE
+ ↓
+DESIGN DECISION
+```
+
+Do not jump directly from:
+
+```text
+search result
+ ↓
+AEGIS requirement
+```
+
+---
+
+# 12. Research Classification
+
+Every important research finding should be classified as one of:
+
+```text
+FACT
+EVIDENCE
+STANDARD
+RECOMMENDATION
+ASSUMPTION
+DESIGN DECISION
+OPEN QUESTION
+```
+
+This prevents speculation from becoming architecture.
+
+---
+
+# 13. Claude Role
+
+Claude functions primarily as the:
+
+> **Architecture reasoning and engineering analysis layer.**
+
+Use Claude for:
+
+```text
+architecture review
+complex system decomposition
+dependency analysis
+technical tradeoffs
+large-document reasoning
+cross-document consistency
+implementation planning
+code review
+refactoring analysis
+```
+
+Claude should answer:
+
+```text
+How should this be structured?
+What dependencies exist?
+What could break?
+What is missing?
+What architectural contradiction exists?
+How should implementation be decomposed?
+```
+
+---
+
+# 14. Claude Architecture Review
+
+Before implementation of a major subsystem:
+
+```text
+Architecture
+ ↓
+Claude review
+ ↓
+Contradictions
+ ↓
+Risks
+ ↓
+Recommendations
+ ↓
+Human decision
+```
+
+Claude's recommendation does not automatically modify the architecture.
+
+---
+
+# 15. v0 Role
+
+v0 is the:
+
+> **High-fidelity visual prototyping and interface exploration layer.**
+
+Use v0 for:
+
+```text
+layout exploration
+visual hierarchy
+dashboard composition
+responsive behavior
+component visualization
+interaction prototypes
+high-fidelity interface concepts
+```
+
+---
+
+# 16. v0 Boundary
+
+v0 must not become the authority for:
+
+```text
+database design
+domain modeling
+API architecture
+security
+authentication
+authorization
+global state architecture
+AI decision logic
+clinical protocols
+```
+
+v0 designs the interface.
+
+It does not define the system behind the interface.
+
+---
+
+# 17. v0 Input
+
+A v0 request should contain:
+
+```text
+AEGIS visual direction
+screen specification
+design tokens
+component requirements
+layout requirements
+interaction requirements
+states
+responsive requirements
+```
+
+The prompt should not ask v0 to invent missing architecture.
+
+---
+
+# 18. OpenCode Role
+
+OpenCode is the:
+
+> **Primary repository implementation and engineering execution layer.**
+
+OpenCode performs:
+
+```text
+file creation
+implementation
+integration
+refactoring
+test creation
+bug fixing
+dependency installation
+configuration
+database implementation
+API implementation
+frontend implementation
+```
+
+OpenCode is where architecture becomes executable software.
+
+---
+
+# 19. OpenCode Authority Boundary
+
+OpenCode must not independently redefine:
+
+```text
+domain architecture
+state architecture
+API contracts
+database architecture
+security architecture
+AI architecture
+screen registry
+design system
+```
+
+If implementation reveals a problem:
+
+```text
+STOP
+ ↓
+REPORT
+ ↓
+ANALYZE
+ ↓
+DECIDE
+ ↓
+UPDATE ARCHITECTURE
+ ↓
+IMPLEMENT
+```
+
+---
+
+# 20. Git Role
+
+Git is the:
+
+> **Version control and recovery mechanism.**
+
+Every major implementation phase should have a stable checkpoint.
+
+Conceptually:
+
+```text
+Architecture checkpoint
+        ↓
+Foundation checkpoint
+        ↓
+UI checkpoint
+        ↓
+Domain checkpoint
+        ↓
+API checkpoint
+        ↓
+Operational checkpoint
+        ↓
+Testing checkpoint
+        ↓
+Release checkpoint
+```
+
+---
+
+# 21. Git as Safety Net
+
+Never allow an AI coding agent to make large uncontrolled changes without a recoverable Git state.
+
+Before major AI work:
+
+```text
+commit
+ ↓
+AI implementation
+ ↓
+inspect diff
+ ↓
+test
+ ↓
+accept / reject
+```
+
+---
+
+# 22. Testing Role
+
+Testing is not the final stage.
+
+Testing exists continuously.
+
+```text
+implementation
+ ↓
+test
+ ↓
+fix
+ ↓
+test
+ ↓
+integrate
+```
+
+Tests become an executable expression of architectural intent.
+
+---
+
+# 23. The AEGIS AI Context System
+
+The biggest source of AI mistakes is insufficient context.
+
+Every AI session must receive a controlled context package.
+
+The context package should contain:
+
+```text
+AEGIS identity
+current objective
+relevant architecture documents
+current implementation state
+constraints
+files in scope
+files out of scope
+acceptance criteria
+tests required
+```
+
+---
+
+# 24. Context Must Be Bounded
+
+Do not dump every AEGIS document into every prompt.
+
+This creates context noise.
+
+Instead:
+
+```text
+GLOBAL CONTEXT
++
+TASK-SPECIFIC CONTEXT
++
+CURRENT REPOSITORY STATE
+```
+
+---
+
+# 25. Global AEGIS Context
+
+Every major AI engineering session should know:
+
+```text
+AEGIS purpose
+AEGIS audience
+AEGIS biological-resilience methodology
+visual direction
+system principles
+architecture authority
+implementation philosophy
+safety boundaries
+```
+
+---
+
+# 26. Task Context
+
+Then provide only the documents relevant to the task.
+
+For example, implementing a Threat Intelligence feature may require:
+
+```text
+02 Domain Model
+04 Screen Specification
+05 State Transitions
+06 Data Contracts
+07 API Contracts
+08 Frontend Architecture
+09 Design System
+11 AI Intelligence
+14 Testing
+```
+
+It may not need the full infrastructure architecture.
+
+---
+
+# 27. Repository Context
+
+OpenCode should inspect the actual repository before modifying it.
+
+Required sequence:
+
+```text
+inspect
+ ↓
+understand
+ ↓
+locate
+ ↓
+plan
+ ↓
+implement
+```
+
+Never:
+
+```text
+prompt
+ ↓
+immediately write files
+```
+
+---
+
+# 28. AI Session Types
+
+AEGIS AI work should be categorized into five session types.
+
+## Type A — Research
+
+Purpose:
+
+```text
+discover information
+```
+
+Primary tool:
+
+```text
+ChatGPT
+```
+
+---
+
+## Type B — Architecture
+
+Purpose:
+
+```text
+define or evaluate system structure
+```
+
+Primary tools:
+
+```text
+ChatGPT
+Claude
+```
+
+---
+
+## Type C — Design
+
+Purpose:
+
+```text
+visualize interface
+```
+
+Primary tool:
+
+```text
+v0
+```
+
+---
+
+## Type D — Implementation
+
+Purpose:
+
+```text
+modify repository
+```
+
+Primary tool:
+
+```text
+OpenCode
+```
+
+---
+
+## Type E — Validation
+
+Purpose:
+
+```text
+determine whether implementation satisfies architecture
+```
+
+Tools:
+
+```text
+tests
+ChatGPT
+Claude
+human review
+```
+
+---
+
+# 29. Never Mix Session Types Carelessly
+
+A research session should not suddenly become:
+
+```text
+"and now rewrite the application."
+```
+
+An implementation session should not suddenly become:
+
+```text
+"let's redesign the architecture."
+```
+
+When a new architectural question emerges:
+
+```text
+pause implementation
+ ↓
+architecture session
+ ↓
+decision
+ ↓
+return to implementation
+```
+
+---
+
+# 30. The AEGIS Change Protocol
+
+Any meaningful change follows:
+
+```text
+CHANGE REQUEST
+      ↓
+IMPACT ANALYSIS
+      ↓
+ARCHITECTURE REVIEW
+      ↓
+DECISION
+      ↓
+DOCUMENT UPDATE
+      ↓
+IMPLEMENTATION
+      ↓
+TEST UPDATE
+      ↓
+VALIDATION
+```
+
+---
+
+# 31. Change Classification
+
+Changes are classified as:
+
+### Level 0 — Cosmetic
+
+Examples:
+
+```text
+spacing
+minor typography
+non-functional visual adjustments
+```
+
+Can usually proceed without architecture review.
+
+### Level 1 — Local Functional
+
+Examples:
+
+```text
+filter behavior
+component interaction
+local UI state
+```
+
+Requires relevant specification review.
+
+### Level 2 — Cross-System
+
+Examples:
+
+```text
+new API
+new state transition
+new domain object
+```
+
+Requires architecture review.
+
+### Level 3 — Architectural
+
+Examples:
+
+```text
+database change
+authentication change
+domain restructuring
+AI architecture change
+infrastructure change
+```
+
+Requires explicit architecture approval.
+
+---
+
+# 32. AI Escalation Rule
+
+AI must escalate when:
+
+```text
+requirements conflict
+architecture conflicts
+data contract is missing
+state transition is ambiguous
+security implications are unclear
+clinical workflow is uncertain
+stakeholder requirement is unclear
+```
+
+Preferred output:
+
+```text
+BLOCKED — clarification required.
+```
+
+Not invented behavior.
+
+---
+
+# 33. The No-Hallucination Protocol
+
+When an AI does not know:
+
+```text
+UNKNOWN
+```
+
+When a requirement is missing:
+
+```text
+UNSPECIFIED
+```
+
+When architecture conflicts:
+
+```text
+CONFLICT
+```
+
+When external evidence is insufficient:
+
+```text
+INSUFFICIENT EVIDENCE
+```
+
+These are valid engineering states.
+
+---
+
+# 34. AI Assumption Register
+
+Any temporary assumption must be recorded.
+
+Example:
+
+```text
+ASSUMPTION-001
+Question:
+Which external pathogen sequencing service will be used?
+
+Current assumption:
+Synthetic adapter during MVP.
+
+Status:
+Temporary.
+
+Owner:
+Human project owner.
+
+Review:
+Before external integration.
+```
+
+---
+
+# 35. AI Output Classification
+
+Every major AI output should be mentally categorized as:
+
+```text
+AUTHORITATIVE
+PROPOSED
+GENERATED
+UNVERIFIED
+REJECTED
+```
+
+Only approved information becomes architecture.
+
+---
+
+# 36. AEGIS Prompt Architecture
+
+AI prompts should use a standard structure.
+
+```text
+ROLE
+CONTEXT
+AUTHORITATIVE DOCUMENTS
+CURRENT STATE
+TASK
+REQUIREMENTS
+CONSTRAINTS
+SCOPE
+NON-GOALS
+ACCEPTANCE CRITERIA
+VALIDATION
+OUTPUT FORMAT
+```
+
+---
+
+# 37. Standard OpenCode Prompt
+
+Use this structure:
+
+```text
+You are implementing AEGIS.
+
+ROLE
+You are the implementation engineer working inside the existing AEGIS repository.
+
+SYSTEM
+AEGIS is a high-stakes healthcare and biosecurity decision-support system.
+
+AUTHORITATIVE DOCUMENTS
+[Relevant documents]
+
+CURRENT REPOSITORY STATE
+[Current implementation]
+
+TASK
+[One bounded task]
+
+REQUIREMENTS
+[Exact requirements]
+
+STATE REQUIREMENTS
+[State transitions]
+
+DATA REQUIREMENTS
+[Data contracts]
+
+API REQUIREMENTS
+[Service contracts]
+
+UI REQUIREMENTS
+[Screen/component requirements]
+
+IN SCOPE
+[Files/features]
+
+OUT OF SCOPE
+[Files/features]
+
+CONSTRAINTS
+Do not invent requirements.
+Do not redesign architecture.
+Do not modify unrelated systems.
+Do not add dependencies without justification.
+Do not remove existing behavior without explicit reason.
+
+ACCEPTANCE CRITERIA
+[Measurable criteria]
+
+TESTS
+[Required tests]
+
+VALIDATION
+[Commands]
+
+If the architecture or requirements are ambiguous, stop and report the ambiguity instead of guessing.
+```
+
+---
+
+# 38. Standard Claude Architecture Prompt
+
+Use this structure:
+
+```text
+You are reviewing the AEGIS architecture.
+
+SYSTEM
+AEGIS is a high-stakes healthcare and biosecurity decision-support system.
+
+AUTHORITATIVE DOCUMENTS
+[Documents]
+
+QUESTION
+[Architecture question]
+
+CURRENT DESIGN
+[Current design]
+
+ANALYZE
+1. correctness
+2. consistency
+3. dependencies
+4. failure modes
+5. scalability
+6. security
+7. maintainability
+8. implementation complexity
+
+Do not silently redesign the system.
+
+Separate:
+FACTS
+RISKS
+ASSUMPTIONS
+RECOMMENDATIONS
+
+End with:
+RECOMMENDATION
+OPEN QUESTIONS
+ARCHITECTURAL IMPACT
+```
+
+---
+
+# 39. Standard ChatGPT Research Prompt
+
+Use:
+
+```text
+You are researching information for AEGIS.
+
+RESEARCH QUESTION
+[Question]
+
+PURPOSE
+[Why AEGIS needs this information]
+
+SEARCH REQUIREMENTS
+Prefer primary, authoritative, current sources.
+
+DISTINGUISH
+FACT
+EVIDENCE
+INTERPRETATION
+ASSUMPTION
+
+DO NOT
+invent missing information
+turn speculation into requirements
+claim clinical validity without evidence
+
+OUTPUT
+1. Findings
+2. Evidence
+3. Relevance to AEGIS
+4. Risks
+5. Open questions
+6. Recommended design implications
+```
+
+---
+
+# 40. Standard v0 Prompt
+
+Use:
+
+```text
+Design a high-fidelity AEGIS interface.
+
+SYSTEM CONTEXT
+AEGIS is a high-stakes healthcare and biosecurity decision-support platform.
+
+VISUAL DIRECTION
+Minimalist tactical HUD.
+High-density telemetry.
+Clinical authority.
+Deep Obsidian.
+Surgical White.
+Antigen Amber for alerts.
+Avoid gaming aesthetics.
+
+SCREEN
+[Exact screen]
+
+PURPOSE
+[Purpose]
+
+INFORMATION HIERARCHY
+[Hierarchy]
+
+COMPONENTS
+[Components]
+
+STATES
+[Loading / empty / normal / alert / error / etc.]
+
+INTERACTIONS
+[Interactions]
+
+CONSTRAINTS
+Do not invent domain logic.
+Do not invent API behavior.
+Do not introduce unrelated screens.
+Use the provided information architecture.
+```
+
+---
+
+# 41. Design-to-Code Handoff
+
+v0 output must not be blindly copied into OpenCode.
+
+The handoff process is:
+
+```text
+v0
+ ↓
+visual result
+ ↓
+human review
+ ↓
+extract approved UI behavior
+ ↓
+map to AEGIS design system
+ ↓
+map to screen specification
+ ↓
+OpenCode
+ ↓
+production implementation
+```
+
+---
+
+# 42. No Screenshot-Driven Engineering
+
+A screenshot is not an architecture.
+
+Therefore:
+
+```text
+screenshot
+ ≠
+component contract
+```
+
+and:
+
+```text
+visual design
+ ≠
+business logic
+```
+
+---
+
+# 43. OpenCode Preflight
+
+Before each implementation task:
+
+```text
+1. Read task.
+2. Read relevant architecture documents.
+3. Inspect repository.
+4. Locate existing abstractions.
+5. Determine dependencies.
+6. Create implementation plan.
+7. Identify risks.
+8. Implement.
+9. Test.
+10. Inspect diff.
+11. Report result.
+```
+
+---
+
+# 44. OpenCode Planning Requirement
+
+For non-trivial tasks, OpenCode should first produce a concise plan.
+
+Example:
+
+```text
+PLAN
+
+1. Add domain type.
+2. Add state transition.
+3. Add API contract.
+4. Add service implementation.
+5. Add UI integration.
+6. Add tests.
+7. Run validation.
+```
+
+Then implementation begins.
+
+---
+
+# 45. Never Ask OpenCode to "Make It Perfect"
+
+Avoid vague prompts:
+
+```text
+make AEGIS perfect
+finish the dashboard
+make it production ready
+fix everything
+build all remaining screens
+```
+
+These are dangerous because the AI must invent the meaning of "perfect."
+
+Use bounded tasks.
+
+---
+
+# 46. Better Task
+
+Instead:
+
+```text
+Implement the Global Monitoring anomaly state transition defined in Document 05.
+
+Do not modify other screens.
+
+The transition is:
+
+NORMAL → ANOMALY_DETECTED
+
+Requirements:
+...
+```
+
+This is executable.
+
+---
+
+# 47. Implementation Loop
+
+Each task follows:
+
+```text
+TASK
+ ↓
+PLAN
+ ↓
+IMPLEMENT
+ ↓
+TEST
+ ↓
+DIFF REVIEW
+ ↓
+ACCEPT / REJECT
+```
+
+---
+
+# 48. Diff Review
+
+After AI implementation, inspect:
+
+```text
+files changed
+lines changed
+dependencies added
+architecture affected
+tests added
+unrelated modifications
+```
+
+If unrelated files changed:
+
+```text
+investigate before accepting
+```
+
+---
+
+# 49. AI Refactoring Protocol
+
+Refactoring is separate from feature development.
+
+Do not combine:
+
+```text
+new feature
++
+massive refactor
+```
+
+unless explicitly required.
+
+Recommended:
+
+```text
+Feature
+ ↓
+Tests
+ ↓
+Stable checkpoint
+ ↓
+Refactor
+ ↓
+Tests
+```
+
+---
+
+# 50. Multi-AI Handoff Protocol
+
+When moving from one AI tool to another:
+
+```text
+Tool A
+ ↓
+approved artifact
+ ↓
+repository/document
+ ↓
+Tool B
+```
+
+Do not rely on copying an entire conversational history.
+
+The repository and architecture documents should carry context.
+
+---
+
+# 51. ChatGPT → Claude
+
+Use when:
+
+```text
+research is complete
+architecture needs deeper review
+complex tradeoff exists
+```
+
+Handoff package:
+
+```text
+research findings
+sources
+relevant architecture
+specific question
+```
+
+---
+
+# 52. Claude → v0
+
+Use when:
+
+```text
+architecture
+screen behavior
+information hierarchy
+design requirements
+```
+
+are sufficiently defined.
+
+Handoff package:
+
+```text
+screen specification
+design system
+visual direction
+states
+interactions
+```
+
+---
+
+# 53. v0 → OpenCode
+
+Use when:
+
+```text
+visual direction is approved
+```
+
+Handoff package:
+
+```text
+approved visual design
+screen specification
+design tokens
+component mapping
+interaction behavior
+state requirements
+```
+
+---
+
+# 54. Claude → OpenCode
+
+Use when:
+
+```text
+architecture is approved
+implementation plan exists
+```
+
+Handoff package:
+
+```text
+architecture decision
+implementation plan
+constraints
+contracts
+acceptance criteria
+```
+
+---
+
+# 55. OpenCode → ChatGPT / Claude
+
+Use when:
+
+```text
+implementation exists
+but requires review
+```
+
+Handoff package:
+
+```text
+changed files
+diff
+tests
+errors
+architecture references
+specific question
+```
+
+---
+
+# 56. Git → All AI Tools
+
+Git provides the stable state.
+
+Before asking an AI to modify the project:
+
+```text
+know current branch
+know current commit
+know working tree state
+```
+
+After implementation:
+
+```text
+inspect diff
+run tests
+commit if approved
+```
+
+---
+
+# 57. AEGIS Development Memory
+
+The project should maintain a compact machine-readable implementation memory.
+
+Recommended:
+
+```text
+docs/
+├── project-state.md
+├── active-work.md
+├── decisions.md
+├── known-issues.md
+├── assumptions.md
+└── changelog.md
+```
+
+These are especially useful for AI coding agents.
+
+---
+
+# 58. project-state.md
+
+Should answer:
+
+```text
+Current milestone
+Current phase
+Completed capabilities
+Active capability
+Blocked capabilities
+Known architectural issues
+Next implementation target
+```
+
+---
+
+# 59. active-work.md
+
+Should answer:
+
+```text
+Current task
+Owner
+Files being modified
+Relevant documents
+Acceptance criteria
+Current status
+Blockers
+```
+
+---
+
+# 60. decisions.md
+
+Contains important accepted decisions.
+
+Example:
+
+```text
+Decision
+Reason
+Alternatives considered
+Consequences
+Date
+```
+
+---
+
+# 61. known-issues.md
+
+Contains:
+
+```text
+bug
+severity
+affected subsystem
+reproduction
+current status
+planned fix
+```
+
+---
+
+# 62. assumptions.md
+
+Contains temporary assumptions.
+
+Each assumption must have:
+
+```text
+identifier
+description
+reason
+impact
+status
+review condition
+```
+
+---
+
+# 63. AI Context Refresh
+
+At the beginning of a major implementation session:
+
+```text
+READ
+project-state.md
+active-work.md
+relevant architecture documents
+known-issues.md
+```
+
+Then inspect the actual repository.
+
+---
+
+# 64. Context Is Not Memory
+
+Never assume:
+
+```text
+"Claude remembers what we discussed last week."
+```
+
+Never assume:
+
+```text
+"OpenCode knows what ChatGPT designed."
+```
+
+Never assume:
+
+```text
+"v0 knows the AEGIS architecture."
+```
+
+The repository must contain the truth.
+
+---
+
+# 65. The Repository Memory Principle
+
+The goal is:
+
+```text
+Conversation
+      ↓
+Decision
+      ↓
+Document
+      ↓
+Repository
+      ↓
+Code
+      ↓
+Tests
+```
+
+This converts temporary AI conversation into durable engineering knowledge.
+
+---
+
+# 66. Parallel AI Work
+
+Multiple AI tools may work in parallel only when their boundaries do not overlap.
+
+Safe:
+
+```text
+Claude → architecture review
+v0 → visual exploration
+```
+
+while:
+
+```text
+OpenCode → unrelated backend implementation
+```
+
+Potentially unsafe:
+
+```text
+Claude → redesign state architecture
+OpenCode → implement old state architecture
+```
+
+---
+
+# 67. Parallel Work Rule
+
+If two agents modify the same subsystem:
+
+```text
+STOP
+```
+
+unless the work has been explicitly partitioned.
+
+---
+
+# 68. Example Parallelization
+
+Possible:
+
+```text
+Agent A
+API contract review
+
+Agent B
+Design-system documentation
+
+Agent C
+Test fixture preparation
+```
+
+while keeping ownership boundaries clear.
+
+---
+
+# 69. AI Review Triangle
+
+For major features:
+
+```text
+          HUMAN
+         /     \
+        /       \
+   CLAUDE —— OPENCode
+```
+
+Claude reviews reasoning.
+
+OpenCode implements.
+
+Human approves.
+
+---
+
+# 70. AI Implementation Triangle
+
+For interface-heavy work:
+
+```text
+          HUMAN
+         /     \
+        /       \
+      v0 —— OPENCode
+```
+
+v0 explores visual form.
+
+OpenCode converts approved design into production code.
+
+Human ensures fidelity.
+
+---
+
+# 71. Research Triangle
+
+For uncertain technical or domain questions:
+
+```text
+        PRIMARY SOURCES
+             ↑
+             │
+         CHATGPT
+             │
+             ↓
+          CLAUDE
+             │
+             ↓
+      AEGIS DECISION
+```
+
+Do not let AI consensus substitute for evidence.
+
+---
+
+# 72. Human-in-the-Loop Gates
+
+Mandatory human gates occur at:
+
+```text
+GATE 1
+Architecture approval
+
+GATE 2
+Design approval
+
+GATE 3
+Major implementation approval
+
+GATE 4
+Security-impacting changes
+
+GATE 5
+AI behavior changes
+
+GATE 6
+Production deployment
+```
+
+---
+
+# 73. Automated Gates
+
+Automated validation should occur at:
+
+```text
+commit
+pull request
+build
+test
+deployment
+```
+
+where infrastructure permits.
+
+---
+
+# 74. AI Safety Gate
+
+Any AI-generated decision-support logic must pass:
+
+```text
+schema validation
+deterministic validation
+test validation
+security review
+human review
+```
+
+before being treated as production behavior.
+
+---
+
+# 75. AI Cannot Manufacture Clinical Authority
+
+AEGIS may support expert workflows.
+
+AI must not fabricate:
+
+```text
+clinical certainty
+pathogen identification certainty
+outbreak confirmation
+recommended intervention authority
+regulatory approval
+clinical validation
+```
+
+Uncertainty must remain visible where relevant.
+
+---
+
+# 76. Decision Support Separation
+
+The system must preserve:
+
+```text
+OBSERVATION
+    ↓
+ANALYSIS
+    ↓
+AI INSIGHT
+    ↓
+RECOMMENDATION
+    ↓
+HUMAN DECISION
+    ↓
+ACTION
+```
+
+These should not collapse into one ambiguous object.
+
+---
+
+# 77. AI Confidence
+
+Where AI-generated outputs are presented, AEGIS should distinguish:
+
+```text
+confidence
+evidence
+uncertainty
+source
+timestamp
+model
+```
+
+when applicable to the architecture.
+
+---
+
+# 78. AI Model Replacement
+
+The application should avoid coupling business logic directly to one AI provider or model.
+
+Conceptually:
+
+```text
+AEGIS Intelligence Interface
+          ↓
+Provider Adapter
+          ↓
+Model
+```
+
+This permits future model replacement.
+
+---
+
+# 79. AI Provider Failure
+
+If the AI service fails:
+
+```text
+timeout
+rate limit
+invalid output
+provider unavailable
+model unavailable
+```
+
+the application should follow the fallback behavior defined in Document 11.
+
+Never silently substitute an unapproved model.
+
+---
+
+# 80. AI Prompt Versioning
+
+Important AI prompts should be versioned.
+
+Example:
+
+```text
+prompts/
+├── threat-assessment.v1.md
+├── anomaly-summary.v1.md
+├── incident-analysis.v1.md
+└── response-support.v1.md
+```
+
+Prompts that influence system behavior should not exist only inside a developer's chat history.
+
+---
+
+# 81. AI Output Schemas
+
+AI outputs should use explicit schemas wherever they feed software.
+
+Conceptually:
+
+```text
+AI
+ ↓
+structured output
+ ↓
+schema validation
+ ↓
+application
+```
+
+Not:
+
+```text
+AI
+ ↓
+free-form text
+ ↓
+critical application logic
+```
+
+---
+
+# 82. Prompt Change Management
+
+Changing an important AI prompt should trigger:
+
+```text
+prompt diff
+ ↓
+test suite
+ ↓
+evaluation
+ ↓
+human review
+```
+
+---
+
+# 83. AI Evaluation
+
+AI features require dedicated evaluation cases.
+
+Examples:
+
+```text
+normal case
+ambiguous case
+false positive
+false negative
+missing data
+conflicting evidence
+adversarial input
+malformed output
+provider failure
+```
+
+---
+
+# 84. Model Evaluation Dataset
+
+Use controlled synthetic evaluation data for development.
+
+Do not casually use sensitive real-world healthcare information.
+
+The dataset should include expected behaviors where possible.
+
+---
+
+# 85. AI Regression Testing
+
+When the model or prompt changes:
+
+```text
+existing evaluation suite
+ ↓
+new output
+ ↓
+compare
+ ↓
+detect regressions
+```
+
+---
+
+# 86. AEGIS Golden Scenarios
+
+Create canonical scenarios.
+
+At minimum:
+
+```text
+GOLDEN-001
+Normal hospital operations
+
+GOLDEN-002
+Environmental anomaly
+
+GOLDEN-003
+Patient cluster anomaly
+
+GOLDEN-004
+Suspected outbreak
+
+GOLDEN-005
+High-threat classification
+
+GOLDEN-006
+Response recommendation
+
+GOLDEN-007
+Human rejection of recommendation
+
+GOLDEN-008
+Response execution
+
+GOLDEN-009
+Recovery
+
+GOLDEN-010
+Feedback and institutional memory
+```
+
+These become system regression scenarios.
+
+---
+
+# 87. The Golden Journey
+
+The most important test scenario is:
+
+```text
+Signal
+ ↓
+Detection
+ ↓
+Investigation
+ ↓
+Threat assessment
+ ↓
+Classification
+ ↓
+Recommendation
+ ↓
+Human decision
+ ↓
+Response
+ ↓
+Monitoring
+ ↓
+Recovery
+ ↓
+Learning
+```
+
+Every major architecture change should preserve this journey.
+
+---
+
+# 88. Development Environment
+
+Development should use:
+
+```text
+synthetic data
+local services
+test credentials
+isolated environment
+```
+
+No production secrets.
+
+---
+
+# 89. Environment Separation
+
+At minimum:
+
+```text
+development
+testing
+staging
+production
+```
+
+Each environment should have controlled configuration.
+
+---
+
+# 90. Secret Management
+
+Never put secrets inside:
+
+```text
+source code
+Git
+AI prompts
+architecture documents
+screenshots
+v0 prompts
+```
+
+Use environment or secret management mechanisms.
+
+---
+
+# 91. AI Prompt Secret Rule
+
+Never paste:
+
+```text
+API keys
+passwords
+tokens
+private credentials
+patient identifiers
+sensitive operational secrets
+```
+
+into AI tools.
+
+---
+
+# 92. External AI Data Boundary
+
+Before sending information to an external AI provider:
+
+```text
+identify data
+ ↓
+classify sensitivity
+ ↓
+remove unnecessary sensitive information
+ ↓
+verify provider policy
+ ↓
+send minimum necessary context
+```
+
+---
+
+# 93. Minimum Context Principle
+
+Give an AI agent:
+
+> **the smallest amount of information required to perform the task correctly.**
+
+This reduces:
+
+```text
+privacy risk
+context noise
+hallucination
+unintended changes
+```
+
+---
+
+# 94. Implementation Workspace
+
+OpenCode should operate primarily from the repository.
+
+The preferred flow:
+
+```text
+AEGIS repository
+ ↓
+OpenCode
+ ↓
+inspect
+ ↓
+plan
+ ↓
+modify
+ ↓
+test
+ ↓
+diff
+```
+
+---
+
+# 95. Architecture Documents in Repository
+
+The 17 architecture documents should live inside the repository.
+
+They are not merely reference material.
+
+They are part of the development system.
+
+---
+
+# 96. AI Documentation Update Rule
+
+When implementation materially changes behavior:
+
+```text
+code change
+ ↓
+determine documentation impact
+ ↓
+update affected document
+```
+
+Examples:
+
+```text
+new API
+ → Document 07
+
+new state
+ → Document 05
+
+new entity
+ → Document 02 / 06
+
+new UI pattern
+ → Document 09
+
+new security rule
+ → Document 10
+
+new AI behavior
+ → Document 11
+
+new test strategy
+ → Document 14
+```
+
+---
+
+# 97. The Documentation Graph
+
+The documents should be treated as connected.
+
+```text
+01
+ ↓
+02 → 05
+ ↓
+03 → 04
+ ↓
+06 → 07
+ ↓
+08 → 09
+ ↓
+10
+ ↓
+11
+ ↓
+12
+ ↓
+13
+ ↓
+14
+ ↓
+15
+ ↓
+16
+ ↓
+17
+```
+
+A change to an upstream document may affect multiple downstream documents.
+
+---
+
+# 98. Impact Analysis
+
+Before major changes ask:
+
+```text
+What documents depend on this?
+
+What code depends on this?
+
+What tests depend on this?
+
+What UI depends on this?
+
+What APIs depend on this?
+
+What AI behavior depends on this?
+```
+
+---
+
+# 99. The AEGIS AI Development Cycle
+
+The complete development cycle is:
+
+```text
+01 — DISCOVER
+Research the problem.
+
+02 — DEFINE
+Convert findings into requirements.
+
+03 — ARCHITECT
+Define system behavior.
+
+04 — REVIEW
+Challenge the architecture.
+
+05 — DESIGN
+Create interface.
+
+06 — IMPLEMENT
+Build the system.
+
+07 — TEST
+Verify behavior.
+
+08 — OBSERVE
+Measure runtime behavior.
+
+09 — REVIEW
+Inspect architecture and implementation.
+
+10 — VALIDATE
+Test with stakeholders.
+
+11 — DOCUMENT
+Record what changed.
+
+12 — RELEASE
+Deploy approved version.
+```
+
+---
+
+# 100. Daily Development Loop
+
+A productive AEGIS development session should look like:
+
+```text
+1. Read project state.
+2. Select ONE capability.
+3. Read relevant architecture.
+4. Inspect repository.
+5. Create implementation plan.
+6. Implement with OpenCode.
+7. Run tests.
+8. Inspect diff.
+9. Review against architecture.
+10. Commit stable work.
+11. Update project state.
+12. Select next capability.
+```
+
+---
+
+# 101. Weekly Architecture Audit
+
+At meaningful milestones:
+
+```text
+architecture
+vs
+implementation
+```
+
+should be reviewed.
+
+Ask:
+
+```text
+What has drifted?
+
+What assumptions became permanent?
+
+What architecture is obsolete?
+
+What code violates the documents?
+
+What documentation is now stale?
+```
+
+---
+
+# 102. AI Drift Audit
+
+Specifically inspect for:
+
+```text
+duplicate components
+duplicate state
+duplicate API logic
+different naming
+unused abstractions
+unapproved dependencies
+screen-specific hacks
+hard-coded data
+hidden business logic
+```
+
+---
+
+# 103. Naming Consistency
+
+AEGIS terminology must remain consistent.
+
+Do not allow different tools to create:
+
+```text
+Threat
+ThreatEvent
+ThreatAlert
+ThreatIncident
+ThreatCase
+```
+
+for the same domain concept without explicit architectural reason.
+
+The domain model is authoritative.
+
+---
+
+# 104. Component Consistency
+
+Likewise, do not allow:
+
+```text
+AlertCard
+ThreatCard
+WarningCard
+RiskCard
+```
+
+to become four implementations of the same visual pattern without justification.
+
+Use the design system.
+
+---
+
+# 105. API Consistency
+
+Do not allow frontend agents to invent endpoints such as:
+
+```text
+/get-dashboard-data
+/get-threat-screen
+/get-response-page-data
+```
+
+simply because a screen needs information.
+
+The API should represent domain capabilities.
+
+---
+
+# 106. Database Consistency
+
+Do not allow frontend convenience to dictate database structure.
+
+The database should represent:
+
+```text
+domain
+relationships
+constraints
+history
+auditability
+```
+
+not screenshots.
+
+---
+
+# 107. State Consistency
+
+Do not maintain independent conflicting versions of critical state.
+
+Avoid:
+
+```text
+component state
++
+page state
++
+global state
++
+API cache
+```
+
+all representing the same truth without a clear ownership model.
+
+Use Document 02 and Document 05.
+
+---
+
+# 108. The "Stop and Ask" Rule
+
+AI must stop when it encounters:
+
+```text
+contradictory requirements
+missing domain definition
+missing API contract
+missing state transition
+security ambiguity
+clinical ambiguity
+irreversible architectural decision
+```
+
+A question is cheaper than rebuilding the system.
+
+---
+
+# 109. The "Do Not Guess" Rule
+
+For AEGIS:
+
+> **A wrong assumption can become an architectural dependency.**
+
+Therefore:
+
+```text
+uncertainty
+ ↓
+question
+```
+
+not:
+
+```text
+uncertainty
+ ↓
+AI invention
+```
+
+---
+
+# 110. The "Smallest Safe Change" Rule
+
+When implementing:
+
+> Make the smallest change that satisfies the approved requirement.
+
+Do not optimize for maximum code generation.
+
+Optimize for minimum unnecessary change.
+
+---
+
+# 111. The "One Source of Truth" Rule
+
+For every major concept, identify one authoritative location.
+
+Examples:
+
+```text
+Domain model
+ → Document 02
+
+State transition
+ → Document 05
+
+Data contract
+ → Document 06
+
+API contract
+ → Document 07
+
+UI token
+ → Document 09
+
+Security rule
+ → Document 10
+
+AI behavior
+ → Document 11
+
+Test requirement
+ → Document 14
+```
+
+---
+
+# 112. The "Architecture Before Code" Rule
+
+When a new capability is proposed:
+
+```text
+idea
+ ↓
+requirement
+ ↓
+architecture
+ ↓
+contract
+ ↓
+implementation
+```
+
+not:
+
+```text
+idea
+ ↓
+AI code
+ ↓
+architecture discovered afterward
+```
+
+---
+
+# 113. The "Code Before AI" Rule
+
+For AI features:
+
+```text
+domain
+ ↓
+data
+ ↓
+deterministic workflow
+ ↓
+AI boundary
+ ↓
+AI implementation
+```
+
+Do not start by plugging a language model into the application.
+
+---
+
+# 114. The "UI Before Backend" Exception
+
+v0 may explore UI before backend implementation.
+
+But this is a **prototype exception**.
+
+The final production implementation must connect to:
+
+```text
+approved state
+approved API
+approved data
+approved domain
+```
+
+---
+
+# 115. Prototype vs Production
+
+Every AEGIS artifact must be classified:
+
+```text
+CONCEPT
+PROTOTYPE
+SIMULATION
+DEVELOPMENT
+STAGING
+PRODUCTION
+```
+
+Do not confuse them.
+
+---
+
+# 116. AI Prototype Rule
+
+AI-generated UI can be disposable.
+
+Production architecture cannot.
+
+Therefore:
+
+```text
+v0 output
+may be thrown away.
+
+Architecture
+must not be casually thrown away.
+```
+
+---
+
+# 117. Rebuild vs Repair
+
+If an AI-generated implementation is fundamentally inconsistent:
+
+```text
+do not endlessly patch it.
+```
+
+Assess:
+
+```text
+repair
+vs
+controlled replacement
+```
+
+Use the architecture as the decision criterion.
+
+---
+
+# 118. Technical Debt Register
+
+When temporary shortcuts are necessary:
+
+```text
+docs/technical-debt.md
+```
+
+Record:
+
+```text
+debt
+reason
+impact
+owner
+planned resolution
+```
+
+---
+
+# 119. AI Technical Debt
+
+AI-generated shortcuts must be treated like human-generated technical debt.
+
+Examples:
+
+```text
+temporary mock data
+duplicated component
+hard-coded state
+temporary adapter
+placeholder service
+```
+
+They must not become invisible permanent infrastructure.
+
+---
+
+# 120. AEGIS Release Gate
+
+A release candidate must satisfy:
+
+```text
+architecture aligned
+requirements satisfied
+13 screens integrated
+state transitions verified
+API contracts verified
+data integrity verified
+AI behavior evaluated
+security validated
+tests passing
+observability active
+deployment validated
+documentation updated
+stakeholder acceptance obtained where required
+```
+
+---
+
+# 121. Final Human Approval
+
+No AI tool can declare AEGIS production-ready.
+
+The release decision belongs to the human project owner and appropriate qualified stakeholders.
+
+---
+
+# 122. Master Tool Workflow
+
+The entire AEGIS workflow can be remembered as:
+
+```text
+CHATGPT
+Think + Research
+      ↓
+CLAUDE
+Challenge + Structure
+      ↓
+DOCUMENTS
+Define Truth
+      ↓
+v0
+Visualize
+      ↓
+OPENCODE
+Build
+      ↓
+GIT
+Checkpoint
+      ↓
+TESTS
+Verify
+      ↓
+CLAUDE / CHATGPT
+Review
+      ↓
+HUMAN
+Approve
+      ↓
+RELEASE
+```
+
+---
+
+# 123. Master Rule
+
+The tools should never be allowed to create a loop like:
+
+```text
+ChatGPT changes architecture
+ ↓
+Claude changes architecture
+ ↓
+v0 changes UX
+ ↓
+OpenCode changes architecture
+ ↓
+ChatGPT explains the new architecture
+```
+
+That is architectural chaos.
+
+Instead:
+
+```text
+Architecture
+      ↓
+Design
+      ↓
+Implementation
+      ↓
+Validation
+```
+
+---
+
+# 124. The AEGIS AI Constitution
+
+The following principles are mandatory:
+
+```text
+1. Architecture precedes implementation.
+
+2. AI accelerates engineering but does not own architecture.
+
+3. Every important AI output must be validated.
+
+4. Unknown information must remain unknown.
+
+5. AI must not invent clinical or biosecurity authority.
+
+6. The repository is the durable memory of the project.
+
+7. Architecture documents are executable guidance, not decoration.
+
+8. One domain concept must have one authoritative definition.
+
+9. One critical state must have one clear owner.
+
+10. API contracts precede API implementation.
+
+11. Data contracts precede database-dependent UI.
+
+12. UI prototypes do not define backend architecture.
+
+13. AI-generated code must be tested.
+
+14. Large uncontrolled AI changes are prohibited.
+
+15. Every consequential change must be traceable.
+
+16. Security is part of implementation, not a final patch.
+
+17. AI features require evaluation and fallback behavior.
+
+18. Synthetic data should be used during development unless appropriately authorized otherwise.
+
+19. Production deployment requires human approval.
+
+20. When uncertain, stop and ask rather than invent.
+```
+
+---
+
+# 125. Final AEGIS Operating Equation
+
+```text
+HUMAN JUDGMENT
+        +
+VERIFIED KNOWLEDGE
+        +
+ARCHITECTURAL DISCIPLINE
+        +
+SPECIALIZED AI TOOLS
+        +
+CONTROLLED IMPLEMENTATION
+        +
+AUTOMATED TESTING
+        +
+EXPERT VALIDATION
+        =
+AEGIS
+```
+
+---
+
+# 126. Final Principle
+
+The objective is not to use the maximum number of AI tools.
+
+The objective is to create a system where every tool contributes its strongest capability without being allowed to corrupt the work of another tool.
+
+AEGIS therefore operates under this principle:
+
+> **One system. One architecture. One source of truth. Multiple specialized AI workers. Human-controlled decisions. Continuous validation.**
+
+That is the operating model for the remainder of the project.
+
+# END OF DOCUMENT 17
