@@ -1,0 +1,2742 @@
+# AEGIS
+# API Architecture + Service Contracts
+
+**System:** AEGIS  
+**Document:** 07 — API Architecture + Service Contracts  
+**Version:** 1.0  
+**Status:** Master Engineering Specification  
+**Date:** August 2026  
+**Authority:** Derived from AEGIS Master Architecture, Domain Model + Global State Architecture, User Flow + Operational Journey Architecture, Functional Requirements + 13 Screen Master Specification, Interaction + State Transition Specification, and Data Architecture + Data Contracts.
+
+---
+
+# 01. Purpose
+
+This document defines the API architecture and service boundaries for AEGIS.
+
+It establishes the contract between:
+
+```text
+AEGIS FRONTEND
+      ↓
+APPLICATION/API LAYER
+      ↓
+DOMAIN SERVICES
+      ↓
+PERSISTENCE / EVENT INFRASTRUCTURE
+```
+
+It defines:
+
+1. API architectural principles
+2. API boundaries
+3. Query contracts
+4. Command contracts
+5. Service responsibilities
+6. Request/response conventions
+7. Error handling
+8. Validation
+9. Authorization boundaries
+10. State transition enforcement
+11. Real-time event contracts
+12. Idempotency
+13. Concurrency
+14. Pagination
+15. Filtering
+16. Search
+17. Audit integration
+18. Transaction boundaries
+19. Frontend integration rules
+20. AI coding-agent implementation rules
+
+The objective is simple:
+
+> **The frontend should never have to guess how AEGIS works.**
+
+---
+
+# 02. API Philosophy
+
+AEGIS is a high-stakes operational system.
+
+Therefore the API must prioritize:
+
+```text
+Correctness
+Traceability
+Consistency
+Security
+Explicitness
+Predictability
+Observability
+```
+
+before convenience.
+
+The API is not merely a transport mechanism for UI data.
+
+It is an enforcement boundary for the AEGIS domain model.
+
+---
+
+# 03. API Architectural Model
+
+The canonical request path is:
+
+```text
+USER
+ ↓
+UI
+ ↓
+APPLICATION CLIENT
+ ↓
+API
+ ↓
+AUTHENTICATION
+ ↓
+AUTHORIZATION
+ ↓
+VALIDATION
+ ↓
+APPLICATION SERVICE
+ ↓
+DOMAIN SERVICE
+ ↓
+DOMAIN RULES
+ ↓
+REPOSITORY / PERSISTENCE
+ ↓
+DOMAIN EVENT
+ ↓
+AUDIT
+ ↓
+RESPONSE
+```
+
+For real-time updates:
+
+```text
+DOMAIN CHANGE
+ ↓
+DOMAIN EVENT
+ ↓
+EVENT TRANSPORT
+ ↓
+REAL-TIME GATEWAY
+ ↓
+CONNECTED CLIENTS
+ ↓
+APPLICATION STATE
+ ↓
+UI
+```
+
+---
+
+# 04. Architectural Boundary
+
+The API must sit between the user interface and domain logic.
+
+The frontend must never directly access:
+
+```text
+database
+ORM
+database credentials
+internal service credentials
+event broker
+private infrastructure
+```
+
+The frontend communicates through approved application contracts.
+
+---
+
+# 05. API Style
+
+AEGIS will use a **resource-oriented HTTP API with explicit domain commands**.
+
+This means the API supports two major interaction categories.
+
+## Queries
+
+Retrieve information.
+
+```text
+GET
+```
+
+## Commands
+
+Request consequential state changes.
+
+```text
+POST
+```
+
+The distinction is conceptual even when both ultimately interact with persistence.
+
+---
+
+# 06. Base API Structure
+
+The canonical production structure is:
+
+```text
+/api/v1/
+```
+
+Example:
+
+```text
+/api/v1/threats
+/api/v1/events
+/api/v1/investigations
+/api/v1/risk-assessments
+```
+
+Versioning exists to protect clients from breaking contract changes.
+
+---
+
+# 07. API Resource Registry
+
+The initial canonical resource registry is:
+
+```text
+observations
+signals
+anomalies
+events
+threats
+risk-assessments
+investigations
+cases
+findings
+transmission-assessments
+containment-actions
+response-actions
+recovery-assessments
+preparedness-lessons
+resilience-gaps
+improvement-items
+research-findings
+evidence
+locations
+organizations
+actors
+notifications
+```
+
+Administrative resources are handled separately.
+
+---
+
+# 08. Service Architecture
+
+AEGIS should **not** begin as a collection of independent microservices.
+
+That would introduce unnecessary distributed-system complexity before the product has validated its domain.
+
+The preferred initial architecture is:
+
+```text
+                    AEGIS API
+                       │
+       ┌───────────────┼───────────────┐
+       ↓               ↓               ↓
+ Application       Domain          Query
+ Services          Services        Services
+       │               │               │
+       └───────────────┼───────────────┘
+                       ↓
+                  Persistence
+                       ↓
+                  Event System
+```
+
+These are logical service boundaries.
+
+They do not require separate deployable services during the first implementation.
+
+---
+
+# 09. Core Service Registry
+
+AEGIS defines the following logical services.
+
+```text
+Observation Service
+Signal Service
+Anomaly Service
+Event Service
+Threat Service
+Risk Service
+Investigation Service
+Case Service
+Finding Service
+Transmission Service
+Containment Service
+Response Service
+Recovery Service
+Preparedness Service
+Research Service
+Evidence Service
+Location Service
+Notification Service
+Audit Service
+Event/Realtime Service
+```
+
+These boundaries correspond to domain responsibilities.
+
+---
+
+# 10. Observation Service
+
+## Responsibility
+
+Manages observations entering the AEGIS domain.
+
+It is responsible for:
+
+```text
+create observation
+validate observation
+associate source
+associate location
+record observation time
+record provenance
+retrieve observations
+```
+
+It must not independently classify a threat.
+
+---
+
+# 11. Signal Service
+
+Responsible for structured signals derived from observations.
+
+Responsibilities:
+
+```text
+create signal
+associate observations
+track signal status
+retrieve signals
+```
+
+The Signal Service must preserve source lineage.
+
+---
+
+# 12. Anomaly Service
+
+Responsible for anomalies requiring operational attention.
+
+Responsibilities:
+
+```text
+create anomaly
+associate signals
+classify anomaly severity/context
+track anomaly status
+retrieve anomaly
+```
+
+It does not independently declare a confirmed threat.
+
+---
+
+# 13. Event Service
+
+Responsible for operational events.
+
+Responsibilities:
+
+```text
+create event
+retrieve event
+update event state
+associate threats
+associate evidence
+associate locations
+```
+
+---
+
+# 14. Threat Service
+
+Responsible for threat-domain operations.
+
+Responsibilities include:
+
+```text
+create threat context
+retrieve threat
+update classification
+update confidence
+update status
+associate evidence
+associate investigations
+associate risk assessments
+```
+
+The Threat Service must enforce threat state transitions.
+
+---
+
+# 15. Risk Service
+
+Responsible for risk assessments.
+
+Responsibilities:
+
+```text
+create assessment
+retrieve assessment
+update assessment
+retrieve assessment history
+associate evidence
+```
+
+Risk assessments must be immutable historical records once finalized where required by governance.
+
+A new assessment may supersede an older one rather than rewriting it.
+
+---
+
+# 16. Investigation Service
+
+Responsible for investigations.
+
+Responsibilities:
+
+```text
+start investigation
+retrieve investigation
+assign actors
+add hypotheses
+add findings
+associate evidence
+update investigation status
+complete investigation
+```
+
+---
+
+# 17. Case Service
+
+Responsible for case-level operational tracking.
+
+Responsibilities:
+
+```text
+create case
+retrieve case
+update case
+associate event
+associate evidence
+associate findings
+manage case relationships
+```
+
+---
+
+# 18. Finding Service
+
+Responsible for findings generated during investigation.
+
+Responsibilities:
+
+```text
+create finding
+retrieve finding
+update finding where permitted
+associate evidence
+associate investigation
+```
+
+A finding must retain traceability to its evidence.
+
+---
+
+# 19. Transmission Service
+
+Responsible for structured transmission assessments.
+
+Responsibilities:
+
+```text
+create assessment
+update assessment
+associate source
+associate target
+associate pathway
+associate evidence
+update confidence
+```
+
+The service must preserve uncertainty.
+
+---
+
+# 20. Containment Service
+
+Responsible for containment actions.
+
+Responsibilities:
+
+```text
+propose containment
+retrieve containment
+authorize containment
+execute containment
+verify containment
+cancel containment
+record outcome
+```
+
+Containment actions must follow the canonical state machine.
+
+---
+
+# 21. Response Service
+
+Responsible for broader response activities.
+
+Responsibilities:
+
+```text
+create response
+start response
+update response
+complete response
+record outcome
+```
+
+A response may contain or reference multiple containment actions.
+
+---
+
+# 22. Recovery Service
+
+Responsible for recovery assessments.
+
+Responsibilities:
+
+```text
+start recovery assessment
+record observations
+associate evidence
+evaluate recovery
+confirm recovery
+```
+
+Recovery confirmation must not be equivalent to manually changing a status field.
+
+---
+
+# 23. Preparedness Service
+
+Responsible for institutional learning.
+
+Responsibilities:
+
+```text
+create lesson
+identify resilience gap
+create improvement item
+update improvement progress
+retrieve preparedness history
+```
+
+The service closes the biological feedback loop.
+
+---
+
+# 24. Research Service
+
+Responsible for research findings.
+
+Responsibilities:
+
+```text
+create research finding
+retrieve research finding
+associate source
+associate evidence
+associate operational entities
+```
+
+Research information must remain distinct from operational facts.
+
+---
+
+# 25. Evidence Service
+
+Responsible for evidence metadata and provenance.
+
+Responsibilities:
+
+```text
+register evidence
+retrieve evidence
+associate evidence
+record provenance
+record integrity metadata
+```
+
+The Evidence Service should not determine the operational conclusion derived from evidence.
+
+---
+
+# 26. Notification Service
+
+Responsible for user-facing operational notifications.
+
+Responsibilities:
+
+```text
+create notification
+retrieve notifications
+mark notification read
+dismiss notification where permitted
+```
+
+Notifications should reference domain events or entities.
+
+---
+
+# 27. Audit Service
+
+Responsible for immutable or append-oriented audit records.
+
+Responsibilities:
+
+```text
+record consequential action
+record actor
+record entity
+record previous state
+record resulting state
+record reason
+record timestamp
+```
+
+The audit layer must not depend on the UI.
+
+---
+
+# 28. Real-Time Service
+
+Responsible for distributing approved domain events.
+
+Responsibilities:
+
+```text
+subscribe client
+publish domain event
+filter authorized events
+deliver update
+handle reconnection
+```
+
+It must not become a second source of domain truth.
+
+---
+
+# 29. Query Architecture
+
+Queries should be optimized around user needs.
+
+Conceptually:
+
+```text
+UI SCREEN
+ ↓
+QUERY
+ ↓
+QUERY SERVICE
+ ↓
+DOMAIN / PROJECTION
+ ↓
+RESPONSE
+```
+
+The query layer may aggregate multiple domain entities.
+
+Example:
+
+```text
+Threat Overview
+ ↓
+Threat
+ + Risk Assessment
+ + Evidence
+ + Investigation
+ + Actions
+```
+
+This does not mean those entities become one database entity.
+
+---
+
+# 30. Command Architecture
+
+Commands represent intent.
+
+Example:
+
+```text
+START_INVESTIGATION
+```
+
+rather than:
+
+```text
+UPDATE_INVESTIGATION_STATUS = "active"
+```
+
+The command allows the domain to determine whether the transition is valid.
+
+---
+
+# 31. Command Processing Contract
+
+Every consequential command follows:
+
+```text
+REQUEST
+ ↓
+AUTHENTICATE
+ ↓
+AUTHORIZE
+ ↓
+VALIDATE
+ ↓
+CHECK CURRENT STATE
+ ↓
+CHECK DOMAIN RULES
+ ↓
+EXECUTE
+ ↓
+PERSIST
+ ↓
+EMIT EVENT
+ ↓
+AUDIT
+ ↓
+RETURN RESULT
+```
+
+No shortcut is permitted.
+
+---
+
+# 32. Core Query Endpoints
+
+The following initial endpoints are canonical.
+
+```text
+GET /api/v1/observations
+GET /api/v1/observations/:id
+
+GET /api/v1/signals
+GET /api/v1/signals/:id
+
+GET /api/v1/anomalies
+GET /api/v1/anomalies/:id
+
+GET /api/v1/events
+GET /api/v1/events/:id
+
+GET /api/v1/threats
+GET /api/v1/threats/:id
+
+GET /api/v1/threats/:id/risk-assessments
+GET /api/v1/threats/:id/investigations
+GET /api/v1/threats/:id/evidence
+GET /api/v1/threats/:id/actions
+
+GET /api/v1/risk-assessments/:id
+
+GET /api/v1/investigations
+GET /api/v1/investigations/:id
+
+GET /api/v1/cases
+GET /api/v1/cases/:id
+
+GET /api/v1/findings/:id
+
+GET /api/v1/transmission-assessments/:id
+
+GET /api/v1/containment-actions/:id
+
+GET /api/v1/response-actions/:id
+
+GET /api/v1/recovery-assessments/:id
+
+GET /api/v1/preparedness-lessons/:id
+
+GET /api/v1/resilience-gaps/:id
+
+GET /api/v1/improvement-items/:id
+
+GET /api/v1/research-findings
+GET /api/v1/research-findings/:id
+```
+
+These are the initial canonical boundaries, not permission to create unlimited variations.
+
+---
+
+# 33. Collection Query Contract
+
+Collection endpoints support:
+
+```text
+pagination
+filtering
+sorting
+search
+time range
+location
+status
+severity
+```
+
+where applicable.
+
+Example conceptual request:
+
+```text
+GET /api/v1/threats
+  ?status=under_review
+  &severity=high
+  &locationId=LOC-001
+  &page=1
+  &pageSize=25
+```
+
+The final query vocabulary must be defined per resource.
+
+---
+
+# 34. Pagination
+
+Collection responses should use explicit pagination metadata.
+
+Conceptually:
+
+```text
+{
+  "data": [],
+  "meta": {
+    "page": 1,
+    "pageSize": 25,
+    "total": 143,
+    "totalPages": 6
+  }
+}
+```
+
+The API must not silently return unbounded datasets.
+
+---
+
+# 35. Cursor Pagination
+
+For high-volume real-time or time-ordered datasets, cursor pagination may be preferred.
+
+Conceptually:
+
+```text
+?cursor=...
+&pageSize=50
+```
+
+The choice should be made based on resource behavior rather than applied mechanically.
+
+---
+
+# 36. Filtering
+
+Filters must correspond to canonical domain fields.
+
+Example:
+
+```text
+status
+severity
+location
+organization
+createdAt
+observedAt
+updatedAt
+```
+
+Frontend-only filter semantics must not contradict backend semantics.
+
+---
+
+# 37. Sorting
+
+Sort fields must be explicitly whitelisted.
+
+Example:
+
+```text
+sort=createdAt
+sort=-severity
+```
+
+The backend must reject unsupported sort fields rather than interpreting arbitrary input.
+
+---
+
+# 38. Search
+
+Search should distinguish:
+
+```text
+exact identifier lookup
+```
+
+from:
+
+```text
+full-text search
+```
+
+and:
+
+```text
+structured filtering
+```
+
+They are not interchangeable.
+
+---
+
+# 39. Resource Detail Contract
+
+A resource detail response should return the canonical entity.
+
+Conceptually:
+
+```text
+{
+  "data": {
+    "id": "...",
+    "type": "...",
+    ...
+  }
+}
+```
+
+Related information should be explicitly requested or included through a defined expansion mechanism.
+
+---
+
+# 40. Relationship Queries
+
+Relationships should have explicit API semantics.
+
+Examples:
+
+```text
+GET /threats/:id/investigations
+GET /investigations/:id/findings
+GET /investigations/:id/evidence
+GET /cases/:id/relationships
+GET /events/:id/threats
+```
+
+Do not hide critical relationships inside arbitrary nested JSON.
+
+---
+
+# 41. Threat Command Registry
+
+Initial threat commands:
+
+```text
+CREATE_THREAT
+UPDATE_THREAT_CLASSIFICATION
+UPDATE_THREAT_CONFIDENCE
+CHANGE_THREAT_STATUS
+```
+
+Every command must validate the current state.
+
+---
+
+# 42. Investigation Command Registry
+
+```text
+START_INVESTIGATION
+ASSIGN_INVESTIGATION
+ADD_HYPOTHESIS
+ADD_FINDING
+COMPLETE_INVESTIGATION
+CLOSE_INVESTIGATION
+```
+
+---
+
+# 43. Risk Command Registry
+
+```text
+CREATE_RISK_ASSESSMENT
+UPDATE_RISK_ASSESSMENT
+FINALIZE_RISK_ASSESSMENT
+SUPERSEDE_RISK_ASSESSMENT
+```
+
+---
+
+# 44. Transmission Command Registry
+
+```text
+CREATE_TRANSMISSION_ASSESSMENT
+UPDATE_TRANSMISSION_ASSESSMENT
+UPDATE_TRANSMISSION_CONFIDENCE
+RESOLVE_TRANSMISSION_ASSESSMENT
+```
+
+---
+
+# 45. Containment Command Registry
+
+```text
+PROPOSE_CONTAINMENT
+AUTHORIZE_CONTAINMENT
+START_CONTAINMENT
+VERIFY_CONTAINMENT
+CANCEL_CONTAINMENT
+```
+
+---
+
+# 46. Response Command Registry
+
+```text
+CREATE_RESPONSE
+START_RESPONSE
+UPDATE_RESPONSE
+COMPLETE_RESPONSE
+```
+
+---
+
+# 47. Recovery Command Registry
+
+```text
+START_RECOVERY_ASSESSMENT
+ADD_RECOVERY_EVIDENCE
+UPDATE_RECOVERY_ASSESSMENT
+CONFIRM_RECOVERY
+```
+
+---
+
+# 48. Preparedness Command Registry
+
+```text
+CREATE_PREPAREDNESS_LESSON
+CREATE_RESILIENCE_GAP
+CREATE_IMPROVEMENT_ITEM
+UPDATE_IMPROVEMENT_ITEM
+COMPLETE_IMPROVEMENT_ITEM
+```
+
+---
+
+# 49. Command Endpoint Pattern
+
+Commands should use explicit action routes.
+
+Example:
+
+```text
+POST /api/v1/investigations/:id/actions/start
+```
+
+or an equivalent standardized command convention.
+
+The final convention must be applied consistently across the API.
+
+Do not mix:
+
+```text
+/actions/start
+/activate
+/transition
+/status
+```
+
+randomly.
+
+---
+
+# 50. Command Request Contract
+
+Conceptually:
+
+```text
+{
+  "commandId": "CMD-...",
+  "reason": "Operational review required",
+  "payload": {}
+}
+```
+
+The authenticated actor should normally come from the security context rather than being trusted from arbitrary client input.
+
+---
+
+# 51. Command Response Contract
+
+Successful command:
+
+```text
+{
+  "data": {
+    "entity": {}
+  },
+  "meta": {
+    "eventId": "...",
+    "version": 4
+  }
+}
+```
+
+The response should give the client enough information to reconcile its local state.
+
+---
+
+# 52. State Transition Enforcement
+
+The API is responsible for enforcing the state machine.
+
+Example:
+
+```text
+PROPOSED
+   ↓
+AUTHORIZED
+   ↓
+EXECUTING
+   ↓
+ACTIVE
+   ↓
+VERIFIED
+```
+
+The frontend may disable invalid actions for usability.
+
+But:
+
+> **Frontend restrictions are not security or domain enforcement.**
+
+The server must independently reject invalid transitions.
+
+---
+
+# 53. Invalid Transition
+
+If a command attempts an invalid transition:
+
+```text
+POST /containment-actions/:id/actions/verify
+```
+
+while the action is:
+
+```text
+PROPOSED
+```
+
+the server must return a domain error.
+
+Conceptually:
+
+```text
+{
+  "error": {
+    "code": "INVALID_STATE_TRANSITION",
+    "message": "Containment action cannot be verified from its current state."
+  }
+}
+```
+
+---
+
+# 54. Authorization
+
+Authorization occurs before consequential domain execution.
+
+The server evaluates:
+
+```text
+Actor
++
+Role
++
+Organization
++
+Permission
++
+Target
++
+Current State
++
+Context
+```
+
+A user seeing a button does not mean the user is authorized to perform the action.
+
+---
+
+# 55. Authorization Failure
+
+Use explicit machine-readable errors.
+
+Examples:
+
+```text
+AUTHENTICATION_REQUIRED
+AUTHORIZATION_DENIED
+INSUFFICIENT_PERMISSION
+OUT_OF_SCOPE
+```
+
+Do not return generic success responses for denied actions.
+
+---
+
+# 56. Validation
+
+Validation exists at multiple levels.
+
+## Transport validation
+
+Is the request structurally valid?
+
+## Domain validation
+
+Is the requested operation meaningful?
+
+## State validation
+
+Is the operation permitted from the current state?
+
+## Authorization validation
+
+Is the actor permitted?
+
+All four matter.
+
+---
+
+# 57. Validation Error Contract
+
+Conceptually:
+
+```text
+{
+  "error": {
+    "code": "VALIDATION_FAILED",
+    "message": "Request contains invalid fields.",
+    "details": [
+      {
+        "field": "confidence",
+        "code": "OUT_OF_RANGE",
+        "message": "Invalid confidence value."
+      }
+    ]
+  }
+}
+```
+
+---
+
+# 58. Error Taxonomy
+
+AEGIS should standardize errors into categories.
+
+```text
+BAD_REQUEST
+UNAUTHENTICATED
+FORBIDDEN
+NOT_FOUND
+CONFLICT
+UNPROCESSABLE_ENTITY
+TOO_MANY_REQUESTS
+INTERNAL_ERROR
+SERVICE_UNAVAILABLE
+```
+
+Domain codes sit beneath these transport-level categories.
+
+---
+
+# 59. Domain Error Registry
+
+Initial domain codes:
+
+```text
+INVALID_STATE_TRANSITION
+ENTITY_ALREADY_RESOLVED
+ASSESSMENT_ALREADY_FINALIZED
+ACTION_NOT_AUTHORIZED
+MISSING_REQUIRED_EVIDENCE
+STALE_ENTITY_VERSION
+DUPLICATE_COMMAND
+INVALID_RELATIONSHIP
+INVALID_SCOPE
+```
+
+The registry must remain centralized.
+
+---
+
+# 60. Idempotency
+
+All high-consequence commands should support idempotency where applicable.
+
+Example:
+
+```text
+commandId = CMD-123
+```
+
+If submitted twice:
+
+```text
+CMD-123
+CMD-123
+```
+
+the system must recognize the duplicate.
+
+This prevents accidental duplicate actions caused by:
+
+```text
+network retry
+double-click
+browser retry
+client reconnect
+```
+
+---
+
+# 61. Idempotency Contract
+
+Conceptually:
+
+```text
+commandId
+actor
+commandType
+target
+payload
+```
+
+should form the basis of duplicate detection.
+
+The implementation strategy may vary.
+
+---
+
+# 62. Concurrency Control
+
+AEGIS must protect against conflicting updates.
+
+Example:
+
+```text
+User A reads Threat version 5
+
+User B updates Threat
+version becomes 6
+
+User A submits update based on version 5
+```
+
+The API should detect stale state.
+
+Return:
+
+```text
+STALE_ENTITY_VERSION
+```
+
+rather than silently overwriting the newer state.
+
+---
+
+# 63. Version Field
+
+Consequential entities should expose a version or equivalent concurrency marker.
+
+Example:
+
+```text
+{
+  "id": "THR-001",
+  "version": 6
+}
+```
+
+The client should return the expected version when required by the command.
+
+---
+
+# 64. Transaction Boundary
+
+A consequential command should be treated as one logical transaction.
+
+Example:
+
+```text
+AUTHORIZE_CONTAINMENT
+```
+
+must not result in:
+
+```text
+database updated
+but
+audit missing
+```
+
+or:
+
+```text
+state changed
+but
+event missing
+```
+
+without explicit recovery semantics.
+
+---
+
+# 65. Transactional Flow
+
+Conceptually:
+
+```text
+BEGIN
+ ↓
+Validate
+ ↓
+Update Domain State
+ ↓
+Record Domain Event
+ ↓
+Record Audit
+ ↓
+COMMIT
+```
+
+Event publication may use a reliable outbox or equivalent mechanism where required.
+
+---
+
+# 66. Event Reliability
+
+AEGIS must avoid:
+
+```text
+DB COMMIT
+ ↓
+publish event
+ ↓
+network failure
+```
+
+creating a state where the database changed but downstream clients never receive the event.
+
+The implementation should use a reliable event publication pattern appropriate to the chosen infrastructure.
+
+---
+
+# 67. Domain Event Envelope
+
+Canonical conceptual envelope:
+
+```text
+{
+  "eventId": "EVT-...",
+  "eventType": "THREAT_STATUS_UPDATED",
+  "entityType": "Threat",
+  "entityId": "THR-001",
+  "entityVersion": 4,
+  "occurredAt": "2026-08-04T12:00:00Z",
+  "actorId": "ACT-001",
+  "correlationId": "COR-001",
+  "data": {}
+}
+```
+
+---
+
+# 68. Event Naming
+
+Events describe something that happened.
+
+Preferred:
+
+```text
+THREAT_CREATED
+THREAT_STATUS_UPDATED
+RISK_ASSESSMENT_CREATED
+INVESTIGATION_STARTED
+CONTAINMENT_AUTHORIZED
+RECOVERY_CONFIRMED
+```
+
+Avoid commands disguised as events:
+
+```text
+START_INVESTIGATION
+AUTHORIZE_CONTAINMENT
+```
+
+Those are commands.
+
+---
+
+# 69. Command vs Event
+
+```text
+COMMAND
+"Do this."
+
+EVENT
+"This happened."
+```
+
+Example:
+
+```text
+Command:
+AUTHORIZE_CONTAINMENT
+
+Event:
+CONTAINMENT_AUTHORIZED
+```
+
+This distinction must remain consistent throughout AEGIS.
+
+---
+
+# 70. Real-Time Subscription
+
+Clients may subscribe to authorized event streams.
+
+Conceptually:
+
+```text
+AEGIS CLIENT
+      ↓
+Realtime Gateway
+      ↓
+Authorized Event Stream
+```
+
+Subscriptions may be scoped by:
+
+```text
+organization
+location
+entity
+event type
+operational context
+```
+
+The server must enforce authorization.
+
+---
+
+# 71. Client Reconnection
+
+If a real-time connection drops:
+
+```text
+CONNECTED
+ ↓
+DISCONNECTED
+ ↓
+RECONNECTING
+ ↓
+RESYNC
+ ↓
+CONNECTED
+```
+
+The client must reconcile missed events rather than assuming no state changed.
+
+---
+
+# 72. Event Ordering
+
+Events must carry:
+
+```text
+eventId
+occurredAt
+entityVersion
+```
+
+and, where required:
+
+```text
+sequence
+```
+
+The client must not blindly apply an older entity version over a newer one.
+
+---
+
+# 73. Event Deduplication
+
+Clients must tolerate duplicate event delivery.
+
+Example:
+
+```text
+EVENT-001
+EVENT-001
+```
+
+must not produce two state mutations.
+
+---
+
+# 74. Query Consistency
+
+After a consequential command:
+
+```text
+COMMAND
+ ↓
+RESPONSE
+```
+
+the returned entity version must be authoritative.
+
+The client should reconcile its state against the response/event rather than immediately trusting stale cached data.
+
+---
+
+# 75. Caching
+
+Caching is permitted for:
+
+```text
+reference data
+research data
+historical data
+low-volatility aggregates
+```
+
+Caching must be carefully controlled for:
+
+```text
+active threat status
+risk status
+containment state
+authorization state
+response state
+```
+
+The more consequential the data, the more carefully freshness must be handled.
+
+---
+
+# 76. Cache Invalidation
+
+Real-time domain events should be able to invalidate or update relevant cached state.
+
+Example:
+
+```text
+THREAT_STATUS_UPDATED
+        ↓
+Invalidate threat cache
+        ↓
+Update application state
+```
+
+---
+
+# 77. Frontend State Integration
+
+The frontend should conceptually implement:
+
+```text
+API Query
+ ↓
+Server State
+ ↓
+Application Store / Query Cache
+ ↓
+Derived State
+ ↓
+UI
+```
+
+Local component state is reserved for temporary interaction state.
+
+---
+
+# 78. Temporary UI State
+
+Examples:
+
+```text
+modalOpen
+selectedTab
+hoveredMapPoint
+filterPanelOpen
+draftInput
+temporarySelection
+```
+
+These are not API domain state.
+
+---
+
+# 79. Operational State
+
+Examples:
+
+```text
+threat.status
+riskAssessment.status
+investigation.status
+containmentAction.status
+responseAction.status
+recoveryAssessment.status
+```
+
+These belong to the domain/application state layer.
+
+---
+
+# 80. API-to-Screen Mapping
+
+The 13-screen architecture must consume the API according to domain responsibility.
+
+Conceptual mapping:
+
+```text
+GLOBAL MONITORING
+→ observations
+→ signals
+→ anomalies
+→ events
+→ aggregate operational metrics
+
+THREAT DISCOVERY
+→ anomalies
+→ events
+→ threats
+
+THREAT OVERVIEW
+→ threat
+→ evidence
+→ risk
+→ investigation
+→ actions
+
+RISK OVERVIEW
+→ risk assessments
+→ threats
+→ evidence
+
+INVESTIGATION
+→ investigations
+→ hypotheses
+→ findings
+→ evidence
+
+CASE INVESTIGATION
+→ cases
+→ relationships
+→ findings
+→ evidence
+
+TRANSMISSION
+→ transmission assessments
+→ cases
+→ evidence
+
+CONTAINMENT
+→ containment actions
+→ risk
+→ transmission
+→ authorization
+
+RESPONSE
+→ response actions
+→ containment
+→ outcomes
+
+RECOVERY
+→ recovery assessments
+→ response
+→ evidence
+
+PREPAREDNESS
+→ lessons
+→ resilience gaps
+→ improvements
+
+RESEARCH
+→ research findings
+→ evidence
+
+EXECUTIVE
+→ authorized aggregate operational data
+```
+
+This mapping must remain aligned with Document 04.
+
+---
+
+# 81. Cross-Screen Data Consistency
+
+If a threat changes from:
+
+```text
+UNDER_REVIEW
+```
+
+to:
+
+```text
+CHARACTERIZED
+```
+
+then all screens displaying that threat must eventually converge on:
+
+```text
+CHARACTERIZED
+```
+
+The system must not allow:
+
+```text
+Threat Overview = CHARACTERIZED
+
+Executive = UNDER_REVIEW
+
+Investigation = UNDER_REVIEW
+```
+
+indefinitely because each screen maintains independent fake state.
+
+---
+
+# 82. Operational Journey API Flow
+
+The primary journey becomes:
+
+```text
+Observation
+ ↓
+Signal
+ ↓
+Anomaly
+ ↓
+Event
+ ↓
+Threat
+ ↓
+Risk Assessment
+ ↓
+Investigation
+ ↓
+Finding
+ ↓
+Transmission Assessment
+ ↓
+Containment Proposal
+ ↓
+Authorization
+ ↓
+Execution
+ ↓
+Verification
+ ↓
+Response
+ ↓
+Recovery
+ ↓
+Preparedness Lesson
+ ↓
+Resilience Gap
+ ↓
+Improvement
+```
+
+Every transition must correspond to a valid domain operation.
+
+---
+
+# 83. API Traceability
+
+Every consequential action should be traceable:
+
+```text
+WHO
+ ↓
+DID WHAT
+ ↓
+TO WHICH ENTITY
+ ↓
+WHEN
+ ↓
+FROM WHICH STATE
+ ↓
+TO WHICH STATE
+ ↓
+WHY
+ ↓
+SUPPORTED BY WHAT EVIDENCE
+```
+
+This is one of AEGIS's most important architectural properties.
+
+---
+
+# 84. API Observability
+
+Every request should be traceable through a correlation identifier.
+
+Conceptually:
+
+```text
+Request
+ ↓
+Correlation ID
+ ↓
+Application Service
+ ↓
+Domain Service
+ ↓
+Database
+ ↓
+Event
+ ↓
+Audit
+```
+
+This allows engineers to reconstruct failures.
+
+---
+
+# 85. Request Metadata
+
+Where appropriate:
+
+```text
+requestId
+correlationId
+actorId
+organizationId
+timestamp
+clientVersion
+```
+
+should be available to the backend.
+
+The server should not blindly trust client-supplied identity metadata.
+
+---
+
+# 86. API Logging
+
+Logs should capture technical information required for debugging without unnecessarily duplicating sensitive operational data.
+
+Do not log sensitive payloads indiscriminately.
+
+Avoid:
+
+```text
+console.log(request.body)
+```
+
+in production.
+
+---
+
+# 87. API Security Principles
+
+The API must enforce:
+
+```text
+authentication
+authorization
+input validation
+rate limiting where appropriate
+secure transport
+auditability
+least privilege
+secret management
+```
+
+Security architecture will define the complete security model.
+
+---
+
+# 88. Sensitive Information
+
+Sensitive operational or patient-related information must not be returned simply because a database query can retrieve it.
+
+Responses must be scoped to:
+
+```text
+purpose
+permission
+role
+organization
+context
+```
+
+---
+
+# 89. Response Minimization
+
+API responses should return what the client requires.
+
+Avoid returning:
+
+```text
+entire patient records
+entire evidence stores
+entire audit histories
+internal infrastructure metadata
+```
+
+unless specifically authorized and required.
+
+---
+
+# 90. API Contract Ownership
+
+The API contract is owned by the AEGIS architecture.
+
+Frontend engineers cannot unilaterally change backend contracts.
+
+Backend engineers cannot silently change frontend assumptions.
+
+AI coding agents cannot reinterpret contracts.
+
+Changes require:
+
+```text
+proposal
+impact analysis
+document update
+implementation
+tests
+```
+
+---
+
+# 91. Breaking Change Rule
+
+A change is potentially breaking if it:
+
+```text
+removes field
+renames field
+changes field meaning
+changes field type
+removes enum value
+changes command behavior
+changes requiredness
+changes authorization semantics
+```
+
+Such changes require explicit review.
+
+---
+
+# 92. API Documentation
+
+Every production endpoint should document:
+
+```text
+purpose
+authentication
+authorization
+request
+response
+errors
+state requirements
+side effects
+events emitted
+audit behavior
+```
+
+---
+
+# 93. Contract Testing
+
+Each API contract should have tests covering:
+
+```text
+valid request
+invalid request
+missing fields
+invalid enum
+unauthorized actor
+invalid state
+stale version
+duplicate command
+not found
+successful response
+domain event
+audit record
+```
+
+---
+
+# 94. Integration Testing
+
+Integration tests should verify complete workflows.
+
+Example:
+
+```text
+Create anomaly
+ ↓
+Create threat
+ ↓
+Create risk assessment
+ ↓
+Start investigation
+ ↓
+Add finding
+ ↓
+Create transmission assessment
+ ↓
+Propose containment
+ ↓
+Authorize containment
+ ↓
+Execute containment
+ ↓
+Verify containment
+ ↓
+Start response
+ ↓
+Complete response
+ ↓
+Confirm recovery
+ ↓
+Create preparedness lesson
+```
+
+The test must verify both:
+
+```text
+state
+```
+
+and:
+
+```text
+history/events/audit
+```
+
+---
+
+# 95. Failure Handling
+
+AEGIS must distinguish:
+
+```text
+business rejection
+```
+
+from:
+
+```text
+technical failure
+```
+
+Example:
+
+```text
+INVALID_STATE_TRANSITION
+```
+
+is not the same as:
+
+```text
+DATABASE_UNAVAILABLE
+```
+
+The UI must respond differently.
+
+---
+
+# 96. Retry Policy
+
+Automatic retries are appropriate for some transient technical failures.
+
+They are dangerous for some consequential commands.
+
+For example:
+
+```text
+GET
+```
+
+may safely retry in many cases.
+
+A consequential command requires:
+
+```text
+idempotency
+```
+
+before automatic retry is considered safe.
+
+---
+
+# 97. Timeout Behavior
+
+Long-running operations must not leave the client guessing.
+
+If an operation exceeds the request timeout:
+
+```text
+request timeout
+```
+
+does not automatically mean:
+
+```text
+operation failed
+```
+
+The client should be able to query the resulting entity or operation status.
+
+---
+
+# 98. Long-Running Operations
+
+If an operation cannot complete synchronously:
+
+```text
+POST command
+ ↓
+202 Accepted
+ ↓
+operation status
+ ↓
+completion event
+```
+
+may be used.
+
+This should only be introduced where necessary.
+
+---
+
+# 99. API Contract for AI Implementation
+
+AI coding agents must treat this document as authoritative.
+
+Before writing API code, the agent must inspect:
+
+```text
+01 Master Architecture
+02 Domain Model + Global State
+03 User Flow + Operational Journey
+04 Functional Requirements + 13 Screens
+05 Interaction + State Transition
+06 Data Architecture + Data Contracts
+07 API Architecture + Service Contracts
+```
+
+The agent must not implement from a single screen description alone.
+
+---
+
+# 100. AI API Implementation Rules
+
+## Rule 01
+
+Do not invent endpoints.
+
+## Rule 02
+
+Do not invent domain entities.
+
+## Rule 03
+
+Do not invent status values.
+
+## Rule 04
+
+Do not bypass domain services.
+
+## Rule 05
+
+Do not let controllers contain complex domain logic.
+
+## Rule 06
+
+Do not let UI components call persistence directly.
+
+## Rule 07
+
+Do not silently change contracts.
+
+## Rule 08
+
+Do not return database objects blindly.
+
+## Rule 09
+
+Do not trust client authorization claims.
+
+## Rule 10
+
+Do not make consequential commands non-idempotent.
+
+## Rule 11
+
+Do not discard historical state.
+
+## Rule 12
+
+Do not fabricate operational data.
+
+---
+
+# 101. Controller Responsibility
+
+Controllers/routes should handle:
+
+```text
+request parsing
+authentication context
+input validation
+calling application services
+mapping result to response
+error mapping
+```
+
+Controllers should not contain:
+
+```text
+complex business rules
+database orchestration
+state-machine logic
+risk calculations
+authorization shortcuts
+```
+
+---
+
+# 102. Application Service Responsibility
+
+Application services coordinate use cases.
+
+Example:
+
+```text
+AuthorizeContainment
+```
+
+may:
+
+```text
+load containment
+validate actor
+invoke domain rule
+persist change
+create event
+record audit
+return result
+```
+
+---
+
+# 103. Domain Service Responsibility
+
+Domain services contain domain-specific logic that cannot naturally belong to a single entity.
+
+Examples may include:
+
+```text
+ThreatClassificationService
+RiskAssessmentService
+TransmissionAssessmentService
+ContainmentPolicyService
+```
+
+The exact services should only be created when domain complexity requires them.
+
+---
+
+# 104. Repository Responsibility
+
+Repositories provide persistence access.
+
+They should answer:
+
+```text
+save
+find
+update
+query
+```
+
+They should not determine whether:
+
+```text
+containment is authorized
+```
+
+That belongs to domain/application logic.
+
+---
+
+# 105. Dependency Direction
+
+The architecture should maintain:
+
+```text
+API
+ ↓
+Application
+ ↓
+Domain
+ ↓
+Infrastructure
+```
+
+not:
+
+```text
+Domain
+ ↓
+UI
+```
+
+and not:
+
+```text
+Database
+ ↓
+UI
+```
+
+---
+
+# 106. Service Dependency Rule
+
+Avoid circular dependencies.
+
+Bad:
+
+```text
+ThreatService
+ ↓
+RiskService
+ ↓
+ThreatService
+```
+
+Prefer explicit orchestration through an application workflow or appropriate domain abstraction.
+
+---
+
+# 107. API Contract Registry
+
+The repository should eventually contain a single authoritative API contract location.
+
+Conceptually:
+
+```text
+/docs
+  /architecture
+  /api
+    api-contract.md
+    commands.md
+    events.md
+    errors.md
+```
+
+The exact repository location will be finalized in the engineering architecture document.
+
+---
+
+# 108. OpenAPI
+
+AEGIS should maintain a machine-readable API specification.
+
+Recommended conceptual artifact:
+
+```text
+openapi.yaml
+```
+
+This should become a generated/validated contract rather than a document manually drifting away from implementation.
+
+The exact tooling decision belongs to Document 08/engineering architecture.
+
+---
+
+# 109. Contract Generation
+
+Where practical:
+
+```text
+Canonical API Contract
+ ↓
+OpenAPI
+ ↓
+Validation
+ ↓
+Client Types
+ ↓
+Server Types
+ ↓
+Tests
+```
+
+This reduces duplicated schema definitions.
+
+---
+
+# 110. API Contract Governance
+
+Before merging an API change:
+
+```text
+Schema changed?
+ ↓
+Domain impact checked?
+ ↓
+Frontend impact checked?
+ ↓
+State transition impact checked?
+ ↓
+Event impact checked?
+ ↓
+Audit impact checked?
+ ↓
+Tests updated?
+ ↓
+Documentation updated?
+```
+
+If any answer is unknown, the change is not ready.
+
+---
+
+# 111. Master API Invariants
+
+AEGIS API must satisfy:
+
+### Invariant 01
+
+Every consequential state change is authorized.
+
+### Invariant 02
+
+Every consequential state change follows the domain state machine.
+
+### Invariant 03
+
+Every consequential state change produces appropriate history.
+
+### Invariant 04
+
+Every important domain change can produce a domain event.
+
+### Invariant 05
+
+Duplicate consequential commands cannot accidentally duplicate effects.
+
+### Invariant 06
+
+Stale clients cannot silently overwrite newer state.
+
+### Invariant 07
+
+Frontend restrictions are never the only enforcement layer.
+
+### Invariant 08
+
+Evidence and interpretation remain distinct.
+
+### Invariant 09
+
+API responses do not become accidental sources of contradictory truth.
+
+### Invariant 10
+
+AI agents cannot silently redefine the API.
+
+---
+
+# 112. AEGIS API Golden Path
+
+The canonical operational API path is:
+
+```text
+CLIENT
+ ↓
+QUERY
+ ↓
+CURRENT STATE
+ ↓
+USER DECISION
+ ↓
+COMMAND
+ ↓
+AUTHENTICATION
+ ↓
+AUTHORIZATION
+ ↓
+VALIDATION
+ ↓
+DOMAIN RULE
+ ↓
+STATE TRANSITION
+ ↓
+PERSISTENCE
+ ↓
+DOMAIN EVENT
+ ↓
+AUDIT
+ ↓
+API RESPONSE
+ ↓
+REAL-TIME PROPAGATION
+ ↓
+OTHER CLIENTS
+```
+
+---
+
+# 113. Final API Architecture
+
+AEGIS should ultimately behave as:
+
+```text
+                    ┌───────────────────┐
+                    │      AEGIS UI     │
+                    └─────────┬─────────┘
+                              │
+                       Query / Command
+                              │
+                              ▼
+                    ┌───────────────────┐
+                    │    API LAYER      │
+                    └─────────┬─────────┘
+                              │
+                ┌─────────────┴─────────────┐
+                ▼                           ▼
+        ┌───────────────┐           ┌───────────────┐
+        │ Application   │           │ Query Layer   │
+        │ Services      │           │ / Projections │
+        └───────┬───────┘           └───────┬───────┘
+                │                           │
+                ▼                           ▼
+        ┌─────────────────────────────────────────┐
+        │             DOMAIN LAYER                │
+        │ Threat / Risk / Investigation / etc.   │
+        └──────────────────┬──────────────────────┘
+                           │
+                ┌──────────┴──────────┐
+                ▼                     ▼
+        ┌──────────────┐      ┌───────────────┐
+        │ Persistence  │      │ Event System  │
+        └──────────────┘      └───────┬───────┘
+                                      │
+                                      ▼
+                              ┌───────────────┐
+                              │ Realtime API  │
+                              └───────┬───────┘
+                                      │
+                                      ▼
+                                Connected UI
+```
+
+The API is therefore not simply:
+
+```text
+frontend → database
+```
+
+It is the **operational enforcement boundary of AEGIS**.
+
+---
+
+# 114. Definition of Done
+
+Document 07 is considered complete when engineering can determine, for every consequential user interaction:
+
+```text
+Which command is issued?
+Which endpoint receives it?
+Who is authorized?
+What validation occurs?
+Which domain service executes it?
+Which state transition occurs?
+Which data changes?
+Which audit record is created?
+Which domain event is emitted?
+Which screens receive the update?
+What happens if the operation fails?
+What happens if the client retries?
+What happens if another user changed the entity first?
+```
+
+If those questions cannot be answered, the implementation architecture is incomplete.
+
+---
+
+# 115. AEGIS API Law
+
+The API must enforce this sequence:
+
+```text
+SEE
+ ↓
+UNDERSTAND
+ ↓
+ASSESS
+ ↓
+DECIDE
+ ↓
+AUTHORIZE
+ ↓
+ACT
+ ↓
+VERIFY
+ ↓
+LEARN
+```
+
+AEGIS must never allow the interface to collapse these stages simply because doing so is technically easier.
+
+The API exists to preserve the integrity of the operational journey.
+
+That is what turns AEGIS from a dashboard into an actual **operational decision-support system**.
