@@ -1,0 +1,2653 @@
+# AEGIS
+# Frontend Architecture + Application Architecture
+
+**System:** AEGIS  
+**Document:** 08 — Frontend Architecture + Application Architecture  
+**Version:** 1.0  
+**Status:** Master Engineering Specification  
+**Date:** August 2026
+
+---
+
+# 01. Purpose
+
+This document defines how the AEGIS frontend is structured, how its screens communicate with the application layer, how domain state reaches the interface, how user actions become API commands, and how the interface remains consistent with the AEGIS operational model.
+
+The frontend must not become a collection of visually impressive but disconnected screens.
+
+AEGIS is an operational system.
+
+Therefore:
+
+> **The frontend is an operational interface over the AEGIS domain, not the domain itself.**
+
+The architecture must preserve:
+
+```text
+Domain truth
+↓
+Application state
+↓
+User interaction
+↓
+Visual representation
+```
+
+rather than allowing visual components to invent business logic.
+
+---
+
+# 02. Frontend Architectural Goals
+
+The frontend must provide:
+
+1. A coherent 13-screen application
+2. Consistent navigation
+3. Predictable state management
+4. Reliable API integration
+5. Real-time operational updates
+6. Explicit loading states
+7. Explicit error states
+8. Explicit empty states
+9. Permission-aware actions
+10. State-transition-aware actions
+11. Accessible interaction patterns
+12. High information density without visual chaos
+13. Clinical authority rather than gaming aesthetics
+14. Maintainable component architecture
+15. Strong separation between UI, application, and domain concerns
+
+---
+
+# 03. Core Frontend Principle
+
+The frontend follows:
+
+```text
+DISPLAY
+↓
+INTERPRET
+↓
+DECIDE
+↓
+COMMAND
+↓
+RECONCILE
+```
+
+A user sees system information.
+
+The interface provides context.
+
+The user decides what to do.
+
+The frontend submits a command.
+
+The backend validates and executes the command.
+
+The frontend reconciles against authoritative state.
+
+---
+
+# 04. Technology Direction
+
+The implementation should be designed around the previously established AEGIS technology direction:
+
+```text
+Next.js
+React
+TypeScript
+Tailwind CSS
+Motion
+Three.js
+```
+
+These are implementation technologies, not architectural substitutes.
+
+The architecture remains valid even if a specific library changes.
+
+---
+
+# 05. Application Architecture
+
+The frontend is organized into five major layers:
+
+```text
+┌────────────────────────────────────┐
+│             UI LAYER               │
+│ Screens / Components / Visuals      │
+├────────────────────────────────────┤
+│       APPLICATION LAYER             │
+│ Use Cases / Commands / UI State     │
+├────────────────────────────────────┤
+│         DATA ACCESS LAYER            │
+│ Queries / Mutations / Realtime      │
+├────────────────────────────────────┤
+│         DOMAIN MODEL LAYER           │
+│ Types / States / Rules / Contracts  │
+├────────────────────────────────────┤
+│         INFRASTRUCTURE              │
+│ API / Auth / Storage / Transport    │
+└────────────────────────────────────┘
+```
+
+---
+
+# 06. Dependency Direction
+
+The dependency direction must remain:
+
+```text
+UI
+ ↓
+Application
+ ↓
+Data Access
+ ↓
+API
+```
+
+Domain types may be consumed by all appropriate layers.
+
+Infrastructure must not leak upward unnecessarily.
+
+---
+
+# 07. What the UI Must Not Do
+
+UI components must not:
+
+```text
+directly query databases
+perform business-critical classification
+determine whether a threat is valid
+decide whether containment is authorized
+mutate global domain state arbitrarily
+invent domain entities
+invent API responses
+hard-code operational outcomes
+```
+
+The UI represents decisions.
+
+It does not make authoritative operational decisions on behalf of the system.
+
+---
+
+# 08. Frontend Directory Architecture
+
+The implementation should follow a structure conceptually similar to:
+
+```text
+src/
+│
+├── app/
+│   ├── layout
+│   ├── routes
+│   └── providers
+│
+├── features/
+│   ├── monitoring/
+│   ├── anomalies/
+│   ├── threats/
+│   ├── risk/
+│   ├── investigations/
+│   ├── transmission/
+│   ├── containment/
+│   ├── response/
+│   ├── recovery/
+│   ├── preparedness/
+│   └── research/
+│
+├── components/
+│   ├── ui/
+│   ├── layout/
+│   ├── data-display/
+│   ├── visualization/
+│   ├── forms/
+│   └── feedback/
+│
+├── domain/
+│   ├── entities/
+│   ├── states/
+│   ├── events/
+│   └── contracts/
+│
+├── application/
+│   ├── queries/
+│   ├── commands/
+│   ├── workflows/
+│   └── permissions/
+│
+├── infrastructure/
+│   ├── api/
+│   ├── auth/
+│   ├── realtime/
+│   └── storage/
+│
+├── hooks/
+├── lib/
+└── styles/
+```
+
+The exact filesystem may evolve during implementation.
+
+The architectural separation must not.
+
+---
+
+# 09. Feature-First Organization
+
+AEGIS should be organized primarily by domain capability rather than by generic file type.
+
+Prefer:
+
+```text
+features/threats/
+```
+
+over:
+
+```text
+components/threatButtons/
+components/threatCards/
+components/threatTables/
+```
+
+The feature owns the composition of its interface.
+
+Shared components remain genuinely shared.
+
+---
+
+# 10. Shared Components
+
+Shared components include things such as:
+
+```text
+Button
+Input
+Select
+Dialog
+Drawer
+Tabs
+Table
+Badge
+Tooltip
+Skeleton
+EmptyState
+ErrorState
+Timeline
+MetricCard
+StatusIndicator
+CommandPanel
+```
+
+They must not contain AEGIS-specific business logic unless explicitly intended.
+
+---
+
+# 11. Domain Components
+
+Domain-specific components include:
+
+```text
+ThreatStatus
+ThreatConfidence
+RiskIndicator
+InvestigationTimeline
+ContainmentAction
+TransmissionPathway
+RecoveryAssessment
+ResilienceGap
+```
+
+These components may understand AEGIS concepts.
+
+---
+
+# 12. Screen Components
+
+Screen components compose features into complete operational experiences.
+
+Example:
+
+```text
+GlobalMonitoringScreen
+ThreatIntelligenceScreen
+InvestigationScreen
+ContainmentScreen
+RecoveryScreen
+```
+
+A screen should orchestrate.
+
+It should not become a 2,000-line monolith.
+
+---
+
+# 13. Layout Architecture
+
+AEGIS uses a persistent application shell.
+
+Conceptually:
+
+```text
+┌───────────────────────────────────────────────┐
+│ GLOBAL HEADER                                 │
+├────────────┬──────────────────────────────────┤
+│            │                                  │
+│ SIDEBAR    │       PRIMARY CONTENT            │
+│            │                                  │
+│            │                                  │
+├────────────┴──────────────────────────────────┤
+│ OPTIONAL CONTEXT / STATUS REGION              │
+└───────────────────────────────────────────────┘
+```
+
+The shell remains stable while operational context changes.
+
+---
+
+# 14. Global Shell Responsibilities
+
+The shell manages:
+
+```text
+navigation
+current location/context
+user identity
+organization context
+system status
+global notifications
+application-level alerts
+theme/design tokens
+responsive behavior
+```
+
+It must not own individual threat state.
+
+---
+
+# 15. Navigation Architecture
+
+Navigation must represent the operational structure of AEGIS.
+
+It should allow the user to move between:
+
+```text
+monitoring
+threat intelligence
+investigation
+risk
+response
+recovery
+preparedness
+research
+```
+
+without losing context.
+
+---
+
+# 16. Deep Linking
+
+Every meaningful operational entity should be addressable.
+
+Example:
+
+```text
+/threats/THR-001
+/investigations/INV-001
+/cases/CAS-001
+/containment-actions/CNT-001
+```
+
+Deep links must restore the relevant application context.
+
+---
+
+# 17. URL as Navigation State
+
+The URL should represent durable navigational state such as:
+
+```text
+entity
+tab
+filter
+search
+time range
+location
+```
+
+Temporary UI state should remain local.
+
+---
+
+# 18. Browser Navigation
+
+Back and forward navigation must behave predictably.
+
+If a user moves:
+
+```text
+Monitoring
+→ Threat
+→ Investigation
+→ Finding
+```
+
+then browser back should return through those meaningful contexts.
+
+---
+
+# 19. Route Protection
+
+Protected operational routes must require authentication.
+
+Authorization must be enforced by the backend.
+
+Frontend route protection exists for:
+
+```text
+UX
+navigation control
+early rejection
+```
+
+not as the authoritative security layer.
+
+---
+
+# 20. Route Registry
+
+The application must maintain one authoritative route registry.
+
+Conceptually:
+
+```text
+AEGIS_ROUTES
+```
+
+This prevents route strings from being duplicated throughout the codebase.
+
+---
+
+# 21. 13-Screen Integration
+
+The 13 screens defined in Document 04 are the authoritative product screen registry.
+
+The frontend architecture must implement exactly those screens.
+
+No additional "helpful" screens should be invented during implementation.
+
+If a required capability does not fit an existing screen:
+
+```text
+STOP
+↓
+identify architectural gap
+↓
+update specification
+↓
+then implement
+```
+
+---
+
+# 22. Screen Contract
+
+Every screen must define:
+
+```text
+route
+purpose
+primary user
+required queries
+available commands
+required permissions
+loading state
+empty state
+error state
+success state
+real-time events
+navigation destinations
+```
+
+The screen implementation must follow Document 04.
+
+---
+
+# 23. Screen Composition Pattern
+
+A screen should follow:
+
+```text
+Screen
+ ↓
+Page Controller / Feature Orchestrator
+ ↓
+Feature Sections
+ ↓
+Domain Components
+ ↓
+Shared UI Components
+```
+
+Avoid:
+
+```text
+Screen
+ ↓
+400 unrelated components
+ ↓
+random API calls
+ ↓
+local state everywhere
+```
+
+---
+
+# 24. Data Fetching Architecture
+
+Data fetching must be centralized through the data-access layer.
+
+Conceptually:
+
+```text
+Screen
+ ↓
+Query Hook / Query Function
+ ↓
+API Client
+ ↓
+API
+```
+
+Components should not independently fetch the same entity through arbitrary methods.
+
+---
+
+# 25. Server State vs Client State
+
+AEGIS must distinguish:
+
+## Server State
+
+Data owned by the backend.
+
+Examples:
+
+```text
+threat
+risk
+investigation
+case
+finding
+containment
+response
+recovery
+preparedness
+```
+
+## Client State
+
+Temporary interface state.
+
+Examples:
+
+```text
+drawerOpen
+selectedTab
+hoveredPoint
+temporaryFilter
+modalState
+draftText
+```
+
+---
+
+# 26. Global State
+
+Global state should be minimal.
+
+Appropriate examples:
+
+```text
+authenticated user
+organization context
+application preferences
+navigation context
+connection status
+global notification state
+```
+
+Do not put every piece of server data into one giant global store.
+
+---
+
+# 27. Server State Management
+
+A query/caching layer should own remote data.
+
+A suitable implementation may use a mature server-state library rather than building custom caching.
+
+The architecture should support:
+
+```text
+query caching
+request deduplication
+refetch
+mutation handling
+stale state
+optimistic behavior where safe
+invalidation
+reconciliation
+```
+
+---
+
+# 28. No Fake Global State
+
+Do not create:
+
+```text
+globalThreatState
+globalRiskState
+globalInvestigationState
+```
+
+simply because multiple screens display them.
+
+The authoritative source remains the API.
+
+---
+
+# 29. Command Architecture
+
+User actions must flow through application commands.
+
+Example:
+
+```text
+User clicks:
+"Authorize Containment"
+
+↓
+UI command handler
+
+↓
+authorizeContainment()
+
+↓
+API client
+
+↓
+POST command
+
+↓
+Backend validation
+
+↓
+Result
+
+↓
+State reconciliation
+```
+
+---
+
+# 30. Command Functions
+
+Commands should have meaningful names.
+
+Examples:
+
+```text
+createThreat()
+startInvestigation()
+finalizeRiskAssessment()
+proposeContainment()
+authorizeContainment()
+startContainment()
+verifyContainment()
+startRecoveryAssessment()
+confirmRecovery()
+createPreparednessLesson()
+```
+
+Avoid generic functions such as:
+
+```text
+updateData()
+changeStatus()
+saveThing()
+```
+
+---
+
+# 31. Mutation States
+
+Every command must expose:
+
+```text
+idle
+submitting
+success
+error
+```
+
+For consequential commands, the UI should additionally handle:
+
+```text
+stale
+unauthorized
+invalidTransition
+conflict
+timeout
+```
+
+---
+
+# 32. No False Success
+
+The UI must never show:
+
+```text
+"Containment authorized"
+```
+
+because the user clicked the button.
+
+It may show:
+
+```text
+"Authorizing..."
+```
+
+until the backend confirms success.
+
+Only authoritative confirmation can produce the final success state.
+
+---
+
+# 33. Optimistic UI
+
+Optimistic updates are dangerous for consequential operational state.
+
+Default:
+
+```text
+NO OPTIMISTIC STATE TRANSITION
+```
+
+for:
+
+```text
+threat classification
+risk status
+containment
+response
+recovery
+authorization
+```
+
+Use optimistic behavior only where it cannot misrepresent operational truth.
+
+---
+
+# 34. Loading Architecture
+
+Every data-dependent section must define a loading state.
+
+Possible patterns:
+
+```text
+skeleton
+progressive loading
+placeholder metric
+loading indicator
+```
+
+Do not display fabricated values while data is loading.
+
+---
+
+# 35. Empty State Architecture
+
+Empty does not mean error.
+
+Example:
+
+```text
+No active investigations
+```
+
+is different from:
+
+```text
+Investigations could not be loaded
+```
+
+The interface must distinguish:
+
+```text
+empty
+loading
+error
+unavailable
+```
+
+---
+
+# 36. Error Architecture
+
+Errors exist at:
+
+```text
+component
+feature
+screen
+application
+network
+authentication
+authorization
+domain
+```
+
+The UI should display the smallest useful recovery surface.
+
+---
+
+# 37. Error Recovery
+
+Where possible:
+
+```text
+Retry
+Refresh
+Return to previous context
+Open related entity
+```
+
+should be available.
+
+Do not simply show:
+
+```text
+Something went wrong.
+```
+
+for every failure.
+
+---
+
+# 38. Domain Errors in UI
+
+Backend errors such as:
+
+```text
+INVALID_STATE_TRANSITION
+STALE_ENTITY_VERSION
+ACTION_NOT_AUTHORIZED
+MISSING_REQUIRED_EVIDENCE
+```
+
+must map to human-readable operational explanations.
+
+The UI should preserve the underlying machine-readable error for logging and diagnostics.
+
+---
+
+# 39. Real-Time Architecture
+
+AEGIS requires real-time awareness.
+
+The frontend should conceptually use:
+
+```text
+REST / HTTP
++
+REAL-TIME EVENT STREAM
+```
+
+HTTP handles:
+
+```text
+queries
+commands
+```
+
+Real-time transport handles:
+
+```text
+events
+```
+
+---
+
+# 40. Real-Time Event Flow
+
+```text
+Backend state change
+ ↓
+Domain event
+ ↓
+Realtime transport
+ ↓
+Frontend event handler
+ ↓
+Query invalidation / cache update
+ ↓
+UI reconciliation
+```
+
+---
+
+# 41. Real-Time Is Not a Second Database
+
+The event stream must not become the sole source of truth.
+
+If a client receives:
+
+```text
+THREAT_STATUS_UPDATED
+```
+
+it may update or invalidate local state.
+
+For critical information, it must remain possible to reconcile against the API.
+
+---
+
+# 42. Connection State
+
+The global application must represent:
+
+```text
+CONNECTED
+CONNECTING
+DISCONNECTED
+RECONNECTING
+DEGRADED
+```
+
+where appropriate.
+
+---
+
+# 43. Degraded Mode
+
+If real-time connectivity fails:
+
+```text
+AEGIS should remain usable where safe.
+```
+
+The interface should clearly indicate stale/reduced freshness.
+
+It must not pretend that real-time information is current.
+
+---
+
+# 44. Freshness Indicators
+
+Operational information should communicate freshness where relevant.
+
+Examples:
+
+```text
+Updated 12 seconds ago
+Live
+Delayed
+Connection interrupted
+Last synchronized 3 minutes ago
+```
+
+Do not use "LIVE" merely as decoration.
+
+It must correspond to actual system behavior.
+
+---
+
+# 45. Polling
+
+Polling may be used where:
+
+```text
+real-time transport is unavailable
+data changes are infrequent
+operational freshness requirements permit it
+```
+
+Polling intervals must not be chosen arbitrarily.
+
+---
+
+# 46. Forms Architecture
+
+Forms should be schema-driven where practical.
+
+Each form must define:
+
+```text
+fields
+types
+requiredness
+validation
+default values
+submission command
+success behavior
+error behavior
+permissions
+```
+
+---
+
+# 47. Draft State
+
+Forms may maintain local draft state.
+
+Drafts are not authoritative domain state until submitted and accepted.
+
+---
+
+# 48. Confirmation Architecture
+
+High-consequence actions require explicit confirmation where defined by product requirements.
+
+Example:
+
+```text
+Authorize Containment
+```
+
+should clearly communicate:
+
+```text
+what will happen
+target
+current state
+user authority
+consequence
+```
+
+before execution where appropriate.
+
+---
+
+# 49. Action Hierarchy
+
+The visual hierarchy should distinguish:
+
+```text
+view
+inspect
+analyze
+recommend
+authorize
+execute
+verify
+```
+
+These are not equivalent actions.
+
+---
+
+# 50. Preventing Accidental Actions
+
+High-consequence controls should not be:
+
+```text
+tiny
+ambiguous
+hidden
+adjacent to destructive alternatives
+triggered by accidental clicks
+```
+
+The interface must reduce operational error.
+
+---
+
+# 51. Modal vs Drawer
+
+Use:
+
+## Drawer
+
+For contextual inspection.
+
+## Modal
+
+For focused decisions requiring attention.
+
+## Dedicated screen
+
+For complex workflows.
+
+Do not put an entire operational workflow inside a modal simply to avoid creating a proper route.
+
+---
+
+# 52. Tables
+
+Tables are appropriate for:
+
+```text
+events
+signals
+threats
+investigations
+cases
+evidence
+actions
+```
+
+They must support the specific requirements defined in Document 04.
+
+---
+
+# 53. Table Architecture
+
+A table should separate:
+
+```text
+data
+columns
+sorting
+filtering
+selection
+pagination
+row actions
+```
+
+from the visual table component.
+
+---
+
+# 54. Data Visualization
+
+Visualizations must communicate operational meaning.
+
+Use:
+
+```text
+trend
+relationship
+geography
+distribution
+timeline
+status
+risk
+```
+
+only when they improve decision making.
+
+Avoid decorative charts.
+
+---
+
+# 55. Three.js / 3D Usage
+
+Three.js may be used for the AEGIS Living Map or spatial visualization where defined.
+
+It must not be used merely because:
+
+```text
+"3D looks futuristic."
+```
+
+The visualization must provide operational value.
+
+---
+
+# 56. Living Map Architecture
+
+The map should be treated as a visualization layer over authoritative location and event data.
+
+Conceptually:
+
+```text
+Location Data
++
+Event Data
++
+Threat Data
++
+Risk Data
++
+Spatial Rules
+↓
+Visualization Model
+↓
+Three.js
+```
+
+Three.js must not become the source of operational state.
+
+---
+
+# 57. Map Interaction
+
+Map interactions may change:
+
+```text
+selected location
+selected entity
+viewport
+layer visibility
+filter context
+```
+
+They must not directly mutate domain state unless an explicit command is triggered.
+
+---
+
+# 58. Motion Architecture
+
+Motion should communicate:
+
+```text
+transition
+state change
+attention
+hierarchy
+spatial relationship
+```
+
+not:
+
+```text
+entertainment
+gaming
+decoration
+```
+
+---
+
+# 59. Animation Rules
+
+Animations must never obscure:
+
+```text
+critical information
+status
+controls
+warnings
+time-sensitive updates
+```
+
+Motion should degrade gracefully on lower-powered devices.
+
+---
+
+# 60. Design System Integration
+
+The frontend consumes the AEGIS design system.
+
+The design system should define:
+
+```text
+tokens
+typography
+spacing
+color
+surface
+borders
+radii
+shadows
+icons
+status semantics
+components
+motion
+```
+
+The frontend must not invent one-off colors or typography values inside individual screens.
+
+---
+
+# 61. Visual Direction
+
+The visual system remains:
+
+```text
+Deep Obsidian
+Surgical White
+Antigen Amber
+```
+
+with restrained supporting semantic colors where required.
+
+The visual goal is:
+
+> **Clinical Authority.**
+
+Not:
+
+```text
+gaming HUD
+cyberpunk
+military game
+sci-fi dashboard cosplay
+```
+
+---
+
+# 62. Information Density
+
+AEGIS is a high-density operational interface.
+
+Density must come from:
+
+```text
+hierarchy
+alignment
+grouping
+compact typography
+efficient tables
+controlled spacing
+progressive disclosure
+```
+
+not from:
+
+```text
+tiny unreadable text
+random cards
+excessive borders
+visual noise
+```
+
+---
+
+# 63. Accessibility
+
+Accessibility is part of system reliability.
+
+The frontend must support:
+
+```text
+keyboard navigation
+visible focus
+semantic HTML
+screen-reader compatibility
+sufficient contrast
+reduced motion
+clear status communication
+non-color-dependent meaning
+```
+
+---
+
+# 64. Color Semantics
+
+Color must not be the only way information is communicated.
+
+For example:
+
+```text
+Amber + icon + label
+```
+
+rather than:
+
+```text
+Amber alone
+```
+
+This is especially important for alerts and risk states.
+
+---
+
+# 65. Responsive Architecture
+
+AEGIS is primarily a professional operational application.
+
+The layout should prioritize:
+
+```text
+desktop
+large desktop
+operational workstation
+```
+
+while maintaining reasonable behavior on smaller screens.
+
+Do not design the desktop experience by simply shrinking it until it fits mobile.
+
+---
+
+# 66. Performance Architecture
+
+The frontend must avoid unnecessary rendering.
+
+Important strategies include:
+
+```text
+component boundaries
+memoization where justified
+virtualized large datasets
+lazy loading
+code splitting
+image optimization
+controlled subscriptions
+efficient map rendering
+```
+
+Do not optimize blindly.
+
+Measure first where possible.
+
+---
+
+# 67. Large Dataset Rendering
+
+Potentially large datasets such as:
+
+```text
+events
+observations
+signals
+audit records
+```
+
+must not render thousands of DOM nodes simultaneously.
+
+Use:
+
+```text
+pagination
+virtualization
+server-side filtering
+server-side sorting
+```
+
+where appropriate.
+
+---
+
+# 68. Map Performance
+
+The Living Map must consider:
+
+```text
+number of entities
+number of layers
+update frequency
+animation cost
+GPU capability
+device memory
+```
+
+Real-time updates must not force the entire map to rerender unnecessarily.
+
+---
+
+# 69. Data Prefetching
+
+Prefetching is permitted when the next navigation target is predictable.
+
+Example:
+
+```text
+Threat list
+ ↓
+hover/select threat
+ ↓
+prefetch threat detail
+```
+
+But prefetching must not create unnecessary operational traffic.
+
+---
+
+# 70. Cache Invalidation Strategy
+
+After mutation:
+
+```text
+mutation success
+ ↓
+identify affected entities
+ ↓
+invalidate/update relevant queries
+ ↓
+process event
+ ↓
+render authoritative state
+```
+
+Avoid refreshing the entire application after every command.
+
+---
+
+# 71. Query Keys
+
+Query keys must be deterministic.
+
+Conceptually:
+
+```text
+["threat", threatId]
+
+["threats", filters]
+
+["investigation", investigationId]
+
+["investigations", filters]
+```
+
+Do not build ad hoc cache identifiers throughout components.
+
+---
+
+# 72. Permission Architecture
+
+Frontend permissions should be derived from authenticated application context.
+
+Example:
+
+```text
+canViewThreat
+canAssessRisk
+canStartInvestigation
+canAuthorizeContainment
+canExecuteContainment
+canConfirmRecovery
+```
+
+These are UI capabilities.
+
+The backend remains authoritative.
+
+---
+
+# 73. Permission-Aware UI
+
+A user who lacks permission should receive appropriate behavior:
+
+```text
+hidden
+disabled
+read-only
+explanation
+```
+
+based on the product requirement.
+
+Do not hide critical system context merely because the user cannot act on it.
+
+---
+
+# 74. Read-Only Mode
+
+AEGIS should support read-only contexts where required.
+
+In read-only mode:
+
+```text
+information remains visible
+commands are unavailable
+state remains inspectable
+```
+
+---
+
+# 75. Audit-Aware UI
+
+Consequential actions should expose appropriate traceability.
+
+Where relevant:
+
+```text
+performed by
+performed at
+reason
+previous state
+current state
+```
+
+The UI does not create the audit record manually.
+
+The backend does.
+
+---
+
+# 76. Notification Architecture
+
+Notifications should reference actual events.
+
+Examples:
+
+```text
+New high-priority anomaly
+Threat classification updated
+Investigation assigned
+Containment authorization required
+Recovery assessment completed
+```
+
+Avoid generic notification spam.
+
+---
+
+# 77. Notification Severity
+
+Notifications should distinguish:
+
+```text
+informational
+attention
+warning
+critical
+```
+
+according to defined semantics.
+
+Do not mark everything critical.
+
+---
+
+# 78. Search Architecture
+
+Global search should provide structured navigation across approved entities.
+
+Potential entities:
+
+```text
+threat
+event
+investigation
+case
+finding
+location
+evidence
+```
+
+Search results must indicate entity type.
+
+---
+
+# 79. Search Result Contract
+
+Conceptually:
+
+```text
+{
+  "id": "...",
+  "type": "threat",
+  "title": "...",
+  "status": "...",
+  "context": "..."
+}
+```
+
+The frontend then navigates to the canonical route.
+
+---
+
+# 80. Application Lifecycle
+
+AEGIS frontend lifecycle:
+
+```text
+BOOT
+ ↓
+LOAD CONFIG
+ ↓
+AUTHENTICATE
+ ↓
+LOAD USER CONTEXT
+ ↓
+LOAD ORGANIZATION CONTEXT
+ ↓
+INITIALIZE DATA CLIENT
+ ↓
+INITIALIZE REALTIME
+ ↓
+LOAD INITIAL SCREEN
+ ↓
+RUN
+```
+
+---
+
+# 81. Authentication State
+
+The application must distinguish:
+
+```text
+unknown
+authenticated
+unauthenticated
+sessionExpired
+authenticationError
+```
+
+Do not briefly render protected content before authentication state is known.
+
+---
+
+# 82. Session Expiration
+
+If a session expires:
+
+```text
+active application
+ ↓
+session expired
+ ↓
+stop consequential commands
+ ↓
+preserve safe UI context
+ ↓
+reauthenticate
+ ↓
+reconcile state
+```
+
+---
+
+# 83. Organization Context
+
+If AEGIS supports multiple organizational contexts, the selected organization must be explicit.
+
+Changing organization context must trigger appropriate:
+
+```text
+query invalidation
+permission recalculation
+realtime subscription update
+navigation validation
+```
+
+---
+
+# 84. Location Context
+
+Location context should be handled explicitly where relevant.
+
+Changing location filters must not silently change the user's operational organization or authorization scope.
+
+---
+
+# 85. Global State Architecture
+
+The frontend global state should contain only cross-cutting concerns.
+
+Conceptually:
+
+```text
+Global Application State
+├── auth
+├── organization
+├── navigation
+├── realtime
+├── notifications
+└── preferences
+```
+
+Domain server state remains in the server-state layer.
+
+---
+
+# 86. State Ownership Rule
+
+Every piece of state must have one owner.
+
+Ask:
+
+> "Who is authoritative for this value?"
+
+Possible answers:
+
+```text
+backend
+application store
+URL
+component
+form
+```
+
+Never allow two unrelated systems to independently own the same value.
+
+---
+
+# 87. Derived State
+
+Derived state should be calculated rather than duplicated.
+
+Example:
+
+```text
+threat.status
++
+risk.score
++
+investigation.status
+```
+
+may derive:
+
+```text
+availableActions
+```
+
+but available actions should ultimately respect backend permissions and domain rules.
+
+---
+
+# 88. Avoid Boolean Explosion
+
+Do not create:
+
+```text
+isThreatActive
+isThreatUnderReview
+isThreatResolved
+isThreatEscalated
+```
+
+all as independent mutable state.
+
+Prefer the canonical domain status.
+
+---
+
+# 89. State Machines in UI
+
+Where the domain state machine is important, frontend state should represent it explicitly.
+
+Example:
+
+```text
+containment.status
+```
+
+rather than a collection of booleans.
+
+---
+
+# 90. Application Workflow State
+
+Complex workflows may maintain temporary UI workflow state.
+
+Example:
+
+```text
+Containment Workflow
+
+review
+→ authorization
+→ confirmation
+→ execution
+→ verification
+```
+
+The workflow state must remain distinct from the authoritative backend containment state.
+
+---
+
+# 91. Unsaved Changes
+
+The frontend must detect unsaved form changes where necessary.
+
+Before navigation:
+
+```text
+unsaved draft
+ ↓
+warning
+ ↓
+continue / cancel
+```
+
+---
+
+# 92. Browser Refresh
+
+Refreshing a screen must not destroy authoritative domain state.
+
+Durable state comes from:
+
+```text
+URL
++
+API
++
+authenticated context
+```
+
+not from temporary memory.
+
+---
+
+# 93. Offline Behavior
+
+AEGIS should not pretend to support unrestricted offline operation.
+
+If disconnected:
+
+```text
+read cached data where safe
+display freshness state
+disable unsafe commands
+reconnect
+reconcile
+```
+
+---
+
+# 94. Security Boundaries
+
+Frontend secrets must never include:
+
+```text
+database credentials
+private API secrets
+server-only signing keys
+service credentials
+```
+
+Public runtime configuration must be distinguishable from server secrets.
+
+---
+
+# 95. Environment Architecture
+
+At minimum:
+
+```text
+development
+test
+staging
+production
+```
+
+must have separate configuration.
+
+Never hard-code production endpoints into components.
+
+---
+
+# 96. Environment Variables
+
+Configuration should be centralized.
+
+Conceptually:
+
+```text
+API_BASE_URL
+REALTIME_ENDPOINT
+APPLICATION_ENV
+PUBLIC_CONFIGURATION
+```
+
+Secrets remain server-side.
+
+---
+
+# 97. Testing Architecture
+
+The frontend testing pyramid should include:
+
+```text
+unit tests
+component tests
+integration tests
+workflow tests
+end-to-end tests
+visual regression where useful
+accessibility tests
+```
+
+---
+
+# 98. Unit Tests
+
+Test:
+
+```text
+pure logic
+formatters
+selectors
+state utilities
+validation
+permission helpers
+```
+
+---
+
+# 99. Component Tests
+
+Test:
+
+```text
+rendering
+states
+interaction
+accessibility
+error behavior
+```
+
+---
+
+# 100. Integration Tests
+
+Test:
+
+```text
+screen
++
+query
++
+mutation
++
+state reconciliation
+```
+
+---
+
+# 101. End-to-End Tests
+
+Test complete operational journeys.
+
+The most important E2E test is not:
+
+```text
+"Does the dashboard render?"
+```
+
+It is:
+
+```text
+Can a user move from detection
+through assessment
+through investigation
+through response
+through recovery
+through institutional learning
+without the application losing state?
+```
+
+---
+
+# 102. Visual Testing
+
+Visual regression should protect:
+
+```text
+layout
+spacing
+typography
+component states
+responsive behavior
+critical screen composition
+```
+
+But visual correctness must never substitute for functional correctness.
+
+---
+
+# 103. Frontend Acceptance Criteria
+
+The frontend is not complete when:
+
+```text
+all 13 routes exist
+```
+
+It is complete when:
+
+```text
+all 13 screens
++
+real API contracts
++
+real state transitions
++
+real loading states
++
+real error states
++
+real permissions
++
+real event propagation
++
+real navigation
+```
+
+work together.
+
+---
+
+# 104. AI Tooling Architecture
+
+The AEGIS development workflow should deliberately separate AI responsibilities.
+
+```text
+CHATGPT
+Research / synthesis / specification reasoning
+
+CLAUDE
+Architecture / decomposition / technical reasoning
+
+v0
+High-fidelity interface exploration
+
+OPENCODE
+Repository implementation / integration / refactoring / testing
+```
+
+Each tool has a different job.
+
+---
+
+# 105. ChatGPT Role
+
+ChatGPT may be used for:
+
+```text
+research
+source discovery
+domain exploration
+stakeholder questions
+requirements analysis
+competitive analysis
+terminology
+architecture critique
+documentation review
+```
+
+ChatGPT must not silently become the source of project truth.
+
+Approved project documents remain authoritative.
+
+---
+
+# 106. Claude Role
+
+Claude may be used for:
+
+```text
+architecture synthesis
+technical decomposition
+component planning
+complex reasoning
+implementation planning
+review
+```
+
+Claude should consume the approved AEGIS documents rather than inventing architecture independently.
+
+---
+
+# 107. v0 Role
+
+v0 is responsible primarily for:
+
+```text
+visual exploration
+high-fidelity layouts
+component composition
+interaction prototypes
+responsive UI exploration
+```
+
+v0 outputs must be treated as visual implementation candidates.
+
+They are not architectural authority.
+
+---
+
+# 108. OpenCode Role
+
+OpenCode is the primary implementation environment.
+
+It should handle:
+
+```text
+repository inspection
+scaffolding
+component implementation
+API integration
+state management
+routing
+testing
+refactoring
+bug fixing
+performance work
+```
+
+OpenCode must implement the approved architecture.
+
+---
+
+# 109. AI Handoff Protocol
+
+The flow should be:
+
+```text
+RESEARCH
+ ↓
+ARCHITECTURE
+ ↓
+SPECIFICATION
+ ↓
+VISUAL DESIGN
+ ↓
+IMPLEMENTATION
+ ↓
+TESTING
+ ↓
+REVIEW
+ ↓
+REFINEMENT
+```
+
+Do not reverse this casually.
+
+---
+
+# 110. v0 → OpenCode Handoff
+
+v0 should provide:
+
+```text
+visual structure
+component hierarchy
+interaction intent
+responsive behavior
+styling direction
+```
+
+OpenCode then translates that into:
+
+```text
+production components
+real data
+real state
+real API calls
+real error handling
+real navigation
+```
+
+Never allow v0 mock data to become permanent operational data.
+
+---
+
+# 111. OpenCode Context Loading
+
+Before implementing a feature, OpenCode should load the relevant specifications.
+
+For frontend work:
+
+```text
+01 Master Architecture
+02 Domain Model + Global State
+03 User Flow
+04 Functional Requirements
+05 Interaction + State Transitions
+06 Data Architecture
+07 API Architecture
+08 Frontend Architecture
+```
+
+Then inspect the actual repository.
+
+---
+
+# 112. Repository Truth Rule
+
+If the documentation and repository disagree:
+
+```text
+DO NOT GUESS.
+```
+
+Instead:
+
+```text
+identify conflict
+document conflict
+determine authoritative decision
+update specification if necessary
+then implement
+```
+
+---
+
+# 113. No AI Drift Rule
+
+AI agents must not:
+
+```text
+rename domain concepts
+create alternative architectures
+replace technologies without approval
+invent screens
+invent endpoints
+invent states
+invent data
+remove required states
+simplify workflows without approval
+```
+
+---
+
+# 114. Frontend Development Sequence
+
+Implementation should progress in this order:
+
+```text
+1. Repository foundation
+2. Application shell
+3. Design system
+4. Routing
+5. API client
+6. Authentication context
+7. Server-state layer
+8. Realtime layer
+9. Shared primitives
+10. Domain components
+11. Screen foundations
+12. Screen data integration
+13. Commands
+14. State reconciliation
+15. Operational workflows
+16. Testing
+17. Performance
+18. Accessibility
+19. Visual refinement
+```
+
+---
+
+# 115. Do Not Build All 13 Screens at Once
+
+The project should not be developed as:
+
+```text
+screen 1
+screen 2
+screen 3
+...
+screen 13
+```
+
+with fake data.
+
+That creates the illusion of progress while hiding integration failures.
+
+Instead build vertical slices.
+
+---
+
+# 116. Vertical Slice Strategy
+
+A vertical slice means:
+
+```text
+UI
++
+API
++
+domain
++
+state
++
+event
++
+test
+```
+
+for one meaningful operational capability.
+
+---
+
+# 117. Recommended First Vertical Slice
+
+The first slice should prove:
+
+```text
+Monitoring
+ ↓
+Anomaly
+ ↓
+Threat
+ ↓
+Threat Detail
+```
+
+It should establish:
+
+```text
+routing
+API client
+query layer
+domain types
+state handling
+real-time update
+loading
+error
+empty
+navigation
+```
+
+before expanding.
+
+---
+
+# 118. Second Vertical Slice
+
+Then:
+
+```text
+Threat
+ ↓
+Risk Assessment
+ ↓
+Investigation
+```
+
+This validates deeper domain relationships.
+
+---
+
+# 119. Third Vertical Slice
+
+Then:
+
+```text
+Investigation
+ ↓
+Transmission
+ ↓
+Containment
+```
+
+This validates consequential command architecture.
+
+---
+
+# 120. Fourth Vertical Slice
+
+Then:
+
+```text
+Containment
+ ↓
+Response
+ ↓
+Recovery
+```
+
+This validates the operational response journey.
+
+---
+
+# 121. Fifth Vertical Slice
+
+Finally:
+
+```text
+Recovery
+ ↓
+Preparedness
+ ↓
+Resilience Improvement
+```
+
+This validates the biological feedback loop.
+
+---
+
+# 122. Frontend Completion Model
+
+AEGIS frontend development should move through:
+
+```text
+FOUNDATION
+ ↓
+STRUCTURE
+ ↓
+DATA
+ ↓
+INTERACTION
+ ↓
+OPERATIONAL FLOW
+ ↓
+REAL-TIME
+ ↓
+TESTING
+ ↓
+REFINEMENT
+```
+
+Not:
+
+```text
+MAKE IT LOOK GOOD
+ ↓
+FIGURE OUT HOW IT WORKS
+```
+
+---
+
+# 123. Master Frontend Invariants
+
+### Invariant 01
+
+The API is the authoritative source of operational state.
+
+### Invariant 02
+
+The frontend never invents domain truth.
+
+### Invariant 03
+
+The frontend never bypasses API contracts.
+
+### Invariant 04
+
+Every consequential action has explicit loading, success, and failure states.
+
+### Invariant 05
+
+Invalid domain transitions are rejected by the backend.
+
+### Invariant 06
+
+Real-time events reconcile application state.
+
+### Invariant 07
+
+Disconnected state is visible.
+
+### Invariant 08
+
+Critical information is never communicated by color alone.
+
+### Invariant 09
+
+The 13-screen registry remains authoritative.
+
+### Invariant 10
+
+AI-generated UI must ultimately connect to real application architecture.
+
+---
+
+# 124. Frontend Definition of Done
+
+A screen is complete only when:
+
+```text
+✓ Correct route
+✓ Correct user
+✓ Correct information hierarchy
+✓ Correct API queries
+✓ Correct domain types
+✓ Correct commands
+✓ Correct permissions
+✓ Correct state transitions
+✓ Loading state
+✓ Empty state
+✓ Error state
+✓ Success state
+✓ Real-time behavior where required
+✓ Correct navigation
+✓ Accessible interaction
+✓ Responsive behavior
+✓ Performance acceptable
+✓ Tests passing
+✓ No fabricated operational data
+```
+
+---
+
+# 125. Final Architecture
+
+The AEGIS frontend should ultimately behave like this:
+
+```text
+                         AEGIS USER
+                              │
+                              ▼
+                    ┌──────────────────┐
+                    │  AEGIS FRONTEND  │
+                    └────────┬─────────┘
+                             │
+              ┌──────────────┼──────────────┐
+              ▼              ▼              ▼
+          Navigation      Queries        Commands
+              │              │              │
+              └──────────────┼──────────────┘
+                             ▼
+                    ┌──────────────────┐
+                    │ APPLICATION LAYER│
+                    └────────┬─────────┘
+                             │
+                             ▼
+                    ┌──────────────────┐
+                    │ DATA ACCESS LAYER│
+                    └────────┬─────────┘
+                             │
+                 ┌───────────┴───────────┐
+                 ▼                       ▼
+             HTTP API               REALTIME
+                 │                       │
+                 └───────────┬───────────┘
+                             ▼
+                    ┌──────────────────┐
+                    │  AEGIS BACKEND   │
+                    │ Domain + State   │
+                    └──────────────────┘
+```
+
+The central architectural rule is:
+
+> **The interface may display, guide, request, and reconcile. The backend decides what is true.**
+
+That distinction must remain intact throughout the entire AEGIS build.
