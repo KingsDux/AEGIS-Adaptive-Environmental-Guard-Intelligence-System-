@@ -1,0 +1,2004 @@
+# AEGIS
+
+## User Flow + Operational Journey Architecture
+
+**System:** AEGIS\
+&#x2A;*Product:** Bio-Resilience Pathogen Defense System\
+&#x2A;*Document Type:** User Flow + Operational Journey Architecture\
+&#x2A;*Status:** Master Architecture\
+&#x2A;*Version:** 1.0\
+&#x2A;*Date:** August 2026
+
+---
+
+# 01. Document Purpose
+
+This document defines how AEGIS is experienced and operated across its complete lifecycle.
+
+It establishes:
+
+- how users enter the system
+- how information moves between screens
+- how a biological signal becomes an investigated threat
+- how a threat becomes an operational response
+- how containment and response are coordinated
+- how recovery is represented
+- how completed events become organizational memory
+- how preparedness is strengthened
+- how strategic stakeholders consume the same operational truth
+- which transitions are automatic
+- which transitions require human judgment
+- which actions change global system state
+- which screens are read-only versus operational
+- how AEGIS prevents users from losing context during high-pressure events
+
+This document is **not a visual design specification**.
+
+It is the behavioral and operational architecture that the interface must express.
+
+---
+
+# 02. Core Operational Principle
+
+AEGIS is organized around one continuous biological-response journey:
+
+**Sense → Detect → Recognize → Assess → Investigate → Understand Transmission → Contain → Respond → Recover → Learn → Prepare**
+
+The system should never behave like a collection of unrelated dashboards.
+
+Every screen represents a different operational perspective on the **same underlying system state**.
+
+The user should therefore be able to move from:
+
+**signal**
+
+to
+
+**threat**
+
+to
+
+**investigation**
+
+to
+
+**transmission understanding**
+
+to
+
+**containment**
+
+to
+
+**response**
+
+to
+
+**recovery**
+
+to
+
+**institutional learning**
+
+without losing the identity, history, evidence, status, or operational context of the event.
+
+---
+
+# 03. Authoritative Screen Registry
+
+AEGIS contains exactly these 13 screens:
+
+| #  | Screen                  | Primary Operational Function                      |
+| -- | ----------------------- | ------------------------------------------------- |
+| 01 | Live Surveillance       | Observe live environmental and patient signals    |
+| 02 | Threat Discovery        | Detect and surface abnormal biological patterns   |
+| 03 | Threat Overview         | Establish the current threat picture              |
+| 04 | Risk Overview           | Assess severity, exposure, and operational risk   |
+| 05 | Investigation View      | Conduct structured threat investigation           |
+| 06 | Case Investigation View |  Examine individual cases and their relationships |
+| 07 | Transmission View       | Understand possible transmission pathways         |
+| 08 | Containment View        | Plan and monitor containment measures             |
+| 09 | Response View           | Coordinate active response actions                |
+| 10 | Recovery View           | Monitor recovery and return toward baseline       |
+| 11 | Preparedness View       | Convert knowledge into future readiness           |
+| 12 | Research View           | Examine deeper scientific and analytical context  |
+| 13 | Executive View          | Provide strategic oversight                       |
+
+**No additional operational screens are introduced by this architecture.**
+
+---
+
+# 04. Primary User Journey
+
+The canonical AEGIS journey is:
+
+```text
+LIVE SURVEILLANCE
+       ↓
+THREAT DISCOVERY
+       ↓
+THREAT OVERVIEW
+       ↓
+RISK OVERVIEW
+       ↓
+INVESTIGATION VIEW
+       ↓
+CASE INVESTIGATION VIEW
+       ↓
+TRANSMISSION VIEW
+       ↓
+CONTAINMENT VIEW
+       ↓
+RESPONSE VIEW
+       ↓
+RECOVERY VIEW
+       ↓
+PREPAREDNESS VIEW
+```
+
+Supporting analytical paths connect:
+
+```text
+THREAT OVERVIEW
+      ↕
+RESEARCH VIEW
+
+RISK OVERVIEW
+      ↕
+EXECUTIVE VIEW
+
+INVESTIGATION VIEW
+      ↕
+CASE INVESTIGATION VIEW
+
+TRANSMISSION VIEW
+      ↕
+CONTAINMENT VIEW
+
+RESPONSE VIEW
+      ↕
+RECOVERY VIEW
+
+RECOVERY VIEW
+      ↓
+PREPAREDNESS VIEW
+```
+
+The user does **not** have to traverse every screen sequentially.
+
+The sequence above represents the **canonical operational lifecycle**, not a forced navigation path.
+
+---
+
+# 05. AEGIS Operational State Machine
+
+Every operational event moves through controlled states.
+
+```text
+OBSERVED
+   ↓
+DETECTED
+   ↓
+DISCOVERED
+   ↓
+ASSESSED
+   ↓
+INVESTIGATING
+   ↓
+CHARACTERIZED
+   ↓
+TRANSMISSION UNDERSTOOD
+   ↓
+CONTAINMENT PLANNED
+   ↓
+CONTAINMENT ACTIVE
+   ↓
+RESPONSE ACTIVE
+   ↓
+RECOVERY
+   ↓
+LEARNING
+   ↓
+PREPAREDNESS UPDATED
+   ↓
+CLOSED
+```
+
+Not every event will reach every state.
+
+For example:
+
+```text
+OBSERVED
+   ↓
+DETECTED
+   ↓
+ASSESSED
+   ↓
+RESOLVED
+```
+
+may be valid for a low-significance anomaly.
+
+The architecture must therefore distinguish between:
+
+**operational progression**
+
+and
+
+**screen navigation**.
+
+A user opening another screen does not automatically advance the operational state.
+
+---
+
+# 06. Journey 01 — Live Surveillance
+
+## Objective
+
+Provide the earliest operational awareness of environmental and patient conditions.
+
+This is the AEGIS equivalent of the biological **sensing barrier**.
+
+The system continuously observes signals without assuming that every abnormality represents a threat.
+
+## Entry
+
+The user enters AEGIS through:
+
+**Live Surveillance**
+
+or arrives there from another screen when monitoring needs to resume.
+
+## User Questions
+
+The interface should help answer:
+
+- What is happening now?
+- Where is something abnormal?
+- Is the system within expected conditions?
+- Which signals deserve attention?
+- Has a new abnormal pattern appeared?
+- Is an existing event changing?
+
+## Core Flow
+
+```text
+Observe live environment
+        ↓
+Signal changes
+        ↓
+AEGIS evaluates signal
+        ↓
+Normal
+   OR
+Potential anomaly
+```
+
+### Normal
+
+The system maintains surveillance.
+
+No threat event is created.
+
+### Potential anomaly
+
+The signal becomes eligible for Threat Discovery.
+
+```text
+Potential anomaly
+        ↓
+Threat Discovery
+```
+
+## Critical Principle
+
+**Detection is not diagnosis.**
+
+AEGIS must never visually imply that a raw signal is already a confirmed biological threat.
+
+---
+
+# 07. Journey 02 — Threat Discovery
+
+## Objective
+
+Convert abnormal signals into identifiable candidate threats.
+
+This is the transition between:
+
+**sensing**
+
+and
+
+**recognition**.
+
+## Entry Conditions
+
+Threat Discovery may be entered because:
+
+- surveillance detected an abnormal pattern
+- multiple signals converged
+- a patient-related anomaly emerged
+- an existing event changed materially
+- an authorized user deliberately initiated investigation
+
+## Flow
+
+```text
+Candidate signal
+      ↓
+Pattern evaluation
+      ↓
+Evidence aggregation
+      ↓
+Candidate threat created
+      ↓
+Threat Overview
+```
+
+## Decision Point
+
+The system must distinguish:
+
+```text
+Signal
+↓
+Candidate
+↓
+Threat
+```
+
+These are not interchangeable terms.
+
+## User Responsibility
+
+The system surfaces evidence.
+
+The authorized human determines the operational significance when human validation is required.
+
+---
+
+# 08. Journey 03 — Threat Overview
+
+## Objective
+
+Create the first coherent operational picture of the threat.
+
+This is where fragmented signals become a unified event context.
+
+## Flow
+
+```text
+Threat discovered
+       ↓
+Threat Overview
+       ↓
+Establish current picture
+       ↓
+Determine whether deeper assessment is required
+```
+
+## Primary Decisions
+
+The user should be able to determine:
+
+1. What is the event?
+2. Where is it occurring?
+3. What evidence currently supports it?
+4. What is known?
+5. What remains uncertain?
+6. What is changing?
+7. Does the event require risk assessment?
+
+## Transition
+
+```text
+Threat Overview
+      ↓
+Risk Overview
+```
+
+or:
+
+```text
+Threat Overview
+      ↓
+Investigation View
+```
+
+The first route emphasizes operational risk.
+
+The second emphasizes evidence gathering.
+
+---
+
+# 09. Journey 04 — Risk Overview
+
+## Objective
+
+Translate threat information into operational risk.
+
+Risk is not simply another visualization of threat data.
+
+Risk represents the potential consequences of the event for the healthcare environment.
+
+## Flow
+
+```text
+Threat
+ ↓
+Risk assessment
+ ↓
+Exposure understanding
+ ↓
+Severity assessment
+ ↓
+Operational priority
+```
+
+## Decision
+
+The user determines whether the event requires:
+
+```text
+Monitoring
+      OR
+Investigation
+      OR
+Containment planning
+      OR
+Active response
+```
+
+AEGIS should not automatically jump from "high-looking" telemetry to an irreversible operational action.
+
+---
+
+# 10. Journey 05 — Investigation View
+
+## Objective
+
+Establish what is known about the threat and what evidence is still required.
+
+Investigation transforms uncertainty into structured understanding.
+
+## Flow
+
+```text
+Threat
+  ↓
+Investigation
+  ↓
+Evidence collection
+  ↓
+Evidence evaluation
+  ↓
+Hypothesis development
+  ↓
+Threat characterization
+```
+
+## Investigation State
+
+The investigation must preserve:
+
+- current hypothesis
+- supporting evidence
+- conflicting evidence
+- unresolved questions
+- confidence
+- investigation history
+- linked cases
+- relevant transmission information
+- analytical findings
+
+## Transition
+
+```text
+Investigation
+      ↓
+Case Investigation
+```
+
+when individual cases become necessary for understanding the event.
+
+---
+
+# 11. Journey 06 — Case Investigation View
+
+## Objective
+
+Move from population-level threat understanding into individual case relationships.
+
+This view should answer:
+
+**Who or what is connected to the event, and how does that relationship affect the investigation?**
+
+## Flow
+
+```text
+Threat
+ ↓
+Cases
+ ↓
+Case relationships
+ ↓
+Temporal relationships
+ ↓
+Spatial relationships
+ ↓
+Potential connections
+ ↓
+Investigation evidence
+```
+
+The Case Investigation View should feed findings back into the broader investigation rather than becoming an isolated case-management experience.
+
+## Transition
+
+```text
+Case findings
+      ↓
+Investigation
+      ↓
+Transmission View
+```
+
+when relationships suggest that transmission understanding is required.
+
+---
+
+# 12. Journey 07 — Transmission View
+
+## Objective
+
+Understand how the threat may be moving through the environment.
+
+This is the AEGIS equivalent of understanding how an infectious challenge propagates through a biological system.
+
+## Flow
+
+```text
+Cases + environmental signals
+            ↓
+Relationship analysis
+            ↓
+Potential transmission pathways
+            ↓
+Transmission understanding
+            ↓
+Containment opportunity
+```
+
+## Critical Principle
+
+Transmission visualization must distinguish between:
+
+**observed relationship**
+
+and
+
+**inferred relationship**.
+
+AEGIS must never present an inference as established fact.
+
+## Operational Question
+
+The user should ultimately be able to ask:
+
+> Where can intervention interrupt the event?
+
+That question leads directly into Containment View.
+
+---
+
+# 13. Journey 08 — Containment View
+
+## Objective
+
+Determine where and how the operational environment can be protected.
+
+Containment is the transition from:
+
+**understanding**
+
+to
+
+**intervention**.
+
+## Flow
+
+```text
+Transmission understanding
+        ↓
+Containment opportunities
+        ↓
+Candidate interventions
+        ↓
+Impact assessment
+        ↓
+Containment plan
+        ↓
+Containment active
+```
+
+## Containment Categories
+
+The architecture supports operational categories such as:
+
+- isolation
+- environmental controls
+- ventilation adjustments
+- sterilization actions
+- movement restrictions
+- targeted protective measures
+
+The exact intervention set must remain governed by the approved operational and engineering specification.
+
+## Important Rule
+
+**Containment planning and containment execution are different states.**
+
+A recommended intervention is not equivalent to an executed intervention.
+
+---
+
+# 14. Journey 09 — Response View
+
+## Objective
+
+Coordinate the active operational response.
+
+This is where the system shifts from:
+
+**What should we do?**
+
+to:
+
+**What is currently being done, what has happened, and what remains unresolved?**
+
+## Flow
+
+```text
+Containment plan
+      ↓
+Response activation
+      ↓
+Action execution
+      ↓
+Action monitoring
+      ↓
+Outcome observation
+      ↓
+Response adjustment
+```
+
+## Response Loop
+
+```text
+ACTION
+  ↓
+OBSERVATION
+  ↓
+ASSESSMENT
+  ↓
+ADJUSTMENT
+  ↓
+ACTION
+```
+
+This loop is central to AEGIS.
+
+A response is not a single command.
+
+It is a controlled feedback cycle.
+
+---
+
+# 15. Journey 10 — Recovery View
+
+## Objective
+
+Determine whether the environment is moving toward recovery.
+
+Recovery begins when active response is no longer the only operational priority.
+
+## Flow
+
+```text
+Response
+   ↓
+Stabilization
+   ↓
+Monitoring
+   ↓
+Comparison against expected baseline
+   ↓
+Recovery assessment
+   ↓
+Return toward normal operation
+```
+
+## Recovery Must Not Mean
+
+"Nothing is happening anymore."
+
+Instead:
+
+**Recovery means evidence indicates that the system is moving toward an acceptable operational state.**
+
+The recovery process therefore continues monitoring.
+
+---
+
+# 16. Journey 11 — Preparedness View
+
+## Objective
+
+Convert experience into future resilience.
+
+This is the bridge between:
+
+**one event**
+
+and
+
+**future readiness**.
+
+## Flow
+
+```text
+Recovery
+   ↓
+Event review
+   ↓
+Lessons identified
+   ↓
+Resilience gaps identified
+   ↓
+Preparedness requirements
+   ↓
+Future readiness improvement
+```
+
+This is the AEGIS equivalent of biological memory.
+
+The system does not merely record what happened.
+
+It uses the event to strengthen future preparedness.
+
+---
+
+# 17. Journey 12 — Research View
+
+## Objective
+
+Provide deeper analytical and scientific context without disrupting the primary operational workflow.
+
+Research View supports investigation rather than replacing it.
+
+## Entry Paths
+
+Research may be entered from:
+
+```text
+Threat Overview
+Investigation View
+Case Investigation View
+Transmission View
+Preparedness View
+```
+
+## Return Principle
+
+The user must be able to return to the originating operational context.
+
+Research should therefore behave as a **supporting analytical context**, not a disconnected destination.
+
+---
+
+# 18. Journey 13 — Executive View
+
+## Objective
+
+Provide strategic oversight of AEGIS activity.
+
+Executive View is not another operational control center.
+
+It represents the strategic layer.
+
+## Flow
+
+```text
+Operational events
+       ↓
+Aggregated organizational picture
+       ↓
+Strategic risk
+       ↓
+Resource / readiness decisions
+       ↓
+Organizational resilience
+```
+
+Executive users should not need to understand every telemetry event.
+
+They need to understand:
+
+- current strategic risk
+- significant active events
+- response status
+- organizational exposure
+- resilience gaps
+- preparedness posture
+- recovery trajectory
+
+---
+
+# 19. Canonical End-to-End Operational Journey
+
+The complete AEGIS journey is:
+
+```text
+┌──────────────────────┐
+│ 01 LIVE SURVEILLANCE │
+└──────────┬───────────┘
+           │ abnormal signal
+           ▼
+┌──────────────────────┐
+│ 02 THREAT DISCOVERY  │
+└──────────┬───────────┘
+           │ candidate threat
+           ▼
+┌──────────────────────┐
+│ 03 THREAT OVERVIEW   │
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│ 04 RISK OVERVIEW     │
+└──────────┬───────────┘
+           │ risk requires investigation
+           ▼
+┌──────────────────────┐
+│ 05 INVESTIGATION     │
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│ 06 CASE INVESTIGATION│
+└──────────┬───────────┘
+           │ case relationships
+           ▼
+┌──────────────────────┐
+│ 07 TRANSMISSION      │
+└──────────┬───────────┘
+           │ intervention opportunity
+           ▼
+┌──────────────────────┐
+│ 08 CONTAINMENT       │
+└──────────┬───────────┘
+           │ containment activated
+           ▼
+┌──────────────────────┐
+│ 09 RESPONSE          │
+└──────────┬───────────┘
+           │ stabilization
+           ▼
+┌──────────────────────┐
+│ 10 RECOVERY          │
+└──────────┬───────────┘
+           │ event learning
+           ▼
+┌──────────────────────┐
+│ 11 PREPAREDNESS      │
+└──────────────────────┘
+```
+
+Supporting perspectives:
+
+```text
+             ┌───────────────┐
+             │ 12 RESEARCH   │
+             └───────┬───────┘
+                     │
+          supports analytical depth
+                     │
+                     ▼
+        operational investigation
+
+
+             ┌───────────────┐
+             │ 13 EXECUTIVE  │
+             └───────┬───────┘
+                     │
+              strategic view
+                     │
+                     ▼
+             organizational
+                oversight
+```
+
+---
+
+# 20. Cross-Screen Context Preservation
+
+This is one of the most important architectural rules in AEGIS.
+
+When the user moves between screens, the system must preserve the active operational context.
+
+The user should never feel:
+
+> "I went to another page and lost the event."
+
+Instead:
+
+> "I changed perspectives on the same event."
+
+## Persistent Operational Context
+
+When applicable, the following context travels with the user:
+
+```text
+Active Event
+Event Status
+Threat Identity
+Risk State
+Investigation State
+Selected Case
+Transmission Context
+Containment State
+Response State
+Recovery State
+Evidence Context
+Confidence / Uncertainty
+Relevant timestamps
+```
+
+The interface may display different subsets of this information depending on the screen.
+
+---
+
+# 21. Operational Journey Context Object
+
+Conceptually, AEGIS should maintain a shared operational context:
+
+```text
+OperationalContext
+│
+├── activeEvent
+│
+├── threat
+│
+├── risk
+│
+├── investigation
+│
+├── selectedCase
+│
+├── transmission
+│
+├── containment
+│
+├── response
+│
+├── recovery
+│
+├── preparedness
+│
+├── evidence
+│
+├── confidence
+│
+└── timestamps
+```
+
+This does not mean every field is populated at every stage.
+
+The context grows as understanding increases.
+
+---
+
+# 22. User Decision Architecture
+
+AEGIS should distinguish three categories of system behavior.
+
+## A. System Observation
+
+The system observes something.
+
+Example:
+
+```text
+Signal changes
+```
+
+No human decision is implied.
+
+---
+
+## B. System Recommendation
+
+AEGIS identifies something that may require attention.
+
+Example:
+
+```text
+Potential abnormal pattern detected.
+```
+
+The system informs.
+
+---
+
+## C. Human Operational Decision
+
+An authorized user determines what should happen.
+
+Example:
+
+```text
+Containment action approved.
+```
+
+This distinction is essential for high-stakes healthcare environments.
+
+AEGIS must not blur:
+
+**observation**
+
+with
+
+**recommendation**
+
+with
+
+**authorization**
+
+with
+
+**execution**.
+
+---
+
+# 23. Human-in-the-Loop Architecture
+
+The operational loop is:
+
+```text
+SYSTEM OBSERVES
+       ↓
+SYSTEM ANALYZES
+       ↓
+SYSTEM SURFACES
+       ↓
+HUMAN REVIEWS
+       ↓
+HUMAN DECIDES
+       ↓
+SYSTEM RECORDS
+       ↓
+SYSTEM MONITORS
+       ↓
+SYSTEM FEEDS BACK
+```
+
+For high-consequence actions:
+
+```text
+Recommendation
+      ↓
+Review
+      ↓
+Authorization
+      ↓
+Execution
+      ↓
+Verification
+```
+
+The UI must make these stages visually distinguishable.
+
+---
+
+# 24. Uncertainty Architecture
+
+AEGIS must preserve uncertainty throughout the journey.
+
+At any point the system may contain:
+
+```text
+Known
+Unknown
+Suspected
+Inferred
+Confirmed
+Conflicting
+Pending
+```
+
+These states must not be collapsed into a single "truth" representation.
+
+## Example
+
+Bad:
+
+```text
+Transmission source: Ward 3
+```
+
+when the evidence only suggests it.
+
+Better:
+
+```text
+Potential transmission source
+Ward 3
+Confidence: [state]
+Evidence: [state]
+```
+
+The exact confidence model belongs to the domain/state architecture and must not be fabricated inside the UX layer.
+
+---
+
+# 25. Event Escalation Journey
+
+An event can escalate as evidence changes.
+
+```text
+Low significance
+      ↓
+Watch
+      ↓
+Elevated concern
+      ↓
+Investigation
+      ↓
+High operational risk
+      ↓
+Containment
+      ↓
+Active response
+```
+
+The reverse is also possible:
+
+```text
+Active response
+      ↓
+Stabilization
+      ↓
+Reduced risk
+      ↓
+Recovery
+      ↓
+Monitoring
+      ↓
+Resolved
+```
+
+AEGIS must therefore support both:
+
+**escalation**
+
+and
+
+**de-escalation**.
+
+---
+
+# 26. Response Feedback Loop
+
+Response does not terminate investigation.
+
+Instead:
+
+```text
+Investigation
+      ↓
+Containment
+      ↓
+Response
+      ↓
+New observations
+      ↓
+Investigation updated
+      ↓
+Transmission understanding updated
+      ↓
+Containment adjusted
+      ↓
+Response adjusted
+```
+
+This is the core Bio-Resilience loop.
+
+The system behaves less like:
+
+```text
+ALERT → ACTION → DONE
+```
+
+and more like:
+
+```text
+SENSE
+ ↓
+INTERPRET
+ ↓
+ACT
+ ↓
+OBSERVE
+ ↓
+LEARN
+ ↓
+ADAPT
+ ↓
+ACT AGAIN
+```
+
+---
+
+# 27. Recovery-to-Memory Journey
+
+The biological analogy becomes most valuable after the immediate threat.
+
+```text
+EVENT
+ ↓
+RESPONSE
+ ↓
+OUTCOME
+ ↓
+RECOVERY
+ ↓
+LESSON
+ ↓
+MEMORY
+ ↓
+PREPAREDNESS
+ ↓
+FUTURE RESPONSE
+```
+
+This creates the AEGIS resilience cycle:
+
+```text
+┌───────────────┐
+│    DETECT     │
+└───────┬───────┘
+        ↓
+┌───────────────┐
+│    IDENTIFY   │
+└───────┬───────┘
+        ↓
+┌───────────────┐
+│    ASSESS     │
+└───────┬───────┘
+        ↓
+┌───────────────┐
+│   INVESTIGATE │
+└───────┬───────┘
+        ↓
+┌───────────────┐
+│   CONTAIN     │
+└───────┬───────┘
+        ↓
+┌───────────────┐
+│    RESPOND    │
+└───────┬───────┘
+        ↓
+┌───────────────┐
+│    RECOVER    │
+└───────┬───────┘
+        ↓
+┌───────────────┐
+│     LEARN     │
+└───────┬───────┘
+        ↓
+┌───────────────┐
+│   PREPARE     │
+└───────┬───────┘
+        │
+        └──────────→ stronger future detection
+```
+
+---
+
+# 28. Navigation Architecture
+
+Navigation should follow operational intent rather than arbitrary page ordering.
+
+## Primary Operational Progression
+
+```text
+Live Surveillance
+        ↓
+Threat Discovery
+        ↓
+Threat Overview
+        ↓
+Risk Overview
+        ↓
+Investigation
+        ↓
+Transmission
+        ↓
+Containment
+        ↓
+Response
+        ↓
+Recovery
+        ↓
+Preparedness
+```
+
+## Investigation Branch
+
+```text
+Investigation
+      ↓
+Case Investigation
+      ↓
+Investigation
+```
+
+## Analytical Branch
+
+```text
+Threat Overview
+      ↓
+Research
+      ↓
+Threat Overview
+```
+
+## Strategic Branch
+
+```text
+Risk Overview
+      ↓
+Executive
+      ↓
+Risk Overview
+```
+
+These branches must return the user to the relevant operational context.
+
+---
+
+# 29. Breadcrumb / Journey Awareness
+
+AEGIS should communicate where the user is within the operational lifecycle.
+
+Conceptually:
+
+```text
+THREAT
+  →
+RISK
+  →
+INVESTIGATION
+  →
+TRANSMISSION
+  →
+CONTAINMENT
+  →
+RESPONSE
+  →
+RECOVERY
+```
+
+The current stage should be obvious.
+
+The user should never have to remember:
+
+> "Which part of the incident am I looking at?"
+
+---
+
+# 30. Operational Event Timeline
+
+Every significant event should contribute to a chronological operational history.
+
+Conceptually:
+
+```text
+TIME
+ │
+ ├── signal observed
+ │
+ ├── anomaly detected
+ │
+ ├── threat created
+ │
+ ├── risk assessed
+ │
+ ├── investigation started
+ │
+ ├── case relationship identified
+ │
+ ├── transmission hypothesis developed
+ │
+ ├── containment proposed
+ │
+ ├── containment authorized
+ │
+ ├── response initiated
+ │
+ ├── response outcome observed
+ │
+ ├── recovery initiated
+ │
+ └── preparedness lesson recorded
+```
+
+This timeline becomes part of the event's institutional memory.
+
+---
+
+# 31. Operational Journey Failure Handling
+
+AEGIS must assume that real operations are messy.
+
+The user may:
+
+- navigate backward
+- change screens
+- discover contradictory evidence
+- receive new signals
+- change an assessment
+- pause an investigation
+- escalate an event
+- de-escalate an event
+- return after inactivity
+- revisit a completed event
+
+The architecture must therefore support **non-linear operational journeys**.
+
+Example:
+
+```text
+Response
+   ↓
+New evidence
+   ↓
+Investigation
+   ↓
+Transmission
+   ↓
+Containment
+   ↓
+Response
+```
+
+This is not an error.
+
+It is expected behavior.
+
+---
+
+# 32. Stale Context Protection
+
+A critical operational risk is allowing a user to act on outdated information.
+
+Therefore:
+
+```text
+User opens event
+       ↓
+System state changes
+       ↓
+User context becomes stale
+       ↓
+AEGIS identifies state change
+       ↓
+User is informed
+       ↓
+User reviews current state
+       ↓
+Action continues only against current state
+```
+
+The exact notification and conflict-resolution behavior must be defined in engineering implementation.
+
+The architectural requirement is:
+
+**Never silently allow stale operational context to masquerade as current truth.**
+
+---
+
+# 33. Action Confirmation Architecture
+
+High-consequence actions require explicit distinction between:
+
+```text
+VIEW
+```
+
+```text
+RECOMMEND
+```
+
+```text
+PREPARE
+```
+
+```text
+AUTHORIZE
+```
+
+```text
+EXECUTE
+```
+
+```text
+VERIFY
+```
+
+This should be reflected in both the state model and UI interaction model.
+
+A button should never obscure whether the user is:
+
+- requesting an action
+- approving an action
+- executing an action
+- recording an action
+
+---
+
+# 34. Role-Based Journey Differences
+
+AEGIS uses the same underlying operational truth but different users require different perspectives.
+
+## Health Worker
+
+Primary concern:
+
+```text
+What is happening around my operational environment?
+What requires attention?
+What action is relevant to me?
+```
+
+Likely journey emphasis:
+
+```text
+Surveillance
+→ Discovery
+→ Threat
+→ Response
+```
+
+---
+
+## Biosecurity / Investigation Specialist
+
+Primary concern:
+
+```text
+What is this?
+What evidence supports it?
+How is it spreading?
+```
+
+Journey emphasis:
+
+```text
+Discovery
+→ Threat
+→ Risk
+→ Investigation
+→ Cases
+→ Transmission
+```
+
+---
+
+## Response Team
+
+Primary concern:
+
+```text
+What should be contained?
+What actions are active?
+Are those actions working?
+```
+
+Journey emphasis:
+
+```text
+Risk
+→ Transmission
+→ Containment
+→ Response
+→ Recovery
+```
+
+---
+
+## Pandemic Preparedness Team
+
+Primary concern:
+
+```text
+What did we learn?
+Where are the resilience gaps?
+What should change before the next event?
+```
+
+Journey emphasis:
+
+```text
+Recovery
+→ Preparedness
+→ Research
+→ Executive
+```
+
+---
+
+## Executive / Strategic Stakeholder
+
+Primary concern:
+
+```text
+What is the organizational risk?
+What is happening?
+Are we responding effectively?
+Where are the major resilience gaps?
+```
+
+Journey emphasis:
+
+```text
+Executive
+→ Risk
+→ Active operational context
+→ Recovery
+→ Preparedness
+```
+
+The underlying event state remains shared.
+
+---
+
+# 35. AEGIS Journey Invariants
+
+The following rules must remain true across the entire application.
+
+## Invariant 01
+
+**A signal is not automatically a threat.**
+
+## Invariant 02
+
+**A recommendation is not an action.**
+
+## Invariant 03
+
+**A proposed intervention is not an executed intervention.**
+
+## Invariant 04
+
+**An inference is not a confirmed fact.**
+
+## Invariant 05
+
+**Navigation does not change operational state unless an explicit action does so.**
+
+## Invariant 06
+
+**Every operational state change must have a traceable cause.**
+
+## Invariant 07
+
+**New evidence can change previous understanding.**
+
+## Invariant 08
+
+**Recovery does not mean monitoring stops.**
+
+## Invariant 09
+
+**Completed events remain useful for preparedness.**
+
+## Invariant 10
+
+**All screens represent the same underlying operational reality.**
+
+---
+
+# 36. The AEGIS Golden Path
+
+For development and validation, this is the most important user journey.
+
+### Scenario
+
+A meaningful abnormal biological pattern emerges.
+
+```text
+1. LIVE SURVEILLANCE
+   ↓
+   Abnormal signal becomes visible.
+
+2. THREAT DISCOVERY
+   ↓
+   Pattern is surfaced as a candidate threat.
+
+3. THREAT OVERVIEW
+   ↓
+   Event context is established.
+
+4. RISK OVERVIEW
+   ↓
+   Operational significance is assessed.
+
+5. INVESTIGATION
+   ↓
+   Evidence and hypotheses are organized.
+
+6. CASE INVESTIGATION
+   ↓
+   Relevant case relationships are examined.
+
+7. TRANSMISSION
+   ↓
+   Potential pathways are evaluated.
+
+8. CONTAINMENT
+   ↓
+   Intervention opportunities are identified and managed.
+
+9. RESPONSE
+   ↓
+   Authorized response actions are coordinated.
+
+10. RECOVERY
+    ↓
+    Conditions are monitored toward stabilization.
+
+11. PREPAREDNESS
+    ↓
+    Lessons and resilience improvements are captured.
+```
+
+The Golden Path is successful only if **context, state, evidence, and history survive the entire journey**.
+
+---
+
+# 37. Golden Path Acceptance Criteria
+
+The AEGIS Golden Path passes only when a user can:
+
+### Detection
+
+- identify an abnormal signal
+- understand that it is not automatically a confirmed threat
+- enter the relevant threat context
+
+### Recognition
+
+- understand what the threat represents
+- see supporting information
+- distinguish known information from uncertainty
+
+### Assessment
+
+- understand operational risk
+- determine whether deeper investigation is required
+
+### Investigation
+
+- inspect evidence
+- inspect cases
+- understand relevant relationships
+- update understanding as evidence changes
+
+### Transmission
+
+- inspect possible transmission pathways
+- distinguish evidence from inference
+
+### Containment
+
+- identify containment opportunities
+- understand the current containment state
+- distinguish proposed actions from active actions
+
+### Response
+
+- understand active response
+- observe response outcomes
+- continue the response feedback loop
+
+### Recovery
+
+- understand whether conditions are stabilizing
+- monitor movement toward recovery
+
+### Learning
+
+- review what happened
+- identify lessons
+- feed lessons into preparedness
+
+### System Integrity
+
+At no point should the user:
+
+- lose the active event
+- encounter contradictory state
+- see a stale state presented as current
+- mistake a recommendation for execution
+- mistake an inference for fact
+- encounter an unexplained state transition
+- need to reconstruct the event manually from disconnected screens
+
+---
+
+# 38. Operational Journey Success Definition
+
+AEGIS succeeds when the user can move from:
+
+**"Something changed."**
+
+to:
+
+**"We understand what changed."**
+
+to:
+
+**"We understand the risk."**
+
+to:
+
+**"We understand what may be causing it."**
+
+to:
+
+**"We know where intervention can occur."**
+
+to:
+
+**"We have coordinated the response."**
+
+to:
+
+**"We can see whether the response is working."**
+
+to:
+
+**"We understand recovery."**
+
+to:
+
+**"We have strengthened future preparedness."**
+
+That is the complete AEGIS operational journey.
+
+---
+
+# 39. Final Architecture
+
+The AEGIS experience can therefore be reduced to one continuous system:
+
+```text
+                 ┌──────────────────┐
+                 │ LIVE SURVEILLANCE│
+                 └────────┬─────────┘
+                          ↓
+                 ┌──────────────────┐
+                 │ THREAT DISCOVERY │
+                 └────────┬─────────┘
+                          ↓
+                 ┌──────────────────┐
+                 │ THREAT OVERVIEW  │
+                 └────────┬─────────┘
+                          ↓
+                 ┌──────────────────┐
+                 │   RISK OVERVIEW  │
+                 └────────┬─────────┘
+                          ↓
+                 ┌──────────────────┐
+                 │  INVESTIGATION   │
+                 └────────┬─────────┘
+                          ↓
+                 ┌──────────────────┐
+                 │ CASE INVESTIGATION│
+                 └────────┬─────────┘
+                          ↓
+                 ┌──────────────────┐
+                 │   TRANSMISSION   │
+                 └────────┬─────────┘
+                          ↓
+                 ┌──────────────────┐
+                 │   CONTAINMENT    │
+                 └────────┬─────────┘
+                          ↓
+                 ┌──────────────────┐
+                 │     RESPONSE     │
+                 └────────┬─────────┘
+                          ↓
+                 ┌──────────────────┐
+                 │     RECOVERY     │
+                 └────────┬─────────┘
+                          ↓
+                 ┌──────────────────┐
+                 │  PREPAREDNESS    │
+                 └──────────────────┘
+
+
+       ┌──────────────────────┐
+       │      RESEARCH        │
+       │ analytical support   │
+       └──────────┬───────────┘
+                  │
+                  └──── supports operational understanding
+
+
+       ┌──────────────────────┐
+       │      EXECUTIVE       │
+       │ strategic oversight  │
+       └──────────┬───────────┘
+                  │
+                  └──── observes organizational state
+```
+
+The architecture is therefore not:
+
+**13 pages.**
+
+It is:
+
+**one operational system expressed through 13 perspectives.**
+
+That distinction is fundamental to the engineering of AEGIS.
+
+---
+
+# 40. Architectural Principle to Carry Into Engineering
+
+The implementation must preserve this fundamental relationship:
+
+```text
+ONE EVENT
+   ↓
+ONE GLOBAL STATE
+   ↓
+MANY OPERATIONAL PERSPECTIVES
+```
+
+Not:
+
+```text
+13 pages
++
+13 independent states
++
+13 disconnected datasets
+```
+
+The first architecture produces AEGIS.
+
+The second produces a dashboard mockup.
+
+AEGIS must be built as the first.
+
+---
+
+# 41. Master Journey Statement
+
+> **AEGIS continuously senses the healthcare environment, detects meaningful deviations, establishes threat context, assesses operational risk, investigates evidence, understands possible transmission, coordinates containment and response, monitors recovery, and converts completed events into institutional preparedness.**
+
+This is the behavioral contract of the product.
+
+Every future screen, component, interaction, state transition, API, data model, and engineering decision must be evaluated against this contract.
+
+If a proposed feature does not strengthen this operational loop, it should not be added merely because it looks impressive.
+
+**AEGIS is not a visualization project.**
+
+**It is a decision-support and operational resilience system represented through an interface.**
