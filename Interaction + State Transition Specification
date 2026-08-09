@@ -1,0 +1,2583 @@
+# AEGIS
+# Interaction + State Transition Specification
+
+**System:** AEGIS  
+**Document:** Interaction + State Transition Specification  
+**Version:** 1.0  
+**Status:** Master Behavioral Specification  
+**Date:** August 2026
+
+---
+
+# 01. Document Purpose
+
+This document defines the behavioral mechanics of AEGIS.
+
+It specifies how:
+
+```text
+USER ACTION
+      ↓
+UI EVENT
+      ↓
+VALIDATION
+      ↓
+DOMAIN EVENT
+      ↓
+STATE TRANSITION
+      ↓
+PERSISTENCE
+      ↓
+AUDIT
+      ↓
+UI UPDATE
+      ↓
+NAVIGATION / NEXT OPERATION
+```
+
+must work throughout the system.
+
+The purpose is to prevent a critical class of implementation errors:
+
+> AEGIS must never look like a functioning operational system while its underlying state behaves like a collection of disconnected mock screens.
+
+This document therefore defines the relationship between:
+
+- user interactions
+- system events
+- domain state
+- global state
+- local UI state
+- persisted state
+- derived state
+- navigation
+- notifications
+- audit records
+- permissions
+- errors
+- real-time updates
+
+---
+
+# 02. Relationship to Previous AEGIS Documents
+
+This specification depends on:
+
+1. AEGIS Master Architecture
+2. AEGIS Domain Model + Global State Architecture
+3. AEGIS User Flow + Operational Journey Architecture
+4. AEGIS Functional Requirements + 13 Screen Master Specification
+
+These documents remain authoritative.
+
+This document does **not** introduce additional screens.
+
+The system contains exactly:
+
+```text
+01 Live Surveillance
+02 Threat Discovery
+03 Threat Overview
+04 Risk Overview
+05 Investigation View
+06 Case Investigation View
+07 Transmission View
+08 Containment View
+09 Response View
+10 Recovery View
+11 Preparedness View
+12 Research View
+13 Executive View
+```
+
+---
+
+# 03. Core Behavioral Principle
+
+AEGIS must be understood as an **event-driven operational system**, not a page-driven application.
+
+The fundamental unit of behavior is:
+
+```text
+EVENT
+```
+
+not:
+
+```text
+PAGE
+```
+
+A screen displays a state.
+
+An interaction may cause a state transition.
+
+The state transition may cause multiple screens to update.
+
+Therefore:
+
+```text
+ONE EVENT
+   ↓
+ONE AUTHORITATIVE STATE CHANGE
+   ↓
+MANY RELEVANT UI CONSEQUENCES
+```
+
+---
+
+# 04. Three State Layers
+
+AEGIS must distinguish three major categories of state.
+
+## 4.1 Local UI State
+
+Temporary state required only by a specific interface.
+
+Examples:
+
+```text
+selected tab
+expanded panel
+active filter
+hover state
+modal visibility
+temporary form input
+sort order
+chart zoom
+```
+
+Local UI state should not be treated as operational truth.
+
+---
+
+## 4.2 Global Application State
+
+State required across multiple screens.
+
+Examples:
+
+```text
+active event
+selected threat
+selected case
+current investigation
+current risk assessment
+active containment context
+active response context
+current user
+permissions
+system connectivity
+```
+
+---
+
+## 4.3 Domain / Persisted State
+
+Operational facts that must survive navigation, refresh, or application restart.
+
+Examples:
+
+```text
+events
+threats
+risk assessments
+investigations
+cases
+transmission findings
+containment actions
+response actions
+recovery assessments
+preparedness lessons
+research findings
+audit records
+```
+
+---
+
+# 05. Source-of-Truth Rule
+
+For every piece of information, AEGIS must have one authoritative owner.
+
+Example:
+
+```text
+Threat status
+     ↓
+Threat domain state
+     ↓
+Not individual screen state
+```
+
+A screen may display:
+
+```text
+threat.status
+```
+
+but must not maintain its own competing:
+
+```text
+localThreatStatus
+```
+
+as operational truth.
+
+---
+
+# 06. State Ownership Principle
+
+The following rule applies:
+
+> **Screens render domain state. They do not become the domain state.**
+
+Therefore:
+
+```text
+UI
+ ↓
+Action
+ ↓
+Domain Logic
+ ↓
+State Store / Backend
+ ↓
+Updated State
+ ↓
+UI
+```
+
+not:
+
+```text
+Button
+ ↓
+Change local React variable
+ ↓
+Pretend the operation happened
+```
+
+---
+
+# 07. Interaction Taxonomy
+
+Every meaningful AEGIS interaction belongs to one of these categories.
+
+## Read
+
+Inspect information without changing operational state.
+
+## Select
+
+Choose an existing entity or context.
+
+## Filter
+
+Change the visible information set.
+
+## Navigate
+
+Move between views without changing operational truth.
+
+## Investigate
+
+Create or update structured investigative understanding.
+
+## Assess
+
+Create or modify an authorized assessment.
+
+## Recommend
+
+Generate or record a proposed course of action.
+
+## Authorize
+
+Approve an action for execution.
+
+## Execute
+
+Initiate or record an operational action.
+
+## Verify
+
+Confirm an outcome or state.
+
+## Update
+
+Modify an existing operational record.
+
+## Resolve
+
+Move an operational issue toward a terminal state.
+
+## Learn
+
+Convert event information into institutional knowledge.
+
+---
+
+# 08. Universal Interaction Lifecycle
+
+Every state-changing interaction follows:
+
+```text
+USER
+ ↓
+INTERACTION
+ ↓
+PERMISSION CHECK
+ ↓
+INPUT VALIDATION
+ ↓
+DOMAIN VALIDATION
+ ↓
+DOMAIN EVENT
+ ↓
+STATE TRANSITION
+ ↓
+PERSISTENCE
+ ↓
+AUDIT RECORD
+ ↓
+GLOBAL STATE UPDATE
+ ↓
+DERIVED STATE UPDATE
+ ↓
+UI UPDATE
+ ↓
+USER FEEDBACK
+```
+
+If any mandatory stage fails, the system must not falsely report success.
+
+---
+
+# 09. Read Interaction Contract
+
+For read-only actions:
+
+```text
+USER SELECTS DATA
+       ↓
+LOCAL UI STATE
+       ↓
+RENDER SELECTED CONTEXT
+```
+
+No operational domain mutation occurs.
+
+Example:
+
+Selecting a case does not modify the case.
+
+---
+
+# 10. Navigation Contract
+
+Navigation must be treated separately from operational state.
+
+Example:
+
+```text
+Live Surveillance
+      ↓
+Threat Discovery
+```
+
+does not mean:
+
+```text
+Threat status = discovered
+```
+
+Navigation only changes the user's current view.
+
+Operational state changes only when the appropriate domain action occurs.
+
+---
+
+# 11. Selection Contract
+
+Selecting an entity changes UI context.
+
+Example:
+
+```text
+User selects Threat A
+        ↓
+activeThreatId = Threat A
+```
+
+This does not change:
+
+```text
+Threat A.status
+Threat A.risk
+Threat A.classification
+```
+
+unless a separate authorized action occurs.
+
+---
+
+# 12. Filter Contract
+
+Filtering changes presentation.
+
+Example:
+
+```text
+User selects:
+Location = Ward 3
+Time = Last 24 hours
+Severity = High
+```
+
+The system changes the visible dataset.
+
+It must not mutate the underlying operational data.
+
+---
+
+# 13. Core Domain Event Model
+
+AEGIS domain events should conceptually follow:
+
+```text
+EVENT ID
+EVENT TYPE
+ACTOR
+TIMESTAMP
+ENTITY
+PREVIOUS STATE
+TRIGGER
+NEW STATE
+METADATA
+AUDIT CONTEXT
+```
+
+Example:
+
+```text
+Event:
+THREAT_STATUS_UPDATED
+
+Entity:
+Threat T-001
+
+Previous:
+CANDIDATE
+
+New:
+UNDER_REVIEW
+
+Actor:
+Authorized investigator
+
+Timestamp:
+2026-08-04T...
+
+Reason:
+New evidence received
+```
+
+The exact production schema belongs to the data architecture.
+
+---
+
+# 14. State Transition Rules
+
+A state transition must satisfy:
+
+```text
+CURRENT STATE
+      +
+VALID TRIGGER
+      +
+AUTHORIZED ACTOR
+      +
+VALID CONDITIONS
+      ↓
+ALLOWED NEXT STATE
+```
+
+If these conditions are not satisfied:
+
+```text
+NO TRANSITION
+```
+
+The system must not silently force the state forward.
+
+---
+
+# 15. Invalid Transition Contract
+
+Example:
+
+```text
+PROPOSED
+   ↓
+EXECUTED
+```
+
+is invalid if the domain requires:
+
+```text
+PROPOSED
+   ↓
+REVIEWED
+   ↓
+AUTHORIZED
+   ↓
+EXECUTING
+   ↓
+ACTIVE
+```
+
+The interface must prevent or reject invalid transitions.
+
+---
+
+# 16. State Transition Matrix
+
+## 16.1 Event / Threat Lifecycle
+
+```text
+OBSERVED
+   ↓
+DETECTED
+   ↓
+CANDIDATE
+   ↓
+UNDER REVIEW
+   ↓
+OPERATIONALLY RELEVANT
+   ↓
+CHARACTERIZED
+   ↓
+CONTAINMENT / RESPONSE
+   ↓
+RECOVERY
+   ↓
+CLOSED
+```
+
+The exact state vocabulary must remain aligned with the canonical domain model.
+
+---
+
+# 17. SCREEN 01 — LIVE SURVEILLANCE INTERACTIONS
+
+## 17.1 Inspect Signal
+
+```text
+USER
+ ↓
+Select signal
+ ↓
+Local selection state
+ ↓
+Display signal context
+```
+
+No domain mutation.
+
+---
+
+## 17.2 Filter Signals
+
+```text
+USER
+ ↓
+Apply filter
+ ↓
+Update local/query state
+ ↓
+Recalculate visible dataset
+```
+
+No operational mutation.
+
+---
+
+## 17.3 Detect Anomaly
+
+A detection may originate from:
+
+```text
+sensor input
+OR
+aggregated signal
+OR
+authorized manual observation
+```
+
+Flow:
+
+```text
+Signal
+ ↓
+Detection Logic
+ ↓
+Anomaly Created
+ ↓
+Anomaly State Updated
+ ↓
+Relevant UI Updates
+ ↓
+Threat Discovery Context Available
+```
+
+Detection does **not** equal confirmed threat.
+
+---
+
+## 17.4 Signal Escalation
+
+Where configured:
+
+```text
+Anomaly
+ ↓
+Threshold / rule evaluation
+ ↓
+Escalation event
+ ↓
+Operational notification
+```
+
+The escalation must be auditable.
+
+---
+
+# 18. SCREEN 02 — THREAT DISCOVERY INTERACTIONS
+
+## 18.1 Open Candidate Threat
+
+```text
+User selects candidate
+ ↓
+activeThreatId updated
+ ↓
+Candidate context displayed
+```
+
+No threat-state mutation.
+
+---
+
+## 18.2 Mark Candidate Under Review
+
+```text
+User action
+ ↓
+Permission check
+ ↓
+Validation
+ ↓
+THREAT_REVIEW_STARTED
+ ↓
+Candidate state → Under Review
+ ↓
+Persist
+ ↓
+Audit
+ ↓
+Update relevant screens
+```
+
+---
+
+## 18.3 Dismiss Candidate
+
+```text
+Candidate
+ ↓
+Authorized dismissal
+ ↓
+Validation
+ ↓
+Candidate → Dismissed / Resolved
+ ↓
+Audit
+ ↓
+UI update
+```
+
+Dismissal must preserve historical evidence.
+
+---
+
+# 19. SCREEN 03 — THREAT OVERVIEW INTERACTIONS
+
+## 19.1 Update Threat Classification
+
+```text
+User selects classification
+ ↓
+Permission check
+ ↓
+Evidence/context validation
+ ↓
+Classification transition
+ ↓
+Persist
+ ↓
+Audit
+ ↓
+Risk context recalculated
+ ↓
+Affected screens update
+```
+
+Classification must never be changed only in local UI state.
+
+---
+
+## 19.2 Update Threat Status
+
+```text
+User action
+ ↓
+Validate transition
+ ↓
+Apply domain transition
+ ↓
+Persist
+ ↓
+Audit
+ ↓
+Global state update
+```
+
+---
+
+# 20. SCREEN 04 — RISK OVERVIEW INTERACTIONS
+
+## 20.1 Create Risk Assessment
+
+```text
+Evidence
++
+Threat context
++
+Authorized assessment
+        ↓
+Risk Assessment
+        ↓
+Validation
+        ↓
+Persist
+        ↓
+Audit
+        ↓
+Risk state updated
+```
+
+---
+
+## 20.2 Modify Risk Assessment
+
+A modification must preserve:
+
+```text
+previous assessment
+new assessment
+reason
+actor
+timestamp
+supporting evidence
+```
+
+This prevents the system from rewriting history.
+
+---
+
+## 20.3 Escalate Risk
+
+```text
+Risk assessment
+ ↓
+Threshold / authorized decision
+ ↓
+Escalation
+ ↓
+Operational notification
+ ↓
+Executive context update
+```
+
+---
+
+# 21. SCREEN 05 — INVESTIGATION INTERACTIONS
+
+## 21.1 Start Investigation
+
+```text
+Threat
+ ↓
+Authorized investigator
+ ↓
+START_INVESTIGATION
+ ↓
+Investigation created
+ ↓
+Status = Active
+ ↓
+Audit
+ ↓
+Global state updated
+```
+
+---
+
+## 21.2 Add Finding
+
+```text
+Investigator
+ ↓
+Finding entered
+ ↓
+Validate
+ ↓
+Attach evidence
+ ↓
+Persist finding
+ ↓
+Audit
+ ↓
+Investigation state updated
+```
+
+---
+
+## 21.3 Update Hypothesis
+
+```text
+Evidence
+ ↓
+Investigator updates hypothesis
+ ↓
+System records new hypothesis
+ ↓
+Previous hypothesis preserved
+ ↓
+Confidence updated where applicable
+ ↓
+Audit
+```
+
+AEGIS must preserve investigative history.
+
+---
+
+# 22. SCREEN 06 — CASE INVESTIGATION INTERACTIONS
+
+## 22.1 Select Case
+
+```text
+User
+ ↓
+Select case
+ ↓
+activeCaseId
+ ↓
+Display case context
+```
+
+No operational mutation.
+
+---
+
+## 22.2 Associate Case With Event
+
+```text
+User
+ ↓
+Request association
+ ↓
+Permission check
+ ↓
+Validation
+ ↓
+Case-event relationship created
+ ↓
+Persist
+ ↓
+Audit
+ ↓
+Investigation updates
+```
+
+---
+
+## 22.3 Create Case Relationship
+
+```text
+Case A
++
+Case B
++
+Evidence
+        ↓
+Relationship proposed
+        ↓
+Relationship status
+        ↓
+Persist
+        ↓
+Audit
+```
+
+Relationship status must communicate whether the relationship is:
+
+```text
+Observed
+Suspected
+Inferred
+Confirmed
+Rejected
+Unknown
+```
+
+where applicable.
+
+---
+
+# 23. SCREEN 07 — TRANSMISSION INTERACTIONS
+
+## 23.1 Create Transmission Hypothesis
+
+```text
+Cases / environmental evidence
+ ↓
+User creates hypothesis
+ ↓
+Validation
+ ↓
+Transmission hypothesis created
+ ↓
+Confidence recorded
+ ↓
+Audit
+```
+
+---
+
+## 23.2 Update Transmission Understanding
+
+```text
+New evidence
+ ↓
+Existing pathway
+ ↓
+Assessment
+ ↓
+Pathway updated
+ ↓
+Previous interpretation preserved
+ ↓
+Audit
+```
+
+---
+
+## 23.3 Identify Intervention Point
+
+```text
+Potential pathway
+ ↓
+User identifies intervention point
+ ↓
+Record proposed intervention
+ ↓
+Pass context to Containment
+```
+
+This does not automatically execute containment.
+
+---
+
+# 24. SCREEN 08 — CONTAINMENT INTERACTIONS
+
+## 24.1 Create Containment Proposal
+
+```text
+Risk / transmission context
+ ↓
+Authorized user
+ ↓
+Containment proposal
+ ↓
+Validation
+ ↓
+Persist
+ ↓
+Audit
+```
+
+---
+
+## 24.2 Authorize Containment
+
+```text
+PROPOSED
+ ↓
+Authorized decision maker
+ ↓
+Permission check
+ ↓
+Validation
+ ↓
+AUTHORIZED
+ ↓
+Audit
+ ↓
+Response/containment state updated
+```
+
+Authorization must be distinct from execution.
+
+---
+
+## 24.3 Execute Containment
+
+```text
+AUTHORIZED
+ ↓
+Execution request
+ ↓
+Permission check
+ ↓
+Execution validation
+ ↓
+EXECUTING
+ ↓
+Execution result
+ ↓
+ACTIVE / FAILED
+ ↓
+Audit
+```
+
+---
+
+## 24.4 Verify Containment
+
+```text
+ACTIVE
+ ↓
+Observation / verification
+ ↓
+Outcome assessment
+ ↓
+VERIFIED
+OR
+REQUIRES_ADJUSTMENT
+ ↓
+Audit
+```
+
+---
+
+# 25. SCREEN 09 — RESPONSE INTERACTIONS
+
+## 25.1 Create Response Action
+
+```text
+Operational context
+ ↓
+Authorized user
+ ↓
+Response action created
+ ↓
+Status = Proposed
+ ↓
+Audit
+```
+
+---
+
+## 25.2 Start Response Action
+
+```text
+PROPOSED
+ ↓
+Authorization
+ ↓
+EXECUTING
+ ↓
+ACTIVE
+```
+
+---
+
+## 25.3 Complete Response Action
+
+```text
+ACTIVE
+ ↓
+Completion submitted
+ ↓
+Outcome recorded
+ ↓
+Validation
+ ↓
+COMPLETED
+ ↓
+Audit
+ ↓
+Response metrics update
+```
+
+Completion does not automatically close the threat.
+
+---
+
+## 25.4 Response Adjustment
+
+```text
+Observed outcome
+ ↓
+Assessment
+ ↓
+Adjustment proposed
+ ↓
+Authorization where required
+ ↓
+New action
+ ↓
+Execution
+```
+
+This creates the operational feedback loop.
+
+---
+
+# 26. SCREEN 10 — RECOVERY INTERACTIONS
+
+## 26.1 Begin Recovery
+
+Recovery must be based on operational evidence.
+
+```text
+Response stabilization
++
+Observed conditions
+ ↓
+Recovery assessment
+ ↓
+Recovery state activated
+```
+
+---
+
+## 26.2 Update Recovery Status
+
+```text
+New observations
+ ↓
+Recovery assessment
+ ↓
+Status updated
+ ↓
+Trend recalculated
+ ↓
+Audit
+```
+
+---
+
+## 26.3 Confirm Recovery
+
+```text
+Recovery criteria satisfied
+ ↓
+Authorized verification
+ ↓
+Recovery confirmed
+ ↓
+Preparedness learning activated
+ ↓
+Audit
+```
+
+Recovery confirmation must not erase the historical event.
+
+---
+
+# 27. SCREEN 11 — PREPAREDNESS INTERACTIONS
+
+## 27.1 Create Lesson
+
+```text
+Completed event
+ ↓
+Review
+ ↓
+Lesson identified
+ ↓
+Lesson recorded
+ ↓
+Evidence/context attached
+ ↓
+Audit
+```
+
+---
+
+## 27.2 Identify Resilience Gap
+
+```text
+Event evidence
+ ↓
+Performance review
+ ↓
+Gap identified
+ ↓
+Gap recorded
+ ↓
+Preparedness state updated
+```
+
+---
+
+## 27.3 Create Improvement Item
+
+```text
+Resilience gap
+ ↓
+Improvement proposal
+ ↓
+Owner
+ ↓
+Priority
+ ↓
+Target state
+ ↓
+Persist
+ ↓
+Audit
+```
+
+---
+
+# 28. SCREEN 12 — RESEARCH INTERACTIONS
+
+## 28.1 Open Research Context
+
+Read-only unless explicitly authorized.
+
+```text
+Operational context
+ ↓
+Research context
+ ↓
+Research displayed
+```
+
+---
+
+## 28.2 Add Research Finding
+
+```text
+Authorized researcher
+ ↓
+Finding
+ ↓
+Source/evidence
+ ↓
+Validation
+ ↓
+Persist
+ ↓
+Audit
+```
+
+---
+
+## 28.3 Associate Research With Event
+
+```text
+Research finding
+ ↓
+Association request
+ ↓
+Validation
+ ↓
+Association created
+ ↓
+Operational context can reference it
+```
+
+Association does not automatically alter the event state.
+
+---
+
+# 29. SCREEN 13 — EXECUTIVE INTERACTIONS
+
+Executive View is primarily read-oriented.
+
+## 29.1 Inspect Strategic Risk
+
+```text
+Executive user
+ ↓
+Select risk context
+ ↓
+Strategic information displayed
+```
+
+No operational mutation.
+
+---
+
+## 29.2 Navigate Into Event
+
+```text
+Executive View
+ ↓
+Select event
+ ↓
+Relevant operational context
+ ↓
+Authorized navigation
+```
+
+Permissions still apply.
+
+---
+
+# 30. Global Notification Contract
+
+Notifications must correspond to meaningful system events.
+
+Examples:
+
+```text
+New anomaly detected
+Threat assessment changed
+Risk escalated
+Investigation updated
+Containment authorized
+Containment execution failed
+Response action completed
+Recovery status changed
+Critical system degradation
+```
+
+Notifications must not become visual noise.
+
+---
+
+# 31. Notification Severity
+
+Conceptually:
+
+```text
+INFO
+NOTICE
+WARNING
+CRITICAL
+SYSTEM_FAILURE
+```
+
+Severity must be semantically meaningful.
+
+Color alone must never communicate severity.
+
+---
+
+# 32. Real-Time State Transition
+
+When new information arrives:
+
+```text
+External / Sensor Source
+        ↓
+Ingestion
+        ↓
+Validation
+        ↓
+Domain Event
+        ↓
+State Update
+        ↓
+Persistence
+        ↓
+Event Broadcast
+        ↓
+Relevant Client State
+        ↓
+Affected Screens Update
+```
+
+The client must not invent the new operational state independently.
+
+---
+
+# 33. Real-Time Conflict Resolution
+
+If a user is editing information while a real-time update arrives:
+
+```text
+USER EDIT
++
+REMOTE UPDATE
+```
+
+must not silently overwrite one another.
+
+The implementation must define an explicit conflict strategy.
+
+Until that strategy is defined in the engineering architecture:
+
+> **Never silently discard user input or remote state.**
+
+---
+
+# 34. Optimistic Update Rule
+
+Optimistic UI updates may only be used when the action can be safely represented as pending.
+
+For consequential operations:
+
+```text
+User action
+ ↓
+Pending
+ ↓
+Server/domain confirmation
+ ↓
+Confirmed state
+```
+
+Do not present an unconfirmed consequential action as completed.
+
+---
+
+# 35. Failed Action Contract
+
+When an action fails:
+
+```text
+Attempt
+ ↓
+Failure
+ ↓
+State remains valid
+ ↓
+User informed
+ ↓
+Retry where appropriate
+ ↓
+Audit failure where required
+```
+
+The UI must never show:
+
+```text
+SUCCESS
+```
+
+when persistence or execution failed.
+
+---
+
+# 36. Undo / Reversal Rules
+
+Not every operational action should support generic undo.
+
+For high-consequence operations, use:
+
+```text
+new compensating action
+```
+
+rather than silently rewriting history.
+
+Example:
+
+Instead of:
+
+```text
+Delete containment action
+```
+
+use:
+
+```text
+Containment action
+ ↓
+Cancelled / Superseded
+```
+
+with an audit trail.
+
+---
+
+# 37. State Transition Audit Model
+
+For every consequential state change:
+
+```text
+WHO
+WHAT
+WHEN
+WHY
+FROM
+TO
+EVIDENCE
+AUTHORITY
+RESULT
+```
+
+must be available where applicable.
+
+---
+
+# 38. Global State Propagation
+
+When a domain state changes:
+
+```text
+DOMAIN EVENT
+      ↓
+GLOBAL STATE
+      ↓
+DERIVED STATE
+      ↓
+SCREEN SUBSCRIPTIONS
+      ↓
+UI UPDATE
+```
+
+Example:
+
+```text
+Risk escalated
+      ↓
+Risk domain updated
+      ↓
+Threat context recalculated
+      ↓
+Executive strategic risk updated
+      ↓
+Relevant alert generated
+      ↓
+Risk Overview updates
+      ↓
+Threat Overview updates
+      ↓
+Executive View updates
+```
+
+The application must not require users to manually refresh every screen to see known state changes.
+
+---
+
+# 39. Screen-to-Screen State Contract
+
+## Live Surveillance → Threat Discovery
+
+Trigger:
+
+```text
+Meaningful anomaly selected / escalated
+```
+
+Context transferred:
+
+```text
+signal
+location
+time
+anomaly
+supporting context
+```
+
+---
+
+## Threat Discovery → Threat Overview
+
+Trigger:
+
+```text
+Candidate threat becomes operationally relevant
+```
+
+Context:
+
+```text
+threat
+evidence
+classification
+event context
+```
+
+---
+
+## Threat Overview → Risk Overview
+
+Trigger:
+
+```text
+Threat requires risk assessment
+```
+
+Context:
+
+```text
+threat
+evidence
+current status
+exposure context
+```
+
+---
+
+## Risk Overview → Investigation
+
+Trigger:
+
+```text
+Risk requires investigation
+```
+
+Context:
+
+```text
+risk
+threat
+evidence
+questions
+```
+
+---
+
+## Investigation → Case Investigation
+
+Trigger:
+
+```text
+Cases require individual examination
+```
+
+Context:
+
+```text
+investigation
+case set
+relationships
+timeline
+```
+
+---
+
+## Case Investigation → Transmission
+
+Trigger:
+
+```text
+Relationships require pathway analysis
+```
+
+Context:
+
+```text
+cases
+relationships
+timeline
+locations
+evidence
+```
+
+---
+
+## Transmission → Containment
+
+Trigger:
+
+```text
+Potential intervention point identified
+```
+
+Context:
+
+```text
+pathway
+risk
+evidence
+intervention point
+uncertainty
+```
+
+---
+
+## Containment → Response
+
+Trigger:
+
+```text
+Authorized containment / response action
+```
+
+Context:
+
+```text
+action
+authorization
+affected area
+status
+owner
+```
+
+---
+
+## Response → Recovery
+
+Trigger:
+
+```text
+Response stabilizes sufficiently for recovery assessment
+```
+
+Context:
+
+```text
+actions
+outcomes
+risk
+observations
+baseline
+```
+
+---
+
+## Recovery → Preparedness
+
+Trigger:
+
+```text
+Recovery assessment completed
+```
+
+Context:
+
+```text
+event
+response performance
+outcomes
+lessons
+gaps
+```
+
+---
+
+# 40. Biological Feedback Loop
+
+AEGIS uses the immune-response analogy as a systems-thinking model.
+
+The functional loop is:
+
+```text
+DETECTION
+   ↓
+IDENTIFICATION
+   ↓
+RESPONSE
+   ↓
+OBSERVATION
+   ↓
+OUTCOME
+   ↓
+LEARNING
+   ↓
+PREPAREDNESS
+   ↓
+FUTURE DETECTION
+```
+
+The biological analogy must never override actual domain requirements.
+
+AEGIS is not claiming that organizational software literally behaves like an immune system.
+
+---
+
+# 41. Operational Feedback Loop
+
+The operational version is:
+
+```text
+Signal
+ ↓
+Threat
+ ↓
+Risk
+ ↓
+Investigation
+ ↓
+Intervention
+ ↓
+Outcome
+ ↓
+Assessment
+ ↓
+Adjustment
+ ↓
+Outcome
+```
+
+This creates continuous response refinement.
+
+---
+
+# 42. Institutional Memory Loop
+
+The preparedness feedback loop is:
+
+```text
+EVENT
+ ↓
+RESPONSE
+ ↓
+OUTCOME
+ ↓
+LESSON
+ ↓
+RESILIENCE GAP
+ ↓
+IMPROVEMENT
+ ↓
+READINESS
+ ↓
+FUTURE EVENT
+```
+
+The important requirement is:
+
+> Learning must become actionable system knowledge.
+
+A lesson that never influences preparedness is merely historical documentation.
+
+---
+
+# 43. Cross-Screen Event Example
+
+Consider a hypothetical anomaly.
+
+```text
+1. Surveillance detects unusual pattern.
+```
+
+Global state:
+
+```text
+anomaly.status = DETECTED
+```
+
+↓
+
+```text
+2. User enters Threat Discovery.
+```
+
+No threat confirmation occurs automatically.
+
+↓
+
+```text
+3. Evidence supports operational review.
+```
+
+State:
+
+```text
+candidate.status = UNDER_REVIEW
+```
+
+↓
+
+```text
+4. Threat Overview becomes active.
+```
+
+↓
+
+```text
+5. Risk is assessed.
+```
+
+State:
+
+```text
+risk.status = ELEVATED
+```
+
+↓
+
+```text
+6. Investigation begins.
+```
+
+State:
+
+```text
+investigation.status = ACTIVE
+```
+
+↓
+
+```text
+7. Case relationships are examined.
+```
+
+↓
+
+```text
+8. Potential transmission pathway is identified.
+```
+
+↓
+
+```text
+9. Containment proposal is created.
+```
+
+↓
+
+```text
+10. Authorized containment action begins.
+```
+
+↓
+
+```text
+11. Response is coordinated.
+```
+
+↓
+
+```text
+12. Outcomes are observed.
+```
+
+↓
+
+```text
+13. Recovery begins.
+```
+
+↓
+
+```text
+14. Lessons are captured.
+```
+
+↓
+
+```text
+15. Preparedness is updated.
+```
+
+This is the canonical AEGIS operational feedback cycle.
+
+---
+
+# 44. State Mutation Classification
+
+Every interaction must be classified as one of:
+
+| Class | Example | Persistence |
+|---|---|---|
+| UI-only | Open panel | No |
+| Context | Select event | Usually no operational persistence |
+| Query | Filter | No operational mutation |
+| Read | Inspect evidence | No |
+| Assessment | Update risk | Yes |
+| Investigation | Add finding | Yes |
+| Relationship | Associate cases | Yes |
+| Recommendation | Propose action | Yes |
+| Authorization | Approve action | Yes |
+| Execution | Execute action | Yes |
+| Verification | Verify outcome | Yes |
+| Learning | Add lesson | Yes |
+
+This classification should be encoded into engineering contracts.
+
+---
+
+# 45. Global State Integrity Rules
+
+## Rule 01
+
+One operational fact must have one authoritative source.
+
+## Rule 02
+
+Screens cannot independently redefine domain state.
+
+## Rule 03
+
+Navigation cannot mutate operational state.
+
+## Rule 04
+
+Read actions cannot silently become write actions.
+
+## Rule 05
+
+Recommendations cannot silently become executions.
+
+## Rule 06
+
+Execution cannot be displayed as successful until confirmed.
+
+## Rule 07
+
+Historical state must remain reconstructable.
+
+## Rule 08
+
+New evidence may update interpretation without destroying history.
+
+## Rule 09
+
+Real-time updates must propagate consistently.
+
+## Rule 10
+
+Permission checks must occur before consequential state changes.
+
+---
+
+# 46. State Machine Safety Rules
+
+The implementation must reject:
+
+```text
+Unknown state
+Invalid transition
+Unauthorized transition
+Missing required evidence
+Missing required actor
+Missing required approval
+Malformed action
+Duplicate consequential event
+```
+
+The system must fail safely rather than inventing a valid-looking state.
+
+---
+
+# 47. Duplicate Event Protection
+
+Consequential operations must be protected against accidental duplication.
+
+Example:
+
+```text
+User clicks EXECUTE twice
+```
+
+must not create:
+
+```text
+two independent containment executions
+```
+
+without deliberate authorization.
+
+The backend/domain layer must provide idempotency where appropriate.
+
+---
+
+# 48. Refresh Integrity
+
+After:
+
+```text
+browser refresh
+```
+
+or:
+
+```text
+application restart
+```
+
+persistent operational state must remain consistent.
+
+Temporary UI state may reset unless explicitly designed otherwise.
+
+---
+
+# 49. Browser Back / Forward Behavior
+
+Navigation history must not reverse operational state.
+
+Example:
+
+```text
+User executes authorized action
+ ↓
+Navigates forward
+ ↓
+Presses browser Back
+```
+
+The system must not interpret navigation history as an undo operation.
+
+---
+
+# 50. Concurrent User Interaction
+
+If multiple authorized users modify the same operational entity:
+
+```text
+User A
++
+User B
++
+Same event
+```
+
+AEGIS must preserve data integrity.
+
+The final engineering architecture must define:
+
+- concurrency handling
+- conflict detection
+- update ordering
+- optimistic/pessimistic strategy
+- audit attribution
+
+---
+
+# 51. Permission Failure
+
+When a user attempts an unauthorized operation:
+
+```text
+User action
+ ↓
+Permission check
+ ↓
+DENIED
+ ↓
+No state mutation
+ ↓
+User feedback
+ ↓
+Audit where appropriate
+```
+
+The interface should make the restriction understandable without exposing sensitive authorization logic.
+
+---
+
+# 52. Validation Failure
+
+When an action contains invalid information:
+
+```text
+User action
+ ↓
+Validation
+ ↓
+INVALID
+ ↓
+No mutation
+ ↓
+Field/context feedback
+```
+
+The system must preserve the user's valid input where possible.
+
+---
+
+# 53. Persistence Failure
+
+When the domain operation succeeds locally but persistence fails:
+
+```text
+Attempt
+ ↓
+Persistence failure
+ ↓
+Do NOT mark operation confirmed
+ ↓
+Notify user
+ ↓
+Maintain recoverable state
+ ↓
+Retry/reconciliation strategy
+```
+
+This is especially important for high-consequence operations.
+
+---
+
+# 54. Real-Time Update Failure
+
+If real-time connectivity is lost:
+
+```text
+CONNECTED
+ ↓
+DEGRADED / DISCONNECTED
+```
+
+The user must be able to distinguish:
+
+```text
+current known state
+```
+
+from:
+
+```text
+potentially stale state
+```
+
+AEGIS must not imply real-time awareness when the connection is unavailable.
+
+---
+
+# 55. State Transition Testing Contract
+
+Every state transition must eventually receive a test covering:
+
+```text
+Valid trigger
+Valid actor
+Valid current state
+Valid next state
+Persistence
+Audit
+UI update
+Invalid transition
+Unauthorized transition
+Failure handling
+```
+
+---
+
+# 56. Minimum Interaction Test
+
+Every consequential interaction should be testable as:
+
+```text
+GIVEN
+a valid current state
+
+WHEN
+an authorized user performs the action
+
+THEN
+the correct domain event occurs
+
+AND
+the correct state transition occurs
+
+AND
+the result is persisted
+
+AND
+the audit record exists
+
+AND
+affected views reflect the new state
+```
+
+---
+
+# 57. Example Acceptance Test
+
+```text
+GIVEN
+a containment proposal exists
+
+AND
+the user has authorization to approve it
+
+WHEN
+the user approves the containment action
+
+THEN
+the containment status becomes AUTHORIZED
+
+AND
+the previous PROPOSED state remains auditable
+
+AND
+the authorization actor is recorded
+
+AND
+the authorization timestamp is recorded
+
+AND
+the Response/Containment context updates
+
+AND
+the action is not represented as EXECUTING until execution begins
+```
+
+---
+
+# 58. Interaction Anti-Patterns
+
+AEGIS implementation must prohibit:
+
+### Fake buttons
+
+A button that appears operational but only changes visual state.
+
+### Dead navigation
+
+A navigation action that leads to a screen with no meaningful context.
+
+### Local-only mutations
+
+Changing important state only inside a component.
+
+### Hidden mutations
+
+Changing operational state through a read-only interaction.
+
+### Fake persistence
+
+Displaying success without confirming persistence.
+
+### State duplication
+
+Maintaining separate contradictory versions of the same entity.
+
+### Silent overwrites
+
+Replacing another user's update without conflict handling.
+
+### Fake real-time
+
+Displaying dynamic-looking data without truthful update semantics.
+
+### Unsupported automation
+
+Introducing automated operational actions without architectural authorization.
+
+---
+
+# 59. Interaction Contract for AI Coding Agents
+
+AI coding agents must follow this process before implementing a state-changing interaction:
+
+```text
+1. Identify the screen.
+2. Identify the domain entity.
+3. Identify the current state.
+4. Identify the user action.
+5. Identify the authorized actor.
+6. Identify the domain event.
+7. Identify the valid transition.
+8. Identify persistence requirements.
+9. Identify audit requirements.
+10. Identify affected screens.
+11. Implement.
+12. Test.
+```
+
+If any of these are unknown:
+
+> **Do not invent the behavior.**
+
+---
+
+# 60. Implementation Rule
+
+For every interaction, the implementation should be traceable to:
+
+```text
+Screen Requirement
+      ↓
+Interaction Requirement
+      ↓
+State Transition
+      ↓
+Domain Event
+      ↓
+Data Contract
+      ↓
+Test
+```
+
+This creates a traceability chain across the entire product.
+
+---
+
+# 61. AEGIS Behavioral Architecture
+
+The complete behavioral system is:
+
+```text
+                 ┌───────────────┐
+                 │     SIGNAL    │
+                 └───────┬───────┘
+                         ↓
+                 ┌───────────────┐
+                 │   DETECTION   │
+                 └───────┬───────┘
+                         ↓
+                 ┌───────────────┐
+                 │   DISCOVERY   │
+                 └───────┬───────┘
+                         ↓
+                 ┌───────────────┐
+                 │     RISK      │
+                 └───────┬───────┘
+                         ↓
+                 ┌───────────────┐
+                 │ INVESTIGATION │
+                 └───────┬───────┘
+                         ↓
+                 ┌───────────────┐
+                 │ TRANSMISSION  │
+                 └───────┬───────┘
+                         ↓
+                 ┌───────────────┐
+                 │  CONTAINMENT  │
+                 └───────┬───────┘
+                         ↓
+                 ┌───────────────┐
+                 │   RESPONSE    │
+                 └───────┬───────┘
+                         ↓
+                 ┌───────────────┐
+                 │   RECOVERY    │
+                 └───────┬───────┘
+                         ↓
+                 ┌───────────────┐
+                 │ PREPAREDNESS  │
+                 └───────┬───────┘
+                         │
+                         └──────────────┐
+                                        ↓
+                              FUTURE DETECTION
+```
+
+Supporting the entire loop:
+
+```text
+RESEARCH
+   ↕
+EVIDENCE
+   ↕
+GLOBAL STATE
+   ↕
+AUDIT HISTORY
+   ↕
+EXECUTIVE OVERSIGHT
+```
+
+---
+
+# 62. Master State Transition Contract
+
+The fundamental AEGIS rule is:
+
+```text
+NO VALID EVENT
+      =
+NO STATE CHANGE
+```
+
+And:
+
+```text
+NO AUTHORIZATION
+      =
+NO CONSEQUENTIALLY AUTHORIZED ACTION
+```
+
+And:
+
+```text
+NO CONFIRMATION
+      =
+NO FALSE SUCCESS
+```
+
+And:
+
+```text
+NO EVIDENCE
+      =
+NO FALSE CERTAINTY
+```
+
+These four principles should be treated as core behavioral invariants.
+
+---
+
+# 63. Final Definition of Done
+
+This document is successfully implemented when AEGIS can demonstrate:
+
+```text
+USER ACTION
+      ↓
+CORRECT EVENT
+      ↓
+CORRECT STATE TRANSITION
+      ↓
+CORRECT PERSISTENCE
+      ↓
+CORRECT AUDIT
+      ↓
+CORRECT GLOBAL STATE
+      ↓
+CORRECT SCREEN UPDATES
+      ↓
+CORRECT USER FEEDBACK
+```
+
+across the complete operational journey.
+
+The system must remain coherent when:
+
+- navigating between screens
+- refreshing
+- receiving new data
+- multiple users interact
+- an operation fails
+- permissions deny an action
+- data becomes stale
+- evidence changes
+- a response changes
+- recovery progresses
+- preparedness learning is created
+
+---
+
+# 64. AEGIS Behavioral Contract
+
+AEGIS is successful when the user can trust that:
+
+> **What I see represents the current known operational state.**
+
+> **What I do produces the state transition the system says it produces.**
+
+> **What the system recommends is not confused with what has actually happened.**
+
+> **What the system knows is not confused with what it merely suspects.**
+
+> **What changed can be traced.**
+
+> **What failed is not represented as successful.**
+
+> **What one authorized user changes becomes coherent across the rest of the system.**
+
+> **What AEGIS learns from an event can influence future preparedness.**
+
+That is the behavioral contract of AEGIS.
