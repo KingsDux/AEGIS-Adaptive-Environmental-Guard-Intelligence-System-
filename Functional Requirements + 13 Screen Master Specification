@@ -1,0 +1,2136 @@
+# AEGIS
+# Functional Requirements + 13 Screen Master Specification
+
+**System:** AEGIS  
+**Product:** Bio-Resilience Pathogen Defense System  
+**Document:** Functional Requirements + 13 Screen Master Specification  
+**Version:** 1.0  
+**Status:** Master Product Specification  
+**Date:** August 2026
+
+---
+
+# 01. Document Purpose
+
+This document converts the AEGIS architecture into an implementation-level functional specification.
+
+It defines what each of the 13 AEGIS screens must do, what information each screen is responsible for, how users interact with it, what system state it reads, what state it may change, how it connects to other screens, and what constitutes completion.
+
+This document is intended to become a primary source of truth for:
+
+- product design
+- UX design
+- UI implementation
+- frontend engineering
+- backend engineering
+- state management
+- mock-data construction
+- testing
+- AI-assisted implementation
+- stakeholder review
+
+The document must be read together with:
+
+1. AEGIS Master Architecture
+2. AEGIS Domain Model + Global State Architecture
+3. AEGIS User Flow + Operational Journey Architecture
+
+If a later document conflicts with these foundational documents, the conflict must be explicitly identified and resolved rather than silently overridden.
+
+---
+
+# 02. Product Definition
+
+AEGIS is a high-stakes decision-support and operational resilience system for healthcare, biosecurity, biotechnology, pandemic preparedness, and related expert environments.
+
+AEGIS helps users move through a continuous operational cycle:
+
+```text
+SENSE
+  ↓
+DETECT
+  ↓
+DISCOVER
+  ↓
+ASSESS
+  ↓
+INVESTIGATE
+  ↓
+UNDERSTAND
+  ↓
+CONTAIN
+  ↓
+RESPOND
+  ↓
+RECOVER
+  ↓
+LEARN
+  ↓
+PREPARE
+```
+
+The interface is therefore not a collection of independent dashboards.
+
+It is:
+
+> **One operational system represented through 13 specialized perspectives.**
+
+---
+
+# 03. Authoritative 13-Screen Registry
+
+AEGIS contains exactly these 13 screens.
+
+| # | Screen | Primary Function |
+|---|---|---|
+| 01 | Live Surveillance | Continuous operational observation |
+| 02 | Threat Discovery | Surface and characterize candidate threats |
+| 03 | Threat Overview | Establish the current threat picture |
+| 04 | Risk Overview | Assess operational risk |
+| 05 | Investigation View | Conduct structured investigation |
+| 06 | Case Investigation View | Examine individual cases and relationships |
+| 07 | Transmission View | Understand possible transmission pathways |
+| 08 | Containment View | Manage containment planning and status |
+| 09 | Response View | Coordinate active response |
+| 10 | Recovery View | Monitor stabilization and recovery |
+| 11 | Preparedness View | Convert event learning into future readiness |
+| 12 | Research View | Provide deeper analytical/scientific context |
+| 13 | Executive View | Provide strategic organizational oversight |
+
+**No additional operational screens are authorized by this specification.**
+
+---
+
+# 04. Screen Classification
+
+The screens fall into three functional groups.
+
+## Operational Core
+
+```text
+01 Live Surveillance
+02 Threat Discovery
+03 Threat Overview
+04 Risk Overview
+05 Investigation View
+06 Case Investigation View
+07 Transmission View
+08 Containment View
+09 Response View
+10 Recovery View
+11 Preparedness View
+```
+
+These form the primary operational journey.
+
+## Analytical Support
+
+```text
+12 Research View
+```
+
+Research supports deeper understanding of operational events.
+
+It does not become an independent operational workflow.
+
+## Strategic Oversight
+
+```text
+13 Executive View
+```
+
+Executive View represents the organizational and strategic perspective.
+
+---
+
+# 05. Global Functional Rules
+
+Every screen must follow these rules.
+
+## FR-GLOBAL-001 — Shared Operational Reality
+
+All screens operate against the same underlying AEGIS global state.
+
+A user moving between screens must see consistent event state.
+
+---
+
+## FR-GLOBAL-002 — Navigation Does Not Equal State Mutation
+
+Opening a screen, selecting a navigation item, or moving through the application must not automatically change the operational state of an event.
+
+State changes require explicit system or user actions.
+
+---
+
+## FR-GLOBAL-003 — Context Preservation
+
+When navigating between relevant screens, AEGIS must preserve applicable:
+
+- active event
+- threat
+- risk state
+- investigation state
+- selected case
+- transmission context
+- containment state
+- response state
+- recovery state
+- preparedness context
+- evidence context
+- uncertainty/confidence information
+- relevant timestamps
+
+---
+
+## FR-GLOBAL-004 — Observation Is Not Confirmation
+
+A detected anomaly must not automatically be presented as a confirmed biological threat.
+
+---
+
+## FR-GLOBAL-005 — Recommendation Is Not Execution
+
+A system recommendation must remain distinguishable from an authorized or executed action.
+
+---
+
+## FR-GLOBAL-006 — Inference Is Not Fact
+
+Potential relationships and hypotheses must remain distinguishable from confirmed findings.
+
+---
+
+## FR-GLOBAL-007 — Every State Change Is Traceable
+
+Every meaningful operational state change must have an identifiable cause and timestamp.
+
+---
+
+## FR-GLOBAL-008 — New Evidence Can Change Understanding
+
+AEGIS must allow new evidence to alter previous assessments without destroying historical context.
+
+---
+
+## FR-GLOBAL-009 — Recovery Does Not Stop Monitoring
+
+Recovery remains an active monitored state until the event reaches its defined terminal condition.
+
+---
+
+## FR-GLOBAL-010 — Completed Events Remain Valuable
+
+Historical events must remain usable for preparedness, analysis, and institutional learning.
+
+---
+
+# 06. Global Interaction Model
+
+All meaningful AEGIS interactions fall into these categories:
+
+```text
+VIEW
+SELECT
+FILTER
+EXPAND
+COMPARE
+INVESTIGATE
+ASSESS
+RECOMMEND
+AUTHORIZE
+EXECUTE
+VERIFY
+UPDATE
+NAVIGATE
+```
+
+The system must never hide a consequential state change inside a generic interaction.
+
+---
+
+# 07. Global State Relationship
+
+The screens consume and modify portions of one operational state.
+
+Conceptually:
+
+```text
+AEGIS GLOBAL STATE
+
+├── Surveillance
+├── Events
+├── Threats
+├── Risk
+├── Investigations
+├── Cases
+├── Transmission
+├── Containment
+├── Response
+├── Recovery
+├── Preparedness
+├── Research Context
+├── Executive Context
+├── Evidence
+├── Users / Roles
+├── Audit History
+└── System Status
+```
+
+Not every screen owns these domains.
+
+A screen is a **consumer and/or controlled mutator** of domain state.
+
+---
+
+# 08. SCREEN 01 — LIVE SURVEILLANCE
+
+## 8.1 Purpose
+
+Provide continuous awareness of the monitored healthcare environment.
+
+This is the earliest operational layer of AEGIS.
+
+Its purpose is to help users recognize meaningful deviations before they become fully characterized threats.
+
+---
+
+## 8.2 Primary User
+
+Primary users include:
+
+- healthcare monitoring personnel
+- health workers
+- surveillance teams
+- biosecurity specialists
+- pandemic preparedness teams
+
+---
+
+## 8.3 Core User Questions
+
+The screen must help answer:
+
+1. What is happening now?
+2. Where is it happening?
+3. What has changed?
+4. Which signals are abnormal?
+5. Which abnormalities require attention?
+6. Are existing events changing?
+
+---
+
+## 8.4 Information Hierarchy
+
+Priority order:
+
+```text
+1. Current operational status
+2. Significant anomalies
+3. Spatial/environmental context
+4. Patient/environment signal summaries
+5. Temporal changes
+6. Event relationships
+7. Supporting telemetry
+```
+
+---
+
+## 8.5 Required Functional Data
+
+The screen may consume:
+
+- environmental signals
+- patient-related signals
+- sensor status
+- signal timestamps
+- locations
+- baseline comparisons
+- anomaly indicators
+- event associations
+- system health indicators
+
+The actual production data contract must be defined by the AEGIS Data Architecture.
+
+---
+
+## 8.6 Components
+
+Required component categories:
+
+- global navigation
+- operational status header
+- surveillance visualization
+- signal/telemetry representation
+- anomaly indicators
+- location/context representation
+- time controls
+- filtering controls
+- event entry points
+- system status indicators
+
+---
+
+## 8.7 Core Interactions
+
+Users must be able to:
+
+- inspect current signals
+- identify abnormal signals
+- filter relevant information
+- inspect signal context
+- select an anomaly
+- enter Threat Discovery or the relevant event context
+- inspect historical signal behavior where supported
+
+---
+
+## 8.8 State Behavior
+
+### Normal
+
+Signals remain within expected operating conditions.
+
+### Anomalous
+
+A signal deviates from expected conditions.
+
+### Critical
+
+A signal or aggregated pattern reaches a defined operational threshold.
+
+### Degraded
+
+One or more monitoring sources become unavailable or unreliable.
+
+### Loading
+
+Data is being retrieved.
+
+### Error
+
+Data cannot be retrieved or rendered reliably.
+
+---
+
+## 8.9 State Mutations
+
+Normal viewing should produce no operational state mutation.
+
+Meaningful mutations may include:
+
+```text
+acknowledge anomaly
+create investigation trigger
+change monitoring configuration
+```
+
+only where explicitly authorized by the final product specification.
+
+---
+
+## 8.10 Navigation
+
+Primary progression:
+
+```text
+Live Surveillance
+      ↓
+Threat Discovery
+```
+
+Relevant event context may also lead toward:
+
+```text
+Threat Overview
+```
+
+---
+
+## 8.11 Completion Criteria
+
+The screen is complete when:
+
+- live/simulated surveillance data is represented coherently
+- anomalies are distinguishable from normal conditions
+- the user can inspect signal context
+- event context can be entered without losing information
+- loading/error/degraded states work
+- no false implication of confirmed threat is created
+
+---
+
+# 09. SCREEN 02 — THREAT DISCOVERY
+
+## 9.1 Purpose
+
+Transform abnormal observations into candidate threat contexts.
+
+Threat Discovery is the transition between sensing and structured threat understanding.
+
+---
+
+## 9.2 Primary User
+
+- surveillance specialists
+- biosecurity experts
+- investigation teams
+- authorized clinical/operational personnel
+
+---
+
+## 9.3 Core User Questions
+
+- Why was this signal surfaced?
+- What evidence currently exists?
+- Is this a meaningful anomaly?
+- What is known?
+- What remains uncertain?
+- Should this become an operational event?
+
+---
+
+## 9.4 Information Hierarchy
+
+```text
+1. Candidate threat
+2. Triggering evidence
+3. Location/time
+4. Related signals
+5. Evidence quality
+6. Uncertainty
+7. Recommended next investigative context
+```
+
+---
+
+## 9.5 Components
+
+- candidate threat list
+- evidence summary
+- anomaly relationship view
+- temporal information
+- spatial context
+- confidence/uncertainty representation
+- investigation entry point
+- event status representation
+
+---
+
+## 9.6 Interactions
+
+Users must be able to:
+
+- inspect a candidate
+- inspect supporting signals
+- compare relevant evidence
+- review context
+- open Threat Overview
+- initiate/continue investigation where authorized
+
+---
+
+## 9.7 State Model
+
+```text
+Candidate
+   ↓
+Under Review
+   ↓
+Operationally Relevant
+   OR
+Dismissed / Resolved
+```
+
+Exact terminal-state vocabulary must follow the global domain model.
+
+---
+
+## 9.8 Critical Constraint
+
+Threat Discovery must never visually collapse:
+
+```text
+anomaly
+```
+
+into:
+
+```text
+confirmed pathogen outbreak
+```
+
+without sufficient evidence.
+
+---
+
+## 9.9 Completion Criteria
+
+A user can move from a meaningful anomaly to a coherent threat context without losing the triggering evidence.
+
+---
+
+# 10. SCREEN 03 — THREAT OVERVIEW
+
+## 10.1 Purpose
+
+Provide a unified operational picture of an identified or suspected threat.
+
+---
+
+## 10.2 Primary User
+
+- biosecurity specialists
+- investigation teams
+- response teams
+- clinical leadership
+- pandemic preparedness personnel
+
+---
+
+## 10.3 Core User Questions
+
+- What is the event?
+- Where is it?
+- What is known?
+- What is uncertain?
+- How significant is it?
+- What changed recently?
+- What should be investigated next?
+
+---
+
+## 10.4 Information Hierarchy
+
+```text
+1. Threat identity/status
+2. Current operational state
+3. Risk context
+4. Evidence
+5. Timeline
+6. Cases
+7. Transmission context
+8. Response/recovery context
+```
+
+---
+
+## 10.5 Components
+
+- threat identity header
+- operational status
+- risk summary
+- evidence summary
+- event timeline
+- geographic/spatial context
+- case summary
+- transmission summary
+- action/navigation controls
+
+---
+
+## 10.6 Interactions
+
+Users can:
+
+- inspect threat context
+- inspect evidence
+- inspect timeline
+- open Risk Overview
+- open Investigation View
+- open Research View
+- navigate to relevant downstream operational states
+
+---
+
+## 10.7 State Mutations
+
+Generally read-oriented.
+
+Authorized actions may include:
+
+- update threat assessment
+- change classification
+- assign investigation
+- update event metadata
+
+Exact mutation permissions belong to the role/permission architecture.
+
+---
+
+## 10.8 Completion Criteria
+
+The user can understand the current threat without having to reconstruct information from multiple disconnected screens.
+
+---
+
+# 11. SCREEN 04 — RISK OVERVIEW
+
+## 11.1 Purpose
+
+Translate threat information into operational risk.
+
+---
+
+## 11.2 Primary User
+
+- incident leadership
+- biosecurity experts
+- clinical decision makers
+- pandemic preparedness teams
+- executive stakeholders
+
+---
+
+## 11.3 Core User Questions
+
+- How significant is the threat?
+- Who/what may be exposed?
+- What is the operational impact?
+- How urgent is the situation?
+- Does it require escalation?
+- What decisions are currently required?
+
+---
+
+## 11.4 Information Hierarchy
+
+```text
+1. Current risk state
+2. Severity
+3. Exposure
+4. Operational impact
+5. Trend
+6. Evidence supporting assessment
+7. Uncertainty
+8. Recommended operational path
+```
+
+---
+
+## 11.5 Components
+
+- risk status
+- risk indicators
+- exposure representation
+- trend visualization
+- severity representation
+- evidence/context
+- escalation indicators
+- decision-support area
+
+---
+
+## 11.6 Interactions
+
+Users may:
+
+- inspect risk dimensions
+- inspect supporting evidence
+- update authorized assessments
+- move to Investigation
+- move to Containment when appropriate
+- access Executive View
+
+---
+
+## 11.7 Critical Constraint
+
+Risk visualization must not imply certainty beyond the evidence supporting the assessment.
+
+---
+
+## 11.8 Completion Criteria
+
+A qualified user can determine the operational significance of the event and identify the appropriate next stage.
+
+---
+
+# 12. SCREEN 05 — INVESTIGATION VIEW
+
+## 12.1 Purpose
+
+Provide the structured workspace for investigating the threat.
+
+---
+
+## 12.2 Primary User
+
+- biosecurity investigators
+- epidemiological investigators
+- scientific specialists
+- pandemic preparedness specialists
+- authorized clinical investigation personnel
+
+---
+
+## 12.3 Core User Questions
+
+- What do we know?
+- What evidence supports that understanding?
+- What contradicts it?
+- What remains unknown?
+- What hypotheses exist?
+- What evidence is still needed?
+
+---
+
+## 12.4 Information Hierarchy
+
+```text
+1. Investigation status
+2. Current hypothesis/understanding
+3. Evidence
+4. Contradictory evidence
+5. Cases
+6. Timeline
+7. Environmental context
+8. Unresolved questions
+9. Confidence/uncertainty
+```
+
+---
+
+## 12.5 Components
+
+- investigation header
+- hypothesis/context area
+- evidence workspace
+- timeline
+- case relationship summary
+- unresolved questions
+- confidence representation
+- research entry point
+
+---
+
+## 12.6 Interactions
+
+Users can:
+
+- inspect evidence
+- add authorized findings
+- update investigation status
+- inspect cases
+- compare evidence
+- identify unresolved questions
+- open Case Investigation
+- open Transmission
+- open Research
+
+---
+
+## 12.7 State Mutations
+
+Possible authorized mutations:
+
+```text
+investigation status
+hypothesis
+finding
+evidence relationship
+confidence
+investigator assignment
+```
+
+Every mutation must be auditable.
+
+---
+
+## 12.8 Completion Criteria
+
+The investigation can be advanced without losing historical reasoning or evidence context.
+
+---
+
+# 13. SCREEN 06 — CASE INVESTIGATION VIEW
+
+## 13.1 Purpose
+
+Examine individual cases and their relationships to the broader event.
+
+---
+
+## 13.2 Primary User
+
+- investigation teams
+- epidemiological specialists
+- clinical investigators
+- biosecurity experts
+
+---
+
+## 13.3 Core User Questions
+
+- Which cases are relevant?
+- What relationships exist?
+- What temporal patterns exist?
+- What spatial relationships exist?
+- Which relationships are observed versus inferred?
+
+---
+
+## 13.4 Information Hierarchy
+
+```text
+1. Selected case
+2. Case status
+3. Relevant clinical/operational context
+4. Temporal relationships
+5. Spatial relationships
+6. Related cases
+7. Evidence
+8. Uncertainty
+```
+
+---
+
+## 13.5 Components
+
+- case list
+- selected case context
+- relationship visualization
+- timeline
+- location context
+- evidence panel
+- relationship status
+- navigation to broader investigation
+
+---
+
+## 13.6 Interactions
+
+Users can:
+
+- select cases
+- inspect relationships
+- filter cases
+- inspect timeline
+- inspect spatial relationships
+- return to Investigation
+- move to Transmission
+
+---
+
+## 13.7 Critical Constraint
+
+A relationship shown by AEGIS must carry sufficient semantic distinction to communicate whether it is:
+
+- observed
+- suspected
+- inferred
+- confirmed
+- unknown
+
+---
+
+## 13.8 Completion Criteria
+
+A user can investigate individual case relationships without disconnecting them from the active event.
+
+---
+
+# 14. SCREEN 07 — TRANSMISSION VIEW
+
+## 14.1 Purpose
+
+Help users understand potential transmission pathways and identify intervention opportunities.
+
+---
+
+## 14.2 Primary User
+
+- biosecurity specialists
+- epidemiological investigators
+- response teams
+- pandemic preparedness teams
+
+---
+
+## 14.3 Core User Questions
+
+- How might the event be moving?
+- Which pathways have evidence?
+- Which pathways are hypotheses?
+- Where are potential intervention points?
+- What remains unknown?
+
+---
+
+## 14.4 Information Hierarchy
+
+```text
+1. Transmission picture
+2. Evidence-backed relationships
+3. Potential pathways
+4. Uncertainty
+5. Environmental/case context
+6. Potential intervention points
+```
+
+---
+
+## 14.5 Components
+
+- transmission map/graph
+- relationship indicators
+- temporal context
+- environmental context
+- case relationships
+- confidence representation
+- containment transition
+
+---
+
+## 14.6 Interactions
+
+Users can:
+
+- inspect pathways
+- inspect relationships
+- filter transmission context
+- examine evidence
+- identify potential intervention points
+- move to Containment
+- return to Investigation
+
+---
+
+## 14.7 Critical Constraint
+
+The visualization must clearly distinguish observed evidence from inferred pathways.
+
+---
+
+## 14.8 Completion Criteria
+
+A qualified user can identify where containment planning should focus without mistaking hypotheses for confirmed transmission routes.
+
+---
+
+# 15. SCREEN 08 — CONTAINMENT VIEW
+
+## 15.1 Purpose
+
+Represent containment planning, authorization, activation, monitoring, and status.
+
+---
+
+## 15.2 Primary User
+
+- response teams
+- clinical operations leadership
+- biosecurity specialists
+- authorized operational decision makers
+
+---
+
+## 15.3 Core User Questions
+
+- Where can intervention occur?
+- What containment measures are proposed?
+- Which measures are authorized?
+- Which are active?
+- What has been verified?
+- What remains unresolved?
+
+---
+
+## 15.4 Information Hierarchy
+
+```text
+1. Current containment status
+2. Active containment measures
+3. Proposed measures
+4. Affected areas
+5. Authorization state
+6. Execution state
+7. Verification
+8. Outcome indicators
+```
+
+---
+
+## 15.5 Containment Action Lifecycle
+
+```text
+IDENTIFIED
+   ↓
+PROPOSED
+   ↓
+REVIEWED
+   ↓
+AUTHORIZED
+   ↓
+EXECUTING
+   ↓
+ACTIVE
+   ↓
+VERIFIED
+   ↓
+COMPLETED / MODIFIED
+```
+
+The exact state vocabulary must be aligned with the global state model during implementation.
+
+---
+
+## 15.6 Components
+
+- containment status
+- affected area representation
+- intervention list
+- action status
+- authorization state
+- verification state
+- outcome monitoring
+- response transition
+
+---
+
+## 15.7 Critical Constraint
+
+The UI must never imply that a containment measure has been executed merely because it has been recommended.
+
+---
+
+## 15.8 Completion Criteria
+
+A containment action can be traced from proposal through authorization and execution/verification.
+
+---
+
+# 16. SCREEN 09 — RESPONSE VIEW
+
+## 16.1 Purpose
+
+Coordinate and monitor active operational response.
+
+---
+
+## 16.2 Primary User
+
+- response teams
+- clinical operations
+- biosecurity response personnel
+- incident leadership
+
+---
+
+## 16.3 Core User Questions
+
+- What actions are active?
+- Who/what is responsible?
+- What has been completed?
+- What remains unresolved?
+- What is the observed outcome?
+- Does the response need adjustment?
+
+---
+
+## 16.4 Information Hierarchy
+
+```text
+1. Response status
+2. Active actions
+3. Action progress
+4. Outcomes
+5. Outstanding actions
+6. New observations
+7. Required adjustments
+```
+
+---
+
+## 16.5 Components
+
+- response status
+- action tracker
+- action ownership
+- progress representation
+- outcome indicators
+- timeline
+- new observations
+- adjustment controls
+
+---
+
+## 16.6 Response Loop
+
+```text
+ACTION
+  ↓
+OBSERVATION
+  ↓
+ASSESSMENT
+  ↓
+ADJUSTMENT
+  ↓
+ACTION
+```
+
+---
+
+## 16.7 Interactions
+
+Authorized users can:
+
+- inspect actions
+- update action status
+- record outcomes
+- review new observations
+- initiate approved adjustments
+- transition toward Recovery
+
+---
+
+## 16.8 Critical Constraint
+
+A completed response action does not mean the threat is resolved.
+
+Response effectiveness must remain observable.
+
+---
+
+## 16.9 Completion Criteria
+
+Users can coordinate active response while maintaining visibility into outcomes and unresolved issues.
+
+---
+
+# 17. SCREEN 10 — RECOVERY VIEW
+
+## 17.1 Purpose
+
+Monitor stabilization and movement toward recovery.
+
+---
+
+## 17.2 Primary User
+
+- response leadership
+- clinical operations
+- preparedness teams
+- biosecurity specialists
+
+---
+
+## 17.3 Core User Questions
+
+- Is the system stabilizing?
+- Is risk decreasing?
+- Are conditions returning toward expected baseline?
+- What remains abnormal?
+- When can recovery be considered sufficient?
+
+---
+
+## 17.4 Information Hierarchy
+
+```text
+1. Recovery status
+2. Current conditions
+3. Baseline comparison
+4. Risk trajectory
+5. Remaining anomalies
+6. Recovery milestones
+7. Outstanding concerns
+```
+
+---
+
+## 17.5 Components
+
+- recovery status
+- trend representation
+- baseline comparison
+- event timeline
+- outstanding issues
+- recovery milestones
+- preparedness transition
+
+---
+
+## 17.6 Interactions
+
+Users can:
+
+- inspect recovery trajectory
+- compare current conditions with baseline
+- review remaining anomalies
+- update authorized recovery status
+- move to Preparedness
+
+---
+
+## 17.7 Critical Constraint
+
+Recovery must remain evidence-based.
+
+A quiet dashboard does not automatically equal recovery.
+
+---
+
+## 17.8 Completion Criteria
+
+A user can determine whether the environment is stabilizing and identify what must still be monitored.
+
+---
+
+# 18. SCREEN 11 — PREPAREDNESS VIEW
+
+## 18.1 Purpose
+
+Convert event experience into future resilience.
+
+---
+
+## 18.2 Primary User
+
+- pandemic preparedness teams
+- biosecurity specialists
+- organizational leadership
+- response planning teams
+- strategic stakeholders
+
+---
+
+## 18.3 Core User Questions
+
+- What did we learn?
+- What worked?
+- What failed?
+- Where were the resilience gaps?
+- What should change?
+- What should be prepared before the next event?
+
+---
+
+## 18.4 Information Hierarchy
+
+```text
+1. Preparedness posture
+2. Lessons
+3. Resilience gaps
+4. Response performance
+5. Required improvements
+6. Readiness status
+7. Historical event context
+```
+
+---
+
+## 18.5 Components
+
+- preparedness status
+- lessons
+- resilience gap representation
+- improvement items
+- readiness indicators
+- historical event references
+- research context
+- executive transition
+
+---
+
+## 18.6 Interactions
+
+Users can:
+
+- review event lessons
+- identify gaps
+- record authorized lessons
+- create preparedness improvement items
+- review historical events
+- inspect research context
+- provide strategic context
+
+---
+
+## 18.7 Core Biological Analogy
+
+Preparedness is the institutional equivalent of memory.
+
+The system should preserve useful lessons without pretending that organizational learning is literally equivalent to biological immune memory.
+
+---
+
+## 18.8 Completion Criteria
+
+The completed event produces actionable preparedness knowledge rather than becoming a dead historical record.
+
+---
+
+# 19. SCREEN 12 — RESEARCH VIEW
+
+## 19.1 Purpose
+
+Provide deeper scientific and analytical context supporting operational understanding.
+
+---
+
+## 19.2 Primary User
+
+- scientific specialists
+- biosecurity researchers
+- investigation teams
+- pandemic preparedness teams
+- authorized expert stakeholders
+
+---
+
+## 19.3 Core User Questions
+
+- What additional scientific context is relevant?
+- What evidence supports the current understanding?
+- What external/internal research is relevant?
+- Which uncertainties require deeper investigation?
+
+---
+
+## 19.4 Information Hierarchy
+
+```text
+1. Research context
+2. Relevant evidence
+3. Scientific findings
+4. Supporting sources
+5. Uncertainty
+6. Relationship to active operational context
+```
+
+---
+
+## 19.5 Components
+
+- research context
+- evidence references
+- analytical findings
+- source representation
+- uncertainty
+- relationship to active event
+
+---
+
+## 19.6 Interactions
+
+Users can:
+
+- inspect research
+- compare relevant evidence
+- inspect sources
+- return to originating operational screen
+- associate approved findings with an investigation or preparedness context
+
+---
+
+## 19.7 Critical Constraint
+
+Research information must not silently alter operational state.
+
+A research finding may inform a decision, but the operational state changes only through the authorized workflow.
+
+---
+
+## 19.8 Completion Criteria
+
+Research can deepen operational understanding without becoming an uncontrolled parallel workflow.
+
+---
+
+# 20. SCREEN 13 — EXECUTIVE VIEW
+
+## 20.1 Purpose
+
+Provide strategic oversight of AEGIS activity.
+
+---
+
+## 20.2 Primary User
+
+- executive leadership
+- organizational decision makers
+- strategic health stakeholders
+- senior preparedness leadership
+
+---
+
+## 20.3 Core User Questions
+
+- What is the current strategic risk?
+- What major events are active?
+- Are responses working?
+- Where are the largest organizational vulnerabilities?
+- What is our preparedness posture?
+- What decisions require strategic attention?
+
+---
+
+## 20.4 Information Hierarchy
+
+```text
+1. Strategic risk
+2. Significant active events
+3. Response status
+4. Recovery trajectory
+5. Organizational exposure
+6. Preparedness posture
+7. Resilience gaps
+```
+
+---
+
+## 20.5 Components
+
+- strategic risk summary
+- active-event summary
+- response overview
+- recovery overview
+- preparedness status
+- organizational resilience indicators
+- strategic decision context
+
+---
+
+## 20.6 Interactions
+
+Executive users can:
+
+- inspect significant events
+- inspect strategic risk
+- review response status
+- review recovery
+- review preparedness
+- navigate into relevant operational context where authorized
+
+---
+
+## 20.7 Critical Constraint
+
+Executive View must not become a second operational control center.
+
+Its primary purpose is strategic comprehension and decision support.
+
+---
+
+## 20.8 Completion Criteria
+
+A strategic stakeholder can understand organizational risk and readiness without being forced to interpret low-level telemetry.
+
+---
+
+# 21. Cross-Screen Functional Requirements
+
+## FR-CROSS-001 — Shared Event Identity
+
+If the user selects an active event, all relevant screens must reference the same event identity.
+
+---
+
+## FR-CROSS-002 — Persistent Context
+
+Relevant context must survive navigation.
+
+---
+
+## FR-CROSS-003 — Consistent Status
+
+If an event changes state, all screens representing that event must eventually reflect the updated state.
+
+---
+
+## FR-CROSS-004 — Event Timeline Integrity
+
+Significant state changes must remain visible in the event history.
+
+---
+
+## FR-CROSS-005 — Evidence Integrity
+
+Evidence must retain its relationship to the event and the conclusion it supports.
+
+---
+
+## FR-CROSS-006 — Uncertainty Integrity
+
+Uncertainty must remain visible when moving between screens.
+
+---
+
+## FR-CROSS-007 — No Silent Mutation
+
+A read-only interaction must not unexpectedly modify operational state.
+
+---
+
+## FR-CROSS-008 — No Screen-Owned Reality
+
+No screen may create an isolated version of the event that contradicts the global state.
+
+---
+
+# 22. Global Loading Requirements
+
+Every screen that retrieves dynamic data must support:
+
+```text
+Initial Loading
+Partial Loading
+Refreshing
+Background Update
+Connection Loss
+Recovery After Connection Loss
+```
+
+Loading states must preserve enough surrounding context that users understand what is being loaded.
+
+---
+
+# 23. Global Empty-State Requirements
+
+Empty states must distinguish between:
+
+```text
+No Data Exists
+No Matching Data
+Data Not Yet Available
+Data Unavailable
+No Active Event
+No Relevant Evidence
+```
+
+These must never all appear as the generic:
+
+> "No data."
+
+---
+
+# 24. Global Error Requirements
+
+Errors must communicate:
+
+1. what failed
+2. what information may be affected
+3. whether the current state can still be trusted
+4. what the user can do next
+5. whether retry is possible
+
+For high-consequence actions, failure must never appear as successful execution.
+
+---
+
+# 25. Global Real-Time Requirements
+
+AEGIS is intended to support changing operational conditions.
+
+Where real-time behavior is implemented:
+
+```text
+New Signal
+   ↓
+State Update
+   ↓
+Affected Domain
+   ↓
+Affected Screens
+   ↓
+User Notification / Visual Update
+```
+
+The architecture must avoid uncontrolled full-application refreshes when a localized state update is sufficient.
+
+---
+
+# 26. Global Audit Requirements
+
+Auditable events include, where applicable:
+
+```text
+Event Creation
+Threat Classification
+Risk Assessment
+Investigation Update
+Case Relationship Update
+Transmission Finding
+Containment Proposal
+Containment Authorization
+Containment Execution
+Response Action
+Response Status Change
+Recovery Status Change
+Preparedness Lesson
+Permission-Sensitive Action
+```
+
+The final audit architecture determines exact schemas.
+
+---
+
+# 27. Permission Architecture Requirement
+
+Each screen must distinguish:
+
+```text
+Can View
+Can Investigate
+Can Assess
+Can Recommend
+Can Authorize
+Can Execute
+Can Modify
+Can Close
+```
+
+These permissions must never be inferred solely from the existence of a UI control.
+
+The backend must enforce authorization independently.
+
+---
+
+# 28. Accessibility Requirements
+
+AEGIS must support accessible operation across the product.
+
+At minimum:
+
+- keyboard navigation
+- readable typography
+- sufficient contrast
+- non-color-only status communication
+- semantic structure
+- meaningful labels
+- accessible interactive controls
+- understandable alerts
+- predictable navigation
+
+High-density telemetry must not become an excuse for inaccessible information presentation.
+
+---
+
+# 29. High-Stakes UX Requirements
+
+AEGIS must prioritize:
+
+## Clarity over decoration
+
+Information must be quickly understandable.
+
+## Authority over theatrics
+
+The interface should communicate clinical and operational seriousness rather than gaming aesthetics.
+
+## Evidence over assumption
+
+The system should show what supports a conclusion.
+
+## Context over isolated numbers
+
+Telemetry must retain operational meaning.
+
+## Reversibility where possible
+
+The interface should make consequential actions deliberate.
+
+## Traceability
+
+Users must be able to understand how the current state emerged.
+
+---
+
+# 30. Screen Completion Standard
+
+A screen is not considered complete because:
+
+```text
+the page renders
+```
+
+or:
+
+```text
+the UI looks good
+```
+
+A screen is complete only when:
+
+```text
+FUNCTIONALITY
++
+STATE
++
+DATA
++
+INTERACTION
++
+NAVIGATION
++
+ERROR HANDLING
++
+PERMISSIONS
++
+AUDIT
++
+ACCESSIBILITY
++
+ACCEPTANCE TESTS
+```
+
+are all satisfied.
+
+---
+
+# 31. AEGIS Screen Dependency Map
+
+The primary operational dependency chain is:
+
+```text
+01 Live Surveillance
+        ↓
+02 Threat Discovery
+        ↓
+03 Threat Overview
+        ↓
+04 Risk Overview
+        ↓
+05 Investigation
+        ↓
+06 Case Investigation
+        ↓
+07 Transmission
+        ↓
+08 Containment
+        ↓
+09 Response
+        ↓
+10 Recovery
+        ↓
+11 Preparedness
+```
+
+Supporting dependencies:
+
+```text
+03 Threat Overview
+        ↕
+12 Research
+
+05 Investigation
+        ↕
+12 Research
+
+06 Case Investigation
+        ↕
+12 Research
+
+07 Transmission
+        ↕
+12 Research
+
+11 Preparedness
+        ↕
+12 Research
+
+04 Risk Overview
+        ↕
+13 Executive
+```
+
+---
+
+# 32. Canonical Operational State Progression
+
+The functional specification supports this progression:
+
+```text
+OBSERVED
+   ↓
+DETECTED
+   ↓
+DISCOVERED
+   ↓
+ASSESSED
+   ↓
+INVESTIGATING
+   ↓
+CHARACTERIZED
+   ↓
+TRANSMISSION UNDERSTOOD
+   ↓
+CONTAINMENT PLANNED
+   ↓
+CONTAINMENT ACTIVE
+   ↓
+RESPONSE ACTIVE
+   ↓
+RECOVERY
+   ↓
+LEARNING
+   ↓
+PREPAREDNESS UPDATED
+   ↓
+CLOSED
+```
+
+This does not mean every event must pass through every state.
+
+The global state architecture remains authoritative for exact state semantics.
+
+---
+
+# 33. Functional Requirement Matrix
+
+| Requirement | Screens Affected |
+|---|---|
+| Shared event identity | All |
+| Global operational state | All |
+| Evidence continuity | 02–13 where relevant |
+| Risk continuity | 03–13 where relevant |
+| Investigation continuity | 05–12 |
+| Case continuity | 06–12 |
+| Transmission continuity | 07–12 |
+| Containment continuity | 08–10 |
+| Response continuity | 09–11, 13 |
+| Recovery continuity | 10–13 |
+| Preparedness continuity | 11–13 |
+| Strategic visibility | 04, 10, 11, 13 |
+| Research support | 03, 05, 06, 07, 11, 12 |
+| Auditability | All state-changing screens |
+| Role enforcement | All |
+| Error handling | All |
+| Accessibility | All |
+
+---
+
+# 34. End-to-End Functional Contract
+
+The entire application must support the following functional chain:
+
+```text
+SURVEILLANCE
+↓
+A meaningful abnormality is observed.
+
+THREAT DISCOVERY
+↓
+The abnormality becomes a candidate threat context.
+
+THREAT OVERVIEW
+↓
+The event receives coherent operational context.
+
+RISK OVERVIEW
+↓
+Its significance is assessed.
+
+INVESTIGATION
+↓
+Evidence and hypotheses are structured.
+
+CASE INVESTIGATION
+↓
+Relevant individual cases and relationships are examined.
+
+TRANSMISSION
+↓
+Potential pathways are evaluated.
+
+CONTAINMENT
+↓
+Intervention opportunities are planned and managed.
+
+RESPONSE
+↓
+Authorized actions are coordinated and monitored.
+
+RECOVERY
+↓
+Stabilization is evaluated.
+
+PREPAREDNESS
+↓
+Lessons are converted into future readiness.
+
+RESEARCH
+↓
+Scientific/analytical context supports the operational system.
+
+EXECUTIVE
+↓
+Strategic stakeholders understand organizational risk and resilience.
+```
+
+---
+
+# 35. Master Definition of Product Behavior
+
+AEGIS must behave as:
+
+```text
+ONE SYSTEM
+ONE GLOBAL STATE
+ONE EVENT CONTEXT
+MANY OPERATIONAL PERSPECTIVES
+```
+
+It must not behave as:
+
+```text
+13 independent pages
+13 independent states
+13 independent datasets
+13 unrelated workflows
+```
+
+The 13 screens are views into the same operational reality.
+
+---
+
+# 36. Functional Definition of Done
+
+The AEGIS product requirements are considered sufficiently implemented only when the system can demonstrate:
+
+### Detection
+
+A meaningful abnormal signal can enter the AEGIS operational lifecycle.
+
+### Discovery
+
+The system can distinguish candidate threats from raw anomalies.
+
+### Threat Understanding
+
+The user can establish a coherent threat picture.
+
+### Risk
+
+The user can assess operational significance.
+
+### Investigation
+
+The user can investigate evidence and hypotheses.
+
+### Case Analysis
+
+The user can inspect relevant cases and relationships.
+
+### Transmission
+
+The user can understand potential transmission pathways while preserving uncertainty.
+
+### Containment
+
+The user can distinguish proposed, authorized, active, and verified interventions.
+
+### Response
+
+The user can monitor active actions and their outcomes.
+
+### Recovery
+
+The user can assess stabilization against appropriate context.
+
+### Preparedness
+
+The user can convert event learning into future resilience.
+
+### Research
+
+The user can access supporting analytical/scientific context without bypassing operational controls.
+
+### Executive Oversight
+
+A strategic stakeholder can understand organizational risk and readiness.
+
+### System Integrity
+
+The complete operational context survives navigation across the 13 screens.
+
+### State Integrity
+
+All screens reflect the same underlying global state.
+
+### Safety
+
+Recommendations, authorizations, executions, inferences, and confirmed findings remain clearly differentiated.
+
+### Traceability
+
+Meaningful operational changes can be reconstructed from system history.
+
+---
+
+# 37. Engineering Handoff Rule
+
+This document is **not permission for an AI coding agent to freely interpret the product.**
+
+Before implementation, the agent must also receive:
+
+```text
+AEGIS Master Architecture
++
+AEGIS Domain Model + Global State Architecture
++
+AEGIS User Flow + Operational Journey Architecture
++
+THIS FUNCTIONAL REQUIREMENTS DOCUMENT
+```
+
+The implementation agent must treat those documents as a connected specification.
+
+When they conflict:
+
+```text
+STOP
+↓
+IDENTIFY CONFLICT
+↓
+DO NOT INVENT RESOLUTION
+↓
+REQUEST / APPLY APPROVED ARCHITECTURAL DECISION
+```
+
+---
+
+# 38. Final Product Contract
+
+The AEGIS interface exists to help qualified users move from:
+
+> **Something changed.**
+
+to:
+
+> **We understand what changed.**
+
+to:
+
+> **We understand the risk.**
+
+to:
+
+> **We have investigated the evidence.**
+
+to:
+
+> **We understand possible transmission.**
+
+to:
+
+> **We can coordinate containment and response.**
+
+to:
+
+> **We can observe whether the response is working.**
+
+to:
+
+> **We can determine whether recovery is occurring.**
+
+to:
+
+> **We can learn from the event and strengthen future preparedness.**
+
+That is the functional contract of AEGIS.
+
+Every future feature, component, API, state transition, screen interaction, AI-generated implementation, and engineering decision must be traceable to this contract.
+
+**If it cannot be traced to an operational requirement, it does not belong in the core AEGIS system.**
