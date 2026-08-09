@@ -1,0 +1,2188 @@
+# AEGIS
+
+# Document 20 — Master Verification + Traceability Matrix
+
+**System:** AEGIS  
+**Document:** 20 — Master Verification + Traceability Matrix  
+**Version:** 1.0  
+**Status:** Master Verification Baseline  
+**Purpose:** Establish the authoritative traceability, verification, validation, and completeness framework for AEGIS.
+
+---
+
+# 01. Purpose
+
+This document establishes how AEGIS proves that its implementation matches its approved architecture.
+
+It connects:
+
+```text
+Stakeholder Need
+        ↓
+System Objective
+        ↓
+Requirement
+        ↓
+User Journey
+        ↓
+Screen
+        ↓
+Domain Model
+        ↓
+State
+        ↓
+Data Contract
+        ↓
+API / Service
+        ↓
+UI Component
+        ↓
+Security Control
+        ↓
+AI Capability
+        ↓
+Telemetry
+        ↓
+Test
+        ↓
+Acceptance Evidence
+```
+
+Nothing important should exist in AEGIS without a traceable reason for existing.
+
+Likewise, no approved requirement should exist without a path toward implementation and verification.
+
+---
+
+# 02. The AEGIS Traceability Principle
+
+The governing rule is:
+
+> **Every important requirement must be traceable forward to implementation and backward to its originating need.**
+
+Forward:
+
+```text
+Requirement
+ ↓
+Implementation
+ ↓
+Test
+ ↓
+Evidence
+```
+
+Backward:
+
+```text
+Implementation
+ ↓
+Requirement
+ ↓
+Stakeholder Need
+```
+
+If either direction breaks, the implementation must be reviewed.
+
+---
+
+# 03. Verification vs Validation
+
+AEGIS must distinguish two concepts.
+
+## Verification
+
+> **Did we build the system correctly?**
+
+Examples:
+
+```text
+Does the API conform to its contract?
+Does the state transition work?
+Does the component render the correct state?
+Does authorization prevent unauthorized actions?
+Does the test pass?
+```
+
+---
+
+## Validation
+
+> **Did we build the correct system?**
+
+Examples:
+
+```text
+Does the workflow actually help an investigator?
+Can a health worker understand the situation?
+Does the decision-support presentation make sense?
+Does the system reduce cognitive burden?
+Does the workflow match real operational needs?
+```
+
+Both are required.
+
+---
+
+# 04. Authority Hierarchy
+
+When conflicts occur, use this hierarchy:
+
+```text
+1. Safety / Security Constraints
+2. Approved Stakeholder Requirements
+3. Master Architecture
+4. Domain + State Architecture
+5. Functional Specification
+6. Data + API Contracts
+7. Frontend Architecture
+8. Design System
+9. Implementation
+10. AI-Generated Suggestions
+```
+
+Lower-level artifacts must not silently override higher-level decisions.
+
+---
+
+# 05. Source Documents
+
+The traceability baseline covers:
+
+```text
+01 AEGIS Master Architecture
+02 AEGIS Domain Model + Global State Architecture
+03 AEGIS User Flow + Operational Journey Architecture
+04 AEGIS Functional Requirements + 13 Screen Master Specification
+05 AEGIS Interaction + State Transition Specification
+06 AEGIS Data Architecture + Data Contracts
+07 AEGIS API Architecture + Service Contracts
+08 AEGIS Frontend Architecture + Application Architecture
+09 AEGIS Design System + UI Component Architecture
+10 AEGIS Security, Authentication, Authorization + Audit Architecture
+11 AEGIS AI Intelligence + Decision Support Architecture
+12 AEGIS Observability + Telemetry Architecture
+13 AEGIS Threat Modeling + Risk Architecture
+14 AEGIS Testing + Quality Assurance Architecture
+15 AEGIS Infrastructure + Deployment Architecture
+16 AEGIS Development + Implementation Architecture
+17 AEGIS AI Development Workflow + Tool Orchestration Architecture
+18 AEGIS Repository Constitution + AI Agent Rules
+19 AEGIS Master Build Plan + Progressive Implementation Roadmap
+20 AEGIS Master Verification + Traceability Matrix
+```
+
+These documents collectively form the AEGIS architecture baseline.
+
+---
+
+# 06. Traceability ID System
+
+Every important requirement should receive a stable identifier.
+
+Use domain-prefixed identifiers.
+
+Examples:
+
+```text
+SYS-001
+REQ-001
+FLOW-001
+SCR-001
+DOM-001
+STATE-001
+DATA-001
+API-001
+UI-001
+SEC-001
+AI-001
+OBS-001
+RISK-001
+TEST-001
+ACC-001
+```
+
+Identifiers must remain stable after creation.
+
+Do not renumber identifiers merely because the document layout changes.
+
+---
+
+# 07. Requirement ID Categories
+
+## SYS
+
+System-level objectives.
+
+Example:
+
+```text
+SYS-001
+AEGIS shall support continuous operational awareness of approved monitoring signals.
+```
+
+---
+
+## REQ
+
+Functional requirements.
+
+```text
+REQ-001
+A user shall be able to inspect an identified anomaly.
+```
+
+---
+
+## FLOW
+
+Operational journey requirements.
+
+```text
+FLOW-001
+Anomaly investigation shall preserve selected event context when the user moves into threat assessment.
+```
+
+---
+
+## SCR
+
+Screen requirements.
+
+```text
+SCR-001
+Global Monitoring shall present the approved operational overview.
+```
+
+---
+
+## DOM
+
+Domain requirements.
+
+```text
+DOM-001
+A threat shall maintain an identifiable lifecycle state.
+```
+
+---
+
+## STATE
+
+State transition requirements.
+
+```text
+STATE-001
+A threat shall not transition into an unauthorized lifecycle state.
+```
+
+---
+
+## DATA
+
+Data requirements.
+
+```text
+DATA-001
+Threat records shall conform to the approved threat schema.
+```
+
+---
+
+## API
+
+Service requirements.
+
+```text
+API-001
+The threat assessment service shall conform to the approved service contract.
+```
+
+---
+
+## UI
+
+Component requirements.
+
+```text
+UI-001
+Threat status shall use the approved status component.
+```
+
+---
+
+## SEC
+
+Security requirements.
+
+```text
+SEC-001
+Protected operational actions shall require appropriate authorization.
+```
+
+---
+
+## AI
+
+AI requirements.
+
+```text
+AI-001
+AI-generated recommendations shall be presented as decision support rather than autonomous authority.
+```
+
+---
+
+## OBS
+
+Observability requirements.
+
+```text
+OBS-001
+Critical operational state transitions shall generate appropriate telemetry.
+```
+
+---
+
+## RISK
+
+Risk controls.
+
+```text
+RISK-001
+AI failure shall not prevent the deterministic operational workflow from functioning.
+```
+
+---
+
+## TEST
+
+Verification tests.
+
+```text
+TEST-001
+Verify unauthorized users cannot execute protected response actions.
+```
+
+---
+
+## ACC
+
+Acceptance criteria.
+
+```text
+ACC-001
+A validated user can complete the approved detection-to-response workflow without losing operational context.
+```
+
+---
+
+# 08. Traceability Chain
+
+Every major feature should be representable as:
+
+```text
+SYS
+ ↓
+REQ
+ ↓
+FLOW
+ ↓
+SCR
+ ↓
+DOM
+ ↓
+STATE
+ ↓
+DATA
+ ↓
+API
+ ↓
+UI
+ ↓
+SEC
+ ↓
+OBS
+ ↓
+TEST
+ ↓
+ACC
+```
+
+Not every requirement will use every layer.
+
+But every requirement must have the layers that are relevant to it.
+
+---
+
+# 09. Master Traceability Matrix
+
+| Requirement | User Flow | Screen | Domain | State | Data | API | UI | Security | AI | Observability | Test | Acceptance |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| REQ-001 | FLOW-001 | SCR-001 | DOM-001 | STATE-001 | DATA-001 | API-001 | UI-001 | SEC-001 | — | OBS-001 | TEST-001 | ACC-001 |
+| REQ-002 | FLOW-001 | SCR-002 | DOM-002 | STATE-002 | DATA-002 | API-002 | UI-002 | SEC-002 | AI-001 | OBS-002 | TEST-002 | ACC-002 |
+| REQ-003 | FLOW-002 | SCR-003 | DOM-003 | STATE-003 | DATA-003 | API-003 | UI-003 | SEC-003 | AI-002 | OBS-003 | TEST-003 | ACC-003 |
+| REQ-004 | FLOW-003 | SCR-004 | DOM-004 | STATE-004 | DATA-004 | API-004 | UI-004 | SEC-004 | — | OBS-004 | TEST-004 | ACC-004 |
+| REQ-005 | FLOW-004 | SCR-005 | DOM-005 | STATE-005 | DATA-005 | API-005 | UI-005 | SEC-005 | AI-003 | OBS-005 | TEST-005 | ACC-005 |
+
+**Important:** These example IDs are structural placeholders until the detailed requirement IDs are instantiated against the approved 13-screen specification. They must not be treated as invented product requirements.
+
+---
+
+# 10. No-Fabrication Rule
+
+The matrix must never be populated by guessing.
+
+If a requirement, screen, domain entity, API, state, or test does not exist in the approved documentation:
+
+```text
+DO NOT INVENT IT.
+```
+
+Instead mark:
+
+```text
+TBD
+```
+
+or:
+
+```text
+NOT APPLICABLE
+```
+
+with an explanation where necessary.
+
+---
+
+# 11. Requirement Completeness
+
+Every functional requirement must answer:
+
+```text
+What?
+Who?
+Why?
+When?
+Input?
+Output?
+State change?
+Data dependency?
+UI dependency?
+Security requirement?
+Failure behavior?
+Test?
+Acceptance condition?
+```
+
+If these cannot be answered, the requirement is incomplete.
+
+---
+
+# 12. Requirement Verification Record
+
+Every requirement should eventually have:
+
+```text
+Requirement ID
+Description
+Source
+Priority
+Owner
+Implementation status
+Test status
+Validation status
+Evidence
+Known limitations
+```
+
+---
+
+# 13. Status Model
+
+Use:
+
+```text
+NOT_STARTED
+SPECIFIED
+IN_DESIGN
+IN_IMPLEMENTATION
+IMPLEMENTED
+TESTING
+VERIFIED
+VALIDATED
+ACCEPTED
+BLOCKED
+DEPRECATED
+```
+
+Do not use vague statuses such as:
+
+```text
+almost done
+mostly done
+basically finished
+```
+
+---
+
+# 14. Evidence Model
+
+A requirement is not VERIFIED because an engineer says it works.
+
+Evidence should include one or more:
+
+```text
+unit test
+integration test
+contract test
+E2E test
+security test
+accessibility test
+performance result
+visual verification
+recorded workflow
+stakeholder validation
+deployment verification
+```
+
+---
+
+# 15. Verification Levels
+
+AEGIS uses five verification levels.
+
+## Level 1 — Structural
+
+Does the expected artifact exist?
+
+```text
+route exists
+component exists
+service exists
+schema exists
+```
+
+---
+
+## Level 2 — Functional
+
+Does it perform the expected behavior?
+
+```text
+button works
+state changes
+API responds
+navigation works
+```
+
+---
+
+## Level 3 — System
+
+Does it work with the rest of AEGIS?
+
+```text
+screen
++
+state
++
+API
++
+domain
+```
+
+---
+
+## Level 4 — Operational
+
+Does the complete workflow work?
+
+```text
+detection
+→ investigation
+→ decision
+→ response
+→ feedback
+```
+
+---
+
+## Level 5 — Stakeholder
+
+Does it work for the intended users?
+
+```text
+understandable
+credible
+useful
+trustworthy
+operationally appropriate
+```
+
+---
+
+# 16. 13-Screen Verification Framework
+
+Every one of the approved 13 screens must be traced through:
+
+```text
+Screen
+ ↓
+Purpose
+ ↓
+User
+ ↓
+Requirements
+ ↓
+Data
+ ↓
+Components
+ ↓
+States
+ ↓
+Interactions
+ ↓
+Navigation
+ ↓
+Dependencies
+ ↓
+Security
+ ↓
+Telemetry
+ ↓
+Tests
+ ↓
+Acceptance
+```
+
+---
+
+# 17. Screen Verification Template
+
+For every screen maintain:
+
+```text
+SCREEN ID:
+SCREEN NAME:
+
+Purpose:
+Primary user:
+
+Requirements:
+REQ-
+
+Domain dependencies:
+DOM-
+
+State dependencies:
+STATE-
+
+Data dependencies:
+DATA-
+
+API dependencies:
+API-
+
+Components:
+UI-
+
+Security:
+SEC-
+
+AI:
+AI-
+
+Telemetry:
+OBS-
+
+Tests:
+TEST-
+
+Acceptance:
+ACC-
+
+Status:
+Evidence:
+Known gaps:
+```
+
+---
+
+# 18. 13-Screen Completeness Rule
+
+A screen is not complete because it visually matches the design.
+
+A screen is complete only when:
+
+```text
+visual
++
+functional
++
+state
++
+data
++
+navigation
++
+security
++
+telemetry
++
+testing
+```
+
+are verified.
+
+---
+
+# 19. Domain Traceability
+
+Every major domain entity must be traceable to its use.
+
+For each entity ask:
+
+```text
+Why does this entity exist?
+Which requirement needs it?
+Which screens use it?
+Which state transitions modify it?
+Which data contract represents it?
+Which service exposes it?
+Which tests verify it?
+```
+
+If there is no answer:
+
+```text
+review entity
+```
+
+---
+
+# 20. Domain Entity Matrix
+
+| Domain Entity | Requirement | Screen | State | Data Contract | API | Test |
+|---|---|---|---|---|---|---|
+| Entity A | REQ-x | SCR-x | STATE-x | DATA-x | API-x | TEST-x |
+| Entity B | REQ-x | SCR-x | STATE-x | DATA-x | API-x | TEST-x |
+| Entity C | REQ-x | SCR-x | STATE-x | DATA-x | API-x | TEST-x |
+
+Actual entity names must come from Document 02.
+
+---
+
+# 21. State Traceability
+
+Every important state variable must answer:
+
+```text
+Who changes it?
+What action changes it?
+What event changes it?
+What validates it?
+Which screens consume it?
+What happens if it is invalid?
+```
+
+---
+
+# 22. State Transition Matrix
+
+| Current State | Trigger | Preconditions | Next State | Side Effects | Audit | Telemetry | Test |
+|---|---|---|---|---|---|---|---|
+| STATE-A | EVENT-A | CONDITION-A | STATE-B | EFFECT-A | AUDIT-A | OBS-A | TEST-A |
+| STATE-B | EVENT-B | CONDITION-B | STATE-C | EFFECT-B | AUDIT-B | OBS-B | TEST-B |
+| STATE-C | EVENT-C | CONDITION-C | STATE-D | EFFECT-C | AUDIT-C | OBS-C | TEST-C |
+
+No transition should exist without a reason.
+
+---
+
+# 23. Invalid State Verification
+
+Test not only:
+
+```text
+valid state
+ ↓
+valid transition
+```
+
+but also:
+
+```text
+invalid state
+ ↓
+attempted transition
+ ↓
+rejected safely
+```
+
+---
+
+# 24. Data Traceability
+
+Every critical data object must trace:
+
+```text
+source
+ ↓
+schema
+ ↓
+validation
+ ↓
+transformation
+ ↓
+storage
+ ↓
+API
+ ↓
+UI
+```
+
+---
+
+# 25. Data Contract Verification
+
+For every contract verify:
+
+```text
+required fields
+optional fields
+types
+constraints
+enumerations
+relationships
+timestamps
+identifiers
+null behavior
+invalid behavior
+versioning
+```
+
+---
+
+# 26. API Traceability
+
+Every API endpoint must have:
+
+```text
+business purpose
+consumer
+request contract
+response contract
+authentication requirement
+authorization requirement
+error contract
+audit behavior
+telemetry
+tests
+```
+
+If an endpoint has no business requirement:
+
+```text
+REVIEW
+```
+
+---
+
+# 27. UI Traceability
+
+Every major UI component must have:
+
+```text
+purpose
+owner
+design-system source
+data dependency
+state dependency
+interaction
+accessibility behavior
+loading state
+empty state
+error state
+test
+```
+
+---
+
+# 28. AI Traceability
+
+Every AI capability must trace:
+
+```text
+AI requirement
+ ↓
+input
+ ↓
+data source
+ ↓
+model/service
+ ↓
+prompt or inference contract
+ ↓
+output schema
+ ↓
+validation
+ ↓
+uncertainty
+ ↓
+human presentation
+ ↓
+audit
+ ↓
+telemetry
+ ↓
+evaluation
+```
+
+---
+
+# 29. AI Verification Rule
+
+AI output must never be treated as verified merely because:
+
+```text
+the model returned an answer
+```
+
+Verification must include:
+
+```text
+schema validity
+policy compliance
+appropriate uncertainty
+source/evidence relationship
+failure handling
+human interpretation
+```
+
+where applicable.
+
+---
+
+# 30. AI Failure Trace
+
+Every AI capability must define:
+
+```text
+AI available
+AI unavailable
+AI timeout
+AI malformed response
+AI low confidence
+AI contradictory evidence
+AI service failure
+```
+
+and the corresponding system behavior.
+
+---
+
+# 31. Security Traceability
+
+Security controls must trace to:
+
+```text
+risk
+ ↓
+threat
+ ↓
+control
+ ↓
+implementation
+ ↓
+test
+```
+
+---
+
+# 32. Security Matrix
+
+| Risk | Threat | Control | Implementation | Test | Evidence |
+|---|---|---|---|---|---|
+| RISK-A | THREAT-A | SEC-A | CODE-A | TEST-A | EVIDENCE-A |
+| RISK-B | THREAT-B | SEC-B | CODE-B | TEST-B | EVIDENCE-B |
+
+---
+
+# 33. Audit Traceability
+
+Important actions should produce appropriate audit records.
+
+Example:
+
+```text
+User
+ ↓
+Action
+ ↓
+Resource
+ ↓
+Decision
+ ↓
+State change
+ ↓
+Audit event
+```
+
+Audit requirements must follow Document 10.
+
+---
+
+# 34. Observability Traceability
+
+Critical workflows must connect:
+
+```text
+User action
+ ↓
+Application event
+ ↓
+State transition
+ ↓
+Service call
+ ↓
+Result
+ ↓
+Telemetry
+```
+
+This makes operational debugging possible.
+
+---
+
+# 35. Test Traceability
+
+Every important requirement must map to at least one appropriate verification method.
+
+Example:
+
+```text
+REQ-001
+ ↓
+TEST-001
+ ↓
+PASS
+ ↓
+Evidence
+```
+
+---
+
+# 36. Test Coverage Categories
+
+Track coverage across:
+
+```text
+requirements
+domain logic
+state transitions
+data contracts
+API contracts
+components
+screens
+operational journeys
+security controls
+AI capabilities
+failure scenarios
+accessibility
+performance
+deployment
+```
+
+---
+
+# 37. Do Not Confuse Code Coverage With Product Coverage
+
+High code coverage does not automatically mean:
+
+```text
+high system confidence
+```
+
+A system can have excellent line coverage and still have a broken operational workflow.
+
+Therefore AEGIS prioritizes:
+
+```text
+requirement coverage
++
+journey coverage
++
+state coverage
++
+risk coverage
+```
+
+alongside code coverage.
+
+---
+
+# 38. Operational Journey Traceability
+
+Each major operational journey must trace:
+
+```text
+FLOW
+ ↓
+screens
+ ↓
+actions
+ ↓
+state transitions
+ ↓
+services
+ ↓
+data
+ ↓
+audit
+ ↓
+telemetry
+ ↓
+tests
+ ↓
+stakeholder validation
+```
+
+---
+
+# 39. Core Journey Verification
+
+The primary operational journey must prove:
+
+```text
+Detection
+ ↓
+Investigation
+ ↓
+Threat Assessment
+ ↓
+Decision Support
+ ↓
+Human Decision
+ ↓
+Response
+ ↓
+Monitoring
+ ↓
+Feedback
+ ↓
+Institutional Learning
+```
+
+The exact screen mapping must follow Document 03 and Document 04.
+
+---
+
+# 40. End-to-End Acceptance Test
+
+The central AEGIS acceptance test is:
+
+> Can an authorized user move through the approved operational journey from detection through response and learning without losing critical context, violating state rules, bypassing authorization, corrupting data, or creating an untraceable decision?
+
+This is more important than whether individual screens render.
+
+---
+
+# 41. Cross-Screen Verification
+
+When moving between screens verify:
+
+```text
+selected entity persists
+context persists
+state persists
+permissions persist
+data remains consistent
+navigation remains valid
+```
+
+---
+
+# 42. Regression Matrix
+
+Every major release should verify:
+
+| Area | Previous Behavior | New Change | Regression Test | Result |
+|---|---|---|---|---|
+| Navigation | Existing | Updated | TEST-x | — |
+| State | Existing | Updated | TEST-x | — |
+| Data | Existing | Updated | TEST-x | — |
+| API | Existing | Updated | TEST-x | — |
+| Security | Existing | Updated | TEST-x | — |
+| AI | Existing | Updated | TEST-x | — |
+
+---
+
+# 43. Change Impact Analysis
+
+Before implementing a significant change ask:
+
+```text
+What requirements change?
+What screens change?
+What state changes?
+What data contracts change?
+What APIs change?
+What security controls change?
+What AI behavior changes?
+What telemetry changes?
+What tests become invalid?
+```
+
+---
+
+# 44. Architecture Drift Detection
+
+Architecture drift occurs when:
+
+```text
+implementation
+```
+
+gradually diverges from:
+
+```text
+approved architecture
+```
+
+without an explicit decision.
+
+AEGIS must actively detect this.
+
+---
+
+# 45. Drift Audit
+
+At every major milestone compare:
+
+```text
+Architecture
+vs
+Repository
+vs
+Tests
+vs
+Current State
+```
+
+Any unexplained discrepancy becomes an issue.
+
+---
+
+# 46. AI Agent Drift Prevention
+
+AI coding agents must not:
+
+```text
+invent routes
+invent entities
+invent API endpoints
+invent screens
+invent business rules
+invent permissions
+invent state transitions
+invent security policies
+```
+
+when those are not specified.
+
+They must surface ambiguity.
+
+---
+
+# 47. Ambiguity Protocol
+
+When an agent encounters ambiguity:
+
+```text
+AMBIGUITY DETECTED
+        ↓
+Identify affected area
+        ↓
+Identify conflicting documents
+        ↓
+Do not invent behavior
+        ↓
+Ask / escalate
+        ↓
+Update authoritative specification
+        ↓
+Continue
+```
+
+---
+
+# 48. "TBD" Is Better Than Hallucination
+
+The following:
+
+```text
+TBD
+```
+
+is acceptable.
+
+The following is not:
+
+```text
+invented requirement presented as fact
+```
+
+---
+
+# 49. Definition of Done
+
+A feature is DONE only when:
+
+```text
+[ ] Requirement exists
+[ ] Requirement is understood
+[ ] Architecture supports it
+[ ] Domain model supports it
+[ ] State model supports it
+[ ] Data contract exists
+[ ] API contract exists if required
+[ ] UI implemented
+[ ] Security implemented
+[ ] Audit implemented if required
+[ ] Telemetry implemented if required
+[ ] Tests implemented
+[ ] Tests passing
+[ ] Failure states handled
+[ ] Documentation updated
+[ ] Traceability updated
+[ ] Human review completed
+```
+
+---
+
+# 50. Definition of Verified
+
+A feature is VERIFIED when:
+
+```text
+implementation exists
++
+expected behavior is demonstrated
++
+automated tests pass where applicable
++
+critical failure paths are tested
++
+evidence is recorded
+```
+
+---
+
+# 51. Definition of Validated
+
+A feature is VALIDATED when:
+
+```text
+verified implementation
++
+appropriate stakeholder evaluation
++
+operational usefulness demonstrated
+```
+
+---
+
+# 52. Definition of Accepted
+
+A feature is ACCEPTED when:
+
+```text
+verified
++
+validated
++
+required evidence exists
++
+known limitations are documented
++
+authorized owner approves it
+```
+
+---
+
+# 53. Master Readiness Gates
+
+AEGIS has six major readiness gates.
+
+## Gate 1 — Architecture Ready
+
+```text
+Documents coherent
+No critical unresolved contradictions
+Requirements identifiable
+```
+
+---
+
+## Gate 2 — Implementation Ready
+
+```text
+Repository ready
+Design system ready
+Domain/state contracts ready
+```
+
+---
+
+## Gate 3 — Functional Ready
+
+```text
+Core workflows work
+13 screens integrated
+```
+
+---
+
+## Gate 4 — Hardening Ready
+
+```text
+Security
+Audit
+Observability
+Testing
+```
+
+---
+
+## Gate 5 — Validation Ready
+
+```text
+Deployable
+Stable
+Stakeholder-testable
+```
+
+---
+
+## Gate 6 — Release Ready
+
+```text
+Critical requirements accepted
+Critical risks addressed
+Known limitations documented
+Deployment verified
+```
+
+---
+
+# 54. Master Verification Dashboard
+
+The project should maintain a simple verification summary:
+
+```text
+SYSTEM REQUIREMENTS
+Total:
+Specified:
+Implemented:
+Verified:
+Validated:
+Accepted:
+
+SCREENS
+Total:
+Implemented:
+Verified:
+Validated:
+
+DOMAIN
+Entities:
+Verified:
+State transitions:
+Verified:
+
+DATA
+Contracts:
+Verified:
+
+API
+Contracts:
+Verified:
+
+SECURITY
+Controls:
+Verified:
+
+AI
+Capabilities:
+Verified:
+Evaluated:
+
+OBSERVABILITY
+Critical events:
+Verified:
+
+TESTING
+Requirements covered:
+Journey coverage:
+Risk coverage:
+Regression status:
+```
+
+This is a project-control instrument, not a vanity metric.
+
+---
+
+# 55. Traceability Health
+
+AEGIS should maintain four health categories:
+
+```text
+GREEN
+Complete and verified.
+
+AMBER
+Implemented but incomplete verification.
+
+RED
+Critical gap, conflict, or failure.
+
+GREY
+Not yet applicable / intentionally deferred.
+```
+
+---
+
+# 56. Critical Gap Rule
+
+Any RED item affecting:
+
+```text
+security
+authorization
+data integrity
+state integrity
+critical workflow
+auditability
+AI safety boundary
+```
+
+blocks release.
+
+---
+
+# 57. Verification Debt
+
+Verification debt occurs when:
+
+```text
+feature implemented
+but
+evidence missing
+```
+
+This must be tracked separately from technical debt.
+
+Example:
+
+```text
+Feature: Threat Classification
+Implementation: COMPLETE
+Tests: PARTIAL
+Stakeholder validation: NOT STARTED
+Status: AMBER
+```
+
+---
+
+# 58. Technical Debt vs Verification Debt
+
+### Technical Debt
+
+The implementation needs improvement.
+
+### Verification Debt
+
+The team does not yet have enough evidence that the implementation is correct.
+
+Both matter.
+
+In AEGIS:
+
+> **Unverified critical behavior must be treated as incomplete behavior.**
+
+---
+
+# 59. Release Blocking Conditions
+
+A release must be blocked when:
+
+```text
+critical security issue exists
+critical state corruption exists
+critical workflow broken
+critical authorization failure exists
+critical data contract violation exists
+critical audit gap exists
+critical AI safety boundary failure exists
+required stakeholder validation has failed
+```
+
+---
+
+# 60. Master Traceability Workflow
+
+Whenever a new feature is proposed:
+
+```text
+IDEA
+ ↓
+Need identified
+ ↓
+Requirement ID
+ ↓
+Architecture impact
+ ↓
+Domain impact
+ ↓
+State impact
+ ↓
+Data impact
+ ↓
+API impact
+ ↓
+UI impact
+ ↓
+Security impact
+ ↓
+AI impact
+ ↓
+Observability impact
+ ↓
+Test plan
+ ↓
+Implementation
+ ↓
+Verification
+ ↓
+Validation
+ ↓
+Acceptance
+```
+
+---
+
+# 61. When a Feature Is Removed
+
+Do not simply delete code.
+
+Trace the removal:
+
+```text
+Feature
+ ↓
+Requirements affected
+ ↓
+Screens affected
+ ↓
+State affected
+ ↓
+API affected
+ ↓
+Tests affected
+ ↓
+Documentation affected
+ ↓
+Decision recorded
+```
+
+---
+
+# 62. When a Screen Is Removed
+
+Check:
+
+```text
+navigation
+requirements
+flows
+components
+domain dependencies
+API dependencies
+state dependencies
+tests
+telemetry
+stakeholder workflows
+```
+
+before removal.
+
+---
+
+# 63. When a Domain Entity Is Removed
+
+Check:
+
+```text
+data contracts
+API contracts
+state
+screens
+services
+tests
+AI inputs
+telemetry
+audit
+```
+
+---
+
+# 64. When an API Changes
+
+Check:
+
+```text
+consumer
+request
+response
+validation
+authorization
+audit
+telemetry
+tests
+fixtures
+```
+
+---
+
+# 65. When AI Changes
+
+Check:
+
+```text
+input schema
+prompt/inference contract
+model
+output schema
+validation
+uncertainty
+UI presentation
+audit
+telemetry
+evaluation tests
+```
+
+---
+
+# 66. Repository Verification Structure
+
+Recommended:
+
+```text
+docs/
+├── architecture/
+├── requirements/
+├── traceability/
+│   ├── MASTER_TRACEABILITY.md
+│   ├── SCREEN_TRACEABILITY.md
+│   ├── STATE_TRACEABILITY.md
+│   ├── API_TRACEABILITY.md
+│   ├── SECURITY_TRACEABILITY.md
+│   ├── AI_TRACEABILITY.md
+│   └── TEST_TRACEABILITY.md
+├── verification/
+│   ├── VERIFICATION_STATUS.md
+│   ├── ACCEPTANCE_EVIDENCE.md
+│   └── RELEASE_READINESS.md
+├── decisions/
+└── project-state/
+    └── CURRENT_STATE.md
+```
+
+---
+
+# 67. The Master Traceability File
+
+Recommended location:
+
+```text
+docs/traceability/MASTER_TRACEABILITY.md
+```
+
+This file should be treated as the central map.
+
+It should not contain every piece of implementation detail.
+
+It should point toward the authoritative source.
+
+---
+
+# 68. Evidence Storage
+
+Evidence should be organized predictably.
+
+Conceptually:
+
+```text
+evidence/
+├── screenshots/
+├── recordings/
+├── test-results/
+├── accessibility/
+├── security/
+├── performance/
+├── ai-evaluations/
+└── stakeholder-validation/
+```
+
+Do not commit sensitive operational data.
+
+---
+
+# 69. Evidence Integrity
+
+Evidence must identify:
+
+```text
+requirement
+test
+environment
+version/commit
+date
+result
+```
+
+where appropriate.
+
+---
+
+# 70. AI Agent Verification Workflow
+
+Every OpenCode task should ultimately follow:
+
+```text
+READ
+ ↓
+TRACE
+ ↓
+PLAN
+ ↓
+IMPLEMENT
+ ↓
+TEST
+ ↓
+COMPARE
+ ↓
+REPORT
+```
+
+The final report should identify:
+
+```text
+implemented
+tested
+changed
+not changed
+known gaps
+architecture concerns
+```
+
+---
+
+# 71. AI Agent Completion Rule
+
+An AI agent must never say:
+
+> "Done."
+
+as the only completion signal.
+
+Completion should mean:
+
+```text
+implemented
++
+validated against specification
++
+tested
++
+reported
+```
+
+---
+
+# 72. Human Approval Boundary
+
+AI can:
+
+```text
+analyze
+propose
+implement
+test
+refactor
+```
+
+Human owners remain responsible for:
+
+```text
+architecture approval
+security decisions
+risk acceptance
+clinical/operational assumptions
+AI policy
+release approval
+stakeholder interpretation
+```
+
+---
+
+# 73. The AEGIS Traceability Equation
+
+The system's confidence should be thought of as:
+
+```text
+Confidence
+=
+Requirement Traceability
++
+Implementation Evidence
++
+Test Evidence
++
+Operational Validation
++
+Stakeholder Validation
+```
+
+No single dimension is sufficient.
+
+---
+
+# 74. Final Master Verification Checklist
+
+Before declaring AEGIS architecture-to-implementation transition complete:
+
+```text
+ARCHITECTURE
+[ ] All 20 documents available
+[ ] Cross-document conflicts resolved
+[ ] Authority hierarchy established
+[ ] Requirements identifiable
+
+REQUIREMENTS
+[ ] Requirements have IDs
+[ ] Requirements have acceptance criteria
+[ ] Requirements have verification paths
+
+SCREENS
+[ ] Exact 13-screen registry frozen
+[ ] Every screen traceable
+[ ] Every screen has acceptance criteria
+
+DOMAIN
+[ ] Domain entities traceable
+[ ] Domain relationships traceable
+[ ] Domain state traceable
+
+STATE
+[ ] State ownership defined
+[ ] State transitions traceable
+[ ] Invalid transitions defined
+
+DATA
+[ ] Critical schemas traceable
+[ ] Validation defined
+[ ] Error states defined
+
+API
+[ ] Service contracts traceable
+[ ] Authentication defined
+[ ] Authorization defined
+[ ] Error contracts defined
+
+UI
+[ ] Components traceable
+[ ] Design-system dependencies known
+[ ] Accessibility requirements known
+
+AI
+[ ] AI capabilities traceable
+[ ] Inputs defined
+[ ] Outputs defined
+[ ] Failure behavior defined
+[ ] Human authority preserved
+
+SECURITY
+[ ] Threats mapped
+[ ] Controls mapped
+[ ] Tests mapped
+
+OBSERVABILITY
+[ ] Critical events mapped
+[ ] Telemetry mapped
+[ ] Audit mapped
+
+TESTING
+[ ] Requirements mapped to tests
+[ ] State transitions tested
+[ ] Operational journeys tested
+[ ] Security tested
+[ ] AI evaluated
+[ ] Failure modes tested
+
+DEPLOYMENT
+[ ] Environments defined
+[ ] Release gates defined
+[ ] Rollback defined
+[ ] Monitoring defined
+
+STAKEHOLDERS
+[ ] Validation criteria defined
+[ ] Stakeholder groups defined
+[ ] Acceptance criteria defined
+```
+
+---
+
+# 75. The Final AEGIS Quality Gate
+
+AEGIS should not advance from architecture into serious implementation until the following question can be answered:
+
+> **For every important capability in AEGIS, can we identify where it came from, what it depends on, where it is implemented, how its state changes, what data supports it, what service exposes it, what security controls protect it, what telemetry observes it, what test verifies it, and what evidence proves it works?**
+
+If yes:
+
+```text
+ARCHITECTURE → IMPLEMENTATION
+```
+
+is ready.
+
+If no:
+
+```text
+STOP
+TRACE THE GAP
+RESOLVE IT
+THEN BUILD
+```
+
+---
+
+# 76. Final AEGIS Verification Doctrine
+
+AEGIS follows these permanent verification laws:
+
+```text
+1. Nothing important exists without traceability.
+
+2. Nothing critical is considered complete without evidence.
+
+3. Nothing is verified merely because it renders.
+
+4. Nothing is validated merely because tests pass.
+
+5. Nothing is accepted merely because an AI agent says it is done.
+
+6. Every state transition must have a reason.
+
+7. Every API must have a consumer and business purpose.
+
+8. Every major domain entity must have a requirement.
+
+9. Every critical requirement must have a test.
+
+10. Every critical risk must have a control.
+
+11. Every critical workflow must be observable.
+
+12. Every consequential AI capability must remain bounded and auditable.
+
+13. Every architectural change must be recorded.
+
+14. Ambiguity must be surfaced, not invented away.
+
+15. Mock behavior must never be confused with production capability.
+
+16. Stakeholder validation is part of system verification.
+
+17. The 13 screens are one system, not thirteen independent products.
+
+18. The operational journey is more important than visual completeness.
+
+19. Evidence beats assumption.
+
+20. Traceability beats memory.
+```
+
+---
+
+# 77. AEGIS Architecture-to-Execution Boundary
+
+The completion of Document 20 marks an important transition.
+
+The project now has:
+
+```text
+01 Architecture
+02 Domain + State
+03 User Flows
+04 Functional Requirements
+05 Interaction + State Transitions
+06 Data
+07 APIs
+08 Frontend
+09 Design System
+10 Security
+11 AI
+12 Observability
+13 Threat Modeling
+14 Testing
+15 Infrastructure
+16 Development
+17 AI Workflow
+18 Agent Rules
+19 Build Plan
+20 Verification + Traceability
+```
+
+This means the next problem is **no longer architectural invention**.
+
+The next problem is:
+
+> **Controlled implementation.**
+
+That distinction is critical.
+
+Do not keep generating architecture documents indefinitely.
+
+---
+
+# 78. The Next Phase
+
+The next phase is:
+
+```text
+ARCHITECTURE
+      ↓
+REPOSITORY
+      ↓
+IMPLEMENTATION
+      ↓
+VERIFICATION
+```
+
+The first implementation task should **not** be:
+
+> Build the dashboard.
+
+It should be:
+
+> **Audit and prepare the AEGIS repository against Documents 01–20.**
+
+OpenCode should inspect the actual repository and produce a gap report before changing meaningful code.
+
+---
+
+# END OF DOCUMENT 20
