@@ -1,0 +1,2249 @@
+# AEGIS
+
+# Implementation Phase 0 — Repository Audit & Architecture Alignment
+
+**Project:** AEGIS  
+**Phase:** 0  
+**Phase Name:** Repository Audit & Architecture Alignment  
+**Status:** Mandatory Pre-Implementation Gate  
+**Primary Executor:** OpenCode  
+**Architecture Authority:** AEGIS Documents 01–20  
+**Purpose:** Establish the factual state of the repository and align it against the approved AEGIS architecture before implementation begins.
+
+---
+
+# 01. PHASE 0 PURPOSE
+
+Phase 0 is not a coding phase.
+
+It is a **truth-establishment phase**.
+
+The purpose is to answer:
+
+> **What actually exists in the AEGIS repository right now, what does the approved architecture require, what can be preserved, what must change, what is missing, and what must not be touched?**
+
+The repository is the implementation reality.
+
+The AEGIS architecture documents are the intended system specification.
+
+Phase 0 determines the exact difference between them.
+
+```text
+AEGIS Architecture
+        ↓
+Approved Intent
+        ↓
+        GAP
+        ↑
+Repository Reality
+```
+
+The output of Phase 0 is a verified implementation baseline.
+
+---
+
+# 02. NON-NEGOTIABLE PRINCIPLE
+
+OpenCode MUST NOT begin implementation simply because the architecture documents exist.
+
+It must first inspect the repository.
+
+The sequence is:
+
+```text
+READ
+ ↓
+INSPECT
+ ↓
+INVENTORY
+ ↓
+MAP
+ ↓
+COMPARE
+ ↓
+IDENTIFY GAPS
+ ↓
+CLASSIFY GAPS
+ ↓
+PROPOSE ACTIONS
+ ↓
+REPORT
+ ↓
+HUMAN APPROVAL
+ ↓
+IMPLEMENTATION
+```
+
+Never:
+
+```text
+READ
+ ↓
+ASSUME
+ ↓
+REWRITE
+```
+
+---
+
+# 03. PHASE 0 SCOPE
+
+Phase 0 covers:
+
+```text
+1. Repository structure
+2. Existing application architecture
+3. Existing routes
+4. Existing screens
+5. Existing components
+6. Existing design system
+7. Existing state management
+8. Existing data models
+9. Existing API/services
+10. Existing authentication
+11. Existing authorization
+12. Existing AI functionality
+13. Existing telemetry
+14. Existing testing
+15. Existing infrastructure
+16. Existing dependencies
+17. Existing configuration
+18. Existing documentation
+19. Existing technical debt
+20. Architecture drift
+21. Mock/demo behavior
+22. Dead or duplicate code
+23. Missing functionality
+24. Implementation risks
+25. Migration requirements
+```
+
+---
+
+# 04. PHASE 0 DOES NOT INCLUDE
+
+Unless explicitly authorized after the audit, OpenCode must NOT:
+
+```text
+1. Rewrite the application
+2. Delete existing architecture
+3. Replace the framework
+4. Replace major dependencies
+5. Change the database
+6. Create new production APIs
+7. Create new business logic
+8. Invent missing screens
+9. Invent missing domain entities
+10. Invent new user flows
+11. Invent new state transitions
+12. Modify security architecture
+13. Add autonomous AI behavior
+14. Replace the design system
+15. Remove working code merely because it is imperfect
+16. Perform broad refactoring
+17. Perform speculative optimization
+18. Generate a new architecture
+19. Start implementing Phase 1
+```
+
+Phase 0 is primarily **read-only analysis**.
+
+---
+
+# 05. AUTHORITY MODEL
+
+OpenCode must treat the following as authoritative:
+
+```text
+AEGIS Document 01
+AEGIS Document 02
+AEGIS Document 03
+AEGIS Document 04
+AEGIS Document 05
+AEGIS Document 06
+AEGIS Document 07
+AEGIS Document 08
+AEGIS Document 09
+AEGIS Document 10
+AEGIS Document 11
+AEGIS Document 12
+AEGIS Document 13
+AEGIS Document 14
+AEGIS Document 15
+AEGIS Document 16
+AEGIS Document 17
+AEGIS Document 18
+AEGIS Document 19
+AEGIS Document 20
+```
+
+However:
+
+> **The documents describe intended architecture. They do not prove that the repository already implements it.**
+
+The repository must therefore be independently inspected.
+
+---
+
+# 06. ZERO-ASSUMPTION RULE
+
+OpenCode must not assume:
+
+```text
+the framework
+the routing strategy
+the state library
+the API architecture
+the database
+the authentication provider
+the component library
+the design system
+the screen count
+the existing implementation quality
+the existence of backend services
+the existence of AI services
+the existence of tests
+the existence of production data
+```
+
+Everything must be verified from the repository.
+
+---
+
+# 07. FACT CLASSIFICATION
+
+Every audit finding must be classified as one of:
+
+### VERIFIED
+
+Directly confirmed from repository evidence.
+
+### INFERRED
+
+Strongly indicated by repository structure but not explicitly confirmed.
+
+### UNKNOWN
+
+Cannot currently be determined.
+
+### CONFLICT
+
+Repository behavior conflicts with an approved AEGIS specification.
+
+### MISSING
+
+Required by architecture but absent from repository.
+
+### EXTRA
+
+Exists in repository but has no approved architectural purpose.
+
+### DEPRECATED
+
+Exists but appears intentionally superseded.
+
+### DEAD
+
+Appears unused or unreachable.
+
+### DUPLICATE
+
+Multiple implementations appear to serve the same purpose.
+
+---
+
+# 08. EVIDENCE RULE
+
+Every important audit conclusion must have evidence.
+
+Examples:
+
+```text
+File path
+Directory
+Route
+Component
+Function
+Configuration
+Package
+Schema
+Test
+Documentation
+Git history
+```
+
+Do not write:
+
+```text
+"The project appears to use X."
+```
+
+when the repository can prove it.
+
+Instead:
+
+```text
+VERIFIED
+
+Evidence:
+package.json
+src/app/
+src/components/
+```
+
+---
+
+# 09. REPOSITORY SNAPSHOT
+
+Before analysis, record:
+
+```text
+Repository name:
+Repository path:
+Current branch:
+Current commit:
+Working tree status:
+Package manager:
+Runtime:
+Framework:
+Language:
+Build system:
+Test framework:
+Linting:
+Formatting:
+Database:
+Backend:
+Frontend:
+Deployment configuration:
+Environment configuration:
+```
+
+If any field cannot be determined:
+
+```text
+UNKNOWN
+```
+
+Do not guess.
+
+---
+
+# 10. GIT SAFETY CHECK
+
+Before modifying anything:
+
+```text
+git status
+git branch
+git log -n <appropriate number>
+```
+
+Record:
+
+```text
+current branch
+current commit
+working tree cleanliness
+uncommitted changes
+recent architectural changes
+```
+
+If there are uncommitted user changes:
+
+> Do not overwrite them.
+
+The audit must preserve the existing working state.
+
+---
+
+# 11. REPOSITORY STRUCTURE AUDIT
+
+Inspect the entire repository structure.
+
+Identify:
+
+```text
+application
+components
+pages/routes
+features
+hooks
+state
+services
+API
+database
+schemas
+types
+assets
+styles
+tests
+configuration
+scripts
+documentation
+deployment
+CI/CD
+```
+
+Produce an actual repository tree.
+
+Do not generate an idealized tree.
+
+---
+
+# 12. TECHNOLOGY STACK AUDIT
+
+Determine the actual stack.
+
+Inspect:
+
+```text
+package.json
+lockfiles
+configuration files
+tsconfig
+framework configuration
+Tailwind configuration
+lint configuration
+test configuration
+environment configuration
+Docker configuration
+CI/CD configuration
+```
+
+Record:
+
+```text
+Technology
+Version
+Purpose
+Current usage
+Architecture compatibility
+Risk
+```
+
+---
+
+# 13. DEPENDENCY AUDIT
+
+For every major dependency determine:
+
+```text
+Package
+Version
+Purpose
+Where used
+Criticality
+Architecture relevance
+Potential replacement
+Action
+```
+
+Do not recommend replacing dependencies simply because another technology is preferred.
+
+Only recommend replacement when there is a demonstrated architectural reason.
+
+---
+
+# 14. FRONTEND AUDIT
+
+Inspect the actual frontend architecture.
+
+Determine:
+
+```text
+entry points
+layouts
+routing
+route groups
+pages
+screens
+components
+shared components
+feature components
+hooks
+state
+data fetching
+error handling
+loading handling
+responsive behavior
+accessibility
+styling
+animation
+visualization
+```
+
+---
+
+# 15. ROUTING AUDIT
+
+Create an actual route registry:
+
+| Route | File | Screen | Status | Evidence |
+|---|---|---|---|---|
+| Actual route | Actual file | Actual screen | Existing/Missing/Conflict | Evidence |
+
+Do not infer routes from filenames alone.
+
+Verify actual routing behavior.
+
+---
+
+# 16. 13-SCREEN AUDIT
+
+The approved AEGIS 13-screen registry is authoritative.
+
+OpenCode must compare the registry against the repository.
+
+For each approved screen:
+
+```text
+Screen ID
+Screen name
+Expected route
+Actual route
+Implementation status
+File
+Components
+Data source
+State dependency
+API dependency
+Navigation
+Loading state
+Empty state
+Error state
+Interaction status
+Test status
+Architecture compliance
+```
+
+---
+
+# 17. SCREEN STATUS CLASSIFICATION
+
+Each screen receives exactly one primary status:
+
+```text
+NOT_FOUND
+SHELL_ONLY
+STATIC
+PARTIAL
+FUNCTIONAL
+INTEGRATED
+VERIFIED
+CONFLICT
+```
+
+Definitions:
+
+### NOT_FOUND
+
+No implementation exists.
+
+### SHELL_ONLY
+
+Route/layout exists but meaningful screen functionality does not.
+
+### STATIC
+
+Visual implementation exists but behavior is largely mocked/static.
+
+### PARTIAL
+
+Some functional behavior exists.
+
+### FUNCTIONAL
+
+Core screen behavior exists.
+
+### INTEGRATED
+
+Connected to the required system dependencies.
+
+### VERIFIED
+
+Implementation has evidence demonstrating compliance.
+
+### CONFLICT
+
+Implementation contradicts the approved specification.
+
+---
+
+# 18. IMPORTANT: STATIC DOES NOT EQUAL COMPLETE
+
+A screen containing:
+
+```text
+cards
+charts
+tables
+buttons
+maps
+mock data
+```
+
+does not automatically mean the screen is implemented.
+
+OpenCode must determine whether those elements are:
+
+```text
+real functionality
+mock functionality
+hardcoded data
+simulated behavior
+temporary placeholder
+```
+
+This distinction is critical for AEGIS.
+
+---
+
+# 19. MOCK DATA AUDIT
+
+Find:
+
+```text
+mock data
+fixtures
+hardcoded arrays
+fake API responses
+placeholder JSON
+static telemetry
+simulated events
+demo state
+temporary IDs
+fake timestamps
+```
+
+Classify each:
+
+```text
+intentional development fixture
+temporary mock
+required simulation
+accidental production dependency
+```
+
+Do not remove mocks automatically.
+
+---
+
+# 20. DOMAIN MODEL AUDIT
+
+Compare actual domain concepts against Document 02.
+
+For every domain entity:
+
+```text
+Exists?
+Schema?
+Type?
+Storage?
+Relationships?
+Consumers?
+State?
+API?
+UI?
+Tests?
+```
+
+Classify:
+
+```text
+MATCH
+PARTIAL
+MISSING
+CONFLICT
+EXTRA
+```
+
+---
+
+# 21. GLOBAL STATE AUDIT
+
+Inspect actual state management.
+
+Determine:
+
+```text
+local state
+global state
+server state
+URL state
+persistent state
+derived state
+temporary UI state
+event state
+session state
+```
+
+Identify:
+
+```text
+state library
+stores
+contexts
+reducers
+hooks
+queries
+caches
+```
+
+Compare actual behavior against Document 02 and Document 05.
+
+---
+
+# 22. STATE OWNERSHIP AUDIT
+
+For every important state variable determine:
+
+```text
+Owner
+Source
+Mutator
+Consumers
+Persistence
+Validation
+Transitions
+Failure behavior
+```
+
+Flag:
+
+```text
+duplicate state
+derived state stored unnecessarily
+state synchronization risks
+global state that should be local
+local state that should be shared
+```
+
+Do not refactor during Phase 0.
+
+Report first.
+
+---
+
+# 23. DATA ARCHITECTURE AUDIT
+
+Determine what actually exists:
+
+```text
+types
+schemas
+database models
+fixtures
+validation
+serialization
+transformations
+API DTOs
+client models
+```
+
+Compare against Document 06.
+
+---
+
+# 24. API AUDIT
+
+Inspect:
+
+```text
+API routes
+server actions
+services
+client API calls
+fetch wrappers
+RPC
+REST
+GraphQL
+mock APIs
+external services
+```
+
+For every actual API/service:
+
+```text
+Name
+Location
+Purpose
+Consumer
+Input
+Output
+Authentication
+Authorization
+Error handling
+Telemetry
+Test
+Architecture mapping
+```
+
+---
+
+# 25. API REALITY CHECK
+
+Determine whether each API is:
+
+```text
+REAL
+MOCKED
+LOCAL ONLY
+SIMULATED
+EXTERNAL
+PARTIALLY IMPLEMENTED
+```
+
+Never allow a simulated API to be reported as production functionality.
+
+---
+
+# 26. DESIGN SYSTEM AUDIT
+
+Inspect actual implementation of:
+
+```text
+tokens
+colors
+typography
+spacing
+radius
+shadows
+icons
+buttons
+inputs
+cards
+tables
+badges
+charts
+navigation
+modals
+drawers
+tooltips
+status indicators
+data visualization
+```
+
+Compare against Document 09.
+
+---
+
+# 27. VISUAL DIRECTION AUDIT
+
+Verify whether implementation follows the approved AEGIS direction:
+
+```text
+Minimalist
+HUD-informed
+High-density telemetry
+Deep Obsidian
+Surgical White
+Antigen Amber
+Clinical Authority
+```
+
+Also check for prohibited drift:
+
+```text
+gaming aesthetic
+excessive neon
+unnecessary gradients
+decorative sci-fi
+visual noise
+unjustified 3D
+dashboard ornamentation
+```
+
+Visual differences must be documented, not automatically rewritten.
+
+---
+
+# 28. FRONTEND ARCHITECTURE ALIGNMENT
+
+Compare actual architecture with Document 08.
+
+Evaluate:
+
+```text
+application shell
+routing
+feature boundaries
+component hierarchy
+state management
+data fetching
+error boundaries
+loading architecture
+performance
+accessibility
+visualization
+```
+
+Return:
+
+```text
+ALIGNED
+PARTIALLY ALIGNED
+MISALIGNED
+MISSING
+```
+
+---
+
+# 29. SECURITY AUDIT
+
+Inspect:
+
+```text
+authentication
+sessions
+authorization
+roles
+permissions
+protected routes
+API authorization
+secrets handling
+environment variables
+audit logging
+security headers
+input validation
+```
+
+Do not assume a UI-hidden button constitutes authorization.
+
+---
+
+# 30. AI AUDIT
+
+Determine whether AI functionality actually exists.
+
+Inspect:
+
+```text
+models
+providers
+API calls
+prompts
+agents
+tools
+decision support
+classification
+recommendations
+confidence
+fallback behavior
+logging
+evaluation
+```
+
+Classify every AI capability:
+
+```text
+NONE
+MOCKED
+EXPERIMENTAL
+FUNCTIONAL
+INTEGRATED
+VERIFIED
+```
+
+---
+
+# 31. AI SAFETY BOUNDARY AUDIT
+
+Verify that AI does not silently become:
+
+```text
+autonomous clinical authority
+autonomous operational authority
+unreviewed response execution
+unbounded decision maker
+```
+
+Any such behavior is a CRITICAL ARCHITECTURAL CONFLICT.
+
+---
+
+# 32. OBSERVABILITY AUDIT
+
+Inspect:
+
+```text
+logs
+metrics
+traces
+events
+error reporting
+audit events
+performance monitoring
+health checks
+```
+
+Compare against Document 12.
+
+---
+
+# 33. TESTING AUDIT
+
+Determine actual:
+
+```text
+unit tests
+integration tests
+component tests
+API tests
+E2E tests
+accessibility tests
+security tests
+performance tests
+AI evaluation
+```
+
+Record:
+
+```text
+test framework
+test count
+coverage if available
+passing
+failing
+skipped
+missing
+```
+
+Do not treat test count as quality.
+
+---
+
+# 34. INFRASTRUCTURE AUDIT
+
+Inspect:
+
+```text
+Docker
+CI/CD
+hosting configuration
+environment management
+build process
+deployment scripts
+monitoring
+secrets
+database deployment
+rollback strategy
+```
+
+Compare against Document 15.
+
+---
+
+# 35. DOCUMENTATION AUDIT
+
+Find:
+
+```text
+README
+architecture docs
+development instructions
+agent instructions
+environment setup
+API documentation
+design documentation
+decision records
+```
+
+Determine which documents are:
+
+```text
+current
+obsolete
+duplicated
+contradictory
+missing
+```
+
+---
+
+# 36. AGENT RULE AUDIT
+
+Inspect repository instructions such as:
+
+```text
+AGENTS.md
+CLAUDE.md
+README
+CONTRIBUTING
+.cursor rules
+OpenCode instructions
+project skills
+```
+
+Determine:
+
+```text
+what agents are currently told
+whether instructions conflict
+whether AEGIS Document 18 is represented
+```
+
+---
+
+# 37. ARCHITECTURE DRIFT AUDIT
+
+Search for evidence of:
+
+```text
+duplicate architectures
+old routes
+unused components
+legacy state
+obsolete APIs
+duplicate schemas
+multiple design systems
+contradictory naming
+```
+
+Do not delete them.
+
+Report them.
+
+---
+
+# 38. NAMING AUDIT
+
+AEGIS must use consistent terminology.
+
+Inspect:
+
+```text
+file names
+routes
+variables
+types
+components
+API names
+domain names
+database names
+events
+state names
+```
+
+Identify terminology conflicts.
+
+Do not rename broadly during Phase 0.
+
+---
+
+# 39. DEAD CODE AUDIT
+
+Identify likely:
+
+```text
+unused components
+unused routes
+unused hooks
+unused services
+unused dependencies
+unused schemas
+unused assets
+```
+
+Mark as:
+
+```text
+LIKELY UNUSED
+```
+
+unless confirmed.
+
+---
+
+# 40. DUPLICATION AUDIT
+
+Identify duplicate:
+
+```text
+components
+state
+API wrappers
+types
+schemas
+utilities
+styles
+design tokens
+```
+
+Explain the duplication.
+
+Do not automatically consolidate.
+
+---
+
+# 41. ERROR HANDLING AUDIT
+
+Check every major subsystem for:
+
+```text
+loading
+empty
+error
+timeout
+retry
+offline
+invalid data
+unauthorized
+forbidden
+not found
+service unavailable
+```
+
+Record missing states.
+
+---
+
+# 42. ACCESSIBILITY AUDIT
+
+Inspect:
+
+```text
+semantic HTML
+keyboard navigation
+focus
+ARIA
+contrast
+screen reader behavior
+motion preferences
+form labels
+interactive target sizes
+```
+
+Do not claim compliance without evidence.
+
+---
+
+# 43. RESPONSIVE AUDIT
+
+Determine actual behavior across:
+
+```text
+desktop
+tablet
+mobile
+large displays
+high-density operational displays
+```
+
+Do not assume mobile support unless required by architecture.
+
+---
+
+# 44. PERFORMANCE AUDIT
+
+Identify obvious risks:
+
+```text
+large bundles
+unoptimized assets
+excessive re-renders
+unnecessary client components
+large visualization payloads
+blocking requests
+unbounded polling
+```
+
+Phase 0 identifies risks.
+
+It does not optimize them.
+
+---
+
+# 45. AEGIS ARCHITECTURE GAP MATRIX
+
+Produce:
+
+| Area | Architecture Requires | Repository Has | Gap | Severity | Action |
+|---|---|---|---|---|---|
+| Routing | Approved architecture | Actual | Difference | Critical/High/Medium/Low | Later |
+| Screens | 13 approved screens | Actual | Difference | — | — |
+| State | Approved model | Actual | Difference | — | — |
+| Data | Approved contracts | Actual | Difference | — | — |
+| API | Approved contracts | Actual | Difference | — | — |
+| UI | Approved system | Actual | Difference | — | — |
+| Security | Approved controls | Actual | Difference | — | — |
+| AI | Approved boundary | Actual | Difference | — | — |
+| Observability | Approved telemetry | Actual | Difference | — | — |
+| Testing | Approved strategy | Actual | Difference | — | — |
+| Infrastructure | Approved deployment | Actual | Difference | — | — |
+
+---
+
+# 46. GAP SEVERITY
+
+Use:
+
+## CRITICAL
+
+Blocks safe or correct implementation.
+
+Examples:
+
+```text
+security architecture conflict
+state integrity problem
+fundamental domain contradiction
+critical authorization gap
+destructive implementation conflict
+```
+
+## HIGH
+
+Blocks a major implementation capability.
+
+## MEDIUM
+
+Requires correction but does not block immediate foundational work.
+
+## LOW
+
+Quality improvement or cleanup.
+
+---
+
+# 47. GAP CATEGORIES
+
+Every gap should be categorized:
+
+```text
+ARCHITECTURE
+DOMAIN
+STATE
+UI
+UX
+DATA
+API
+SECURITY
+AI
+OBSERVABILITY
+TESTING
+INFRASTRUCTURE
+DOCUMENTATION
+DEPENDENCY
+PERFORMANCE
+ACCESSIBILITY
+TECHNICAL DEBT
+```
+
+---
+
+# 48. REUSE / REFACTOR / REBUILD DECISION
+
+Every significant existing subsystem must be classified:
+
+### KEEP
+
+Already compatible.
+
+### ADAPT
+
+Mostly compatible with controlled changes.
+
+### REFACTOR
+
+Conceptually correct but structurally poor.
+
+### REBUILD
+
+Fundamentally incompatible.
+
+### REMOVE
+
+No longer required.
+
+### UNKNOWN
+
+Insufficient evidence.
+
+The agent must explain the reasoning.
+
+---
+
+# 49. IMPORTANT REUSE PRINCIPLE
+
+Do not rebuild working infrastructure simply because the project is restarting conceptually.
+
+The project is being reset architecturally.
+
+That does **not** automatically mean:
+
+```text
+delete repository
+start from zero
+```
+
+Existing code should be reused whenever it is demonstrably compatible.
+
+---
+
+# 50. THE 13-SCREEN IMPLEMENTATION MATRIX
+
+Produce a final table:
+
+| # | Approved Screen | Existing | Route | UI | State | Data | API | Interactions | Tests | Status |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 01 | Approved registry | Audit | Audit | Audit | Audit | Audit | Audit | Audit | Audit | — |
+| 02 | Approved registry | Audit | Audit | Audit | Audit | Audit | Audit | Audit | Audit | — |
+| 03 | Approved registry | Audit | Audit | Audit | Audit | Audit | Audit | Audit | Audit | — |
+| 04 | Approved registry | Audit | Audit | Audit | Audit | Audit | Audit | Audit | Audit | — |
+| 05 | Approved registry | Audit | Audit | Audit | Audit | Audit | Audit | Audit | Audit | — |
+| 06 | Approved registry | Audit | Audit | Audit | Audit | Audit | Audit | Audit | Audit | — |
+| 07 | Approved registry | Audit | Audit | Audit | Audit | Audit | Audit | Audit | Audit | — |
+| 08 | Approved registry | Audit | Audit | Audit | Audit | Audit | Audit | Audit | Audit | — |
+| 09 | Approved registry | Audit | Audit | Audit | Audit | Audit | Audit | Audit | Audit | — |
+| 10 | Approved registry | Audit | Audit | Audit | Audit | Audit | Audit | Audit | Audit | — |
+| 11 | Approved registry | Audit | Audit | Audit | Audit | Audit | Audit | Audit | Audit | — |
+| 12 | Approved registry | Audit | Audit | Audit | Audit | Audit | Audit | Audit | Audit | — |
+| 13 | Approved registry | Audit | Audit | Audit | Audit | Audit | Audit | Audit | Audit | — |
+
+**Important:** Do not recreate or rename the 13 screens from memory. Read the authoritative registry.
+
+---
+
+# 51. GLOBAL STATE ALIGNMENT MATRIX
+
+Compare:
+
+```text
+Approved state
+vs
+Repository state
+```
+
+For each:
+
+```text
+State
+Owner
+Repository implementation
+Mutation mechanism
+Consumers
+Persistence
+Mismatch
+```
+
+---
+
+# 52. DOMAIN ALIGNMENT MATRIX
+
+Compare:
+
+```text
+Approved entity
+vs
+Repository entity
+```
+
+Record:
+
+```text
+name
+schema
+relationships
+location
+consumers
+state
+API
+mismatch
+```
+
+---
+
+# 53. API ALIGNMENT MATRIX
+
+Compare:
+
+```text
+Approved service
+vs
+Repository implementation
+```
+
+Record:
+
+```text
+service
+endpoint
+implementation
+consumer
+contract
+auth
+errors
+telemetry
+test
+mismatch
+```
+
+---
+
+# 54. DESIGN SYSTEM ALIGNMENT MATRIX
+
+Compare:
+
+```text
+Approved token/component
+vs
+actual implementation
+```
+
+Identify:
+
+```text
+missing
+duplicate
+incorrect
+unused
+inconsistent
+```
+
+---
+
+# 55. TEST ALIGNMENT MATRIX
+
+Map:
+
+```text
+Requirement
+→
+Current test
+→
+Coverage
+→
+Gap
+```
+
+The goal is not to maximize test count.
+
+The goal is to identify whether critical behavior is protected.
+
+---
+
+# 56. ARCHITECTURE CONFLICT REGISTER
+
+Create:
+
+```text
+docs/traceability/ARCHITECTURE_CONFLICTS.md
+```
+
+Each conflict:
+
+```text
+Conflict ID:
+Area:
+Architecture says:
+Repository does:
+Evidence:
+Severity:
+Impact:
+Recommended resolution:
+Decision:
+Status:
+```
+
+No conflict should be silently resolved by an AI agent.
+
+---
+
+# 57. UNKNOWN REGISTER
+
+Create:
+
+```text
+docs/traceability/UNKNOWN_ITEMS.md
+```
+
+Every unresolved unknown:
+
+```text
+Unknown ID:
+Question:
+Affected architecture:
+Why unknown:
+What evidence is needed:
+Owner:
+Status:
+```
+
+This prevents uncertainty from turning into hallucinated implementation.
+
+---
+
+# 58. DEBT REGISTER
+
+Create:
+
+```text
+docs/traceability/IMPLEMENTATION_DEBT.md
+```
+
+Track:
+
+```text
+technical debt
+verification debt
+documentation debt
+architecture debt
+security debt
+testing debt
+```
+
+---
+
+# 59. PHASE 0 OUTPUT FILES
+
+At the end of Phase 0, produce:
+
+```text
+docs/
+└── implementation/
+    └── phase-0/
+        ├── REPOSITORY_AUDIT.md
+        ├── TECHNOLOGY_STACK_AUDIT.md
+        ├── ROUTE_AUDIT.md
+        ├── SCREEN_IMPLEMENTATION_MATRIX.md
+        ├── DOMAIN_ALIGNMENT.md
+        ├── STATE_ALIGNMENT.md
+        ├── DATA_ALIGNMENT.md
+        ├── API_ALIGNMENT.md
+        ├── DESIGN_SYSTEM_ALIGNMENT.md
+        ├── SECURITY_ALIGNMENT.md
+        ├── AI_ALIGNMENT.md
+        ├── OBSERVABILITY_ALIGNMENT.md
+        ├── TESTING_ALIGNMENT.md
+        ├── INFRASTRUCTURE_ALIGNMENT.md
+        ├── ARCHITECTURE_GAP_MATRIX.md
+        ├── ARCHITECTURE_CONFLICTS.md
+        ├── UNKNOWN_ITEMS.md
+        ├── IMPLEMENTATION_DEBT.md
+        └── PHASE_0_EXECUTIVE_SUMMARY.md
+```
+
+Do not create unnecessary files beyond this structure unless there is a demonstrated reason.
+
+---
+
+# 60. PHASE 0 EXECUTIVE SUMMARY
+
+The final summary must answer:
+
+### A. What exists?
+
+### B. What works?
+
+### C. What is mocked?
+
+### D. What is incomplete?
+
+### E. What conflicts with AEGIS architecture?
+
+### F. What can be reused?
+
+### G. What must be refactored?
+
+### H. What must be rebuilt?
+
+### I. What must not be touched?
+
+### J. What are the highest-risk gaps?
+
+### K. What must happen first?
+
+### L. Is the repository ready for Phase 1?
+
+The final answer must be evidence-based.
+
+---
+
+# 61. PHASE 0 SCORECARD
+
+Provide:
+
+```text
+Architecture Alignment:      __ / 100
+Repository Readiness:        __ / 100
+Screen Readiness:            __ / 100
+Domain Readiness:            __ / 100
+State Readiness:             __ / 100
+Data Readiness:              __ / 100
+API Readiness:               __ / 100
+UI Readiness:                __ / 100
+Security Readiness:           __ / 100
+AI Readiness:                __ / 100
+Observability Readiness:     __ / 100
+Testing Readiness:           __ / 100
+Infrastructure Readiness:    __ / 100
+```
+
+These numbers are summaries, not substitutes for evidence.
+
+---
+
+# 62. READINESS CLASSIFICATION
+
+Return one final classification:
+
+```text
+READY
+```
+
+Meaning the repository can safely enter Phase 1.
+
+```text
+READY WITH CONDITIONS
+```
+
+Meaning foundational work can begin but specific conditions must be resolved.
+
+```text
+NOT READY
+```
+
+Meaning architecture/repository conflicts must be resolved before implementation.
+
+```text
+BLOCKED
+```
+
+Meaning a critical issue prevents safe continuation.
+
+---
+
+# 63. PHASE 0 STOP CONDITION
+
+OpenCode MUST STOP after producing the audit.
+
+It must NOT automatically continue into Phase 1.
+
+The audit must be reviewed first.
+
+---
+
+# 64. HUMAN APPROVAL GATE
+
+The following requires explicit approval before implementation:
+
+```text
+[ ] Repository audit reviewed
+[ ] Architecture conflicts reviewed
+[ ] Screen matrix reviewed
+[ ] Domain alignment reviewed
+[ ] State alignment reviewed
+[ ] Data alignment reviewed
+[ ] API alignment reviewed
+[ ] Design-system alignment reviewed
+[ ] Security alignment reviewed
+[ ] AI alignment reviewed
+[ ] Testing gaps reviewed
+[ ] Infrastructure gaps reviewed
+[ ] Reuse/refactor/rebuild decisions approved
+[ ] Phase 1 scope approved
+```
+
+Only after this gate passes may implementation begin.
+
+---
+
+# 65. PHASE 1 INPUT
+
+Phase 1 must consume:
+
+```text
+AEGIS Documents 01–20
++
+Phase 0 Repository Audit
++
+Architecture Gap Matrix
++
+Approved Conflict Resolutions
++
+Approved Reuse/Refactor/Rebuild Decisions
++
+Approved Phase 1 Scope
+```
+
+Nothing else should silently redefine the project.
+
+---
+
+# 66. PHASE 1 MUST NOT START WITH ALL 13 SCREENS
+
+The first implementation milestone should establish the foundation.
+
+The recommended sequence is:
+
+```text
+Repository Foundation
+        ↓
+Application Shell
+        ↓
+Design System
+        ↓
+Routing
+        ↓
+Domain Types
+        ↓
+Global State
+        ↓
+Data Contracts
+        ↓
+Service/API Boundaries
+        ↓
+First Vertical Slice
+        ↓
+Verification
+        ↓
+Expand Systematically
+```
+
+Do not build thirteen disconnected pages.
+
+Build the system underneath them.
+
+---
+
+# 67. VERTICAL SLICE PRINCIPLE
+
+The first meaningful implementation should prove that:
+
+```text
+UI
+ ↓
+State
+ ↓
+Domain
+ ↓
+Data
+ ↓
+Service
+ ↓
+Telemetry
+ ↓
+Test
+```
+
+can work together.
+
+This is more valuable than having 13 beautiful but disconnected screens.
+
+---
+
+# 68. AI TOOL ORCHESTRATION
+
+AEGIS implementation uses different AI tools for different jobs.
+
+## ChatGPT
+
+Use for:
+
+```text
+research
+external knowledge
+standards
+concept investigation
+architecture critique
+technical comparison
+documentation planning
+traceability review
+```
+
+ChatGPT should not become the source of invented repository facts.
+
+---
+
+## Claude
+
+Use for:
+
+```text
+deep architecture reasoning
+system decomposition
+complex specification review
+UX logic
+state reasoning
+design critique
+technical planning
+```
+
+Claude should reason from the approved AEGIS documents and repository evidence.
+
+---
+
+## v0
+
+Use for:
+
+```text
+high-fidelity interface exploration
+visual composition
+component ideas
+layout exploration
+interaction prototypes
+```
+
+v0 output is **design material**, not automatically authoritative production architecture.
+
+---
+
+## OpenCode
+
+Use for:
+
+```text
+repository inspection
+implementation
+refactoring
+integration
+testing
+verification
+```
+
+OpenCode is the primary execution agent.
+
+---
+
+# 69. AI SOURCE-OF-TRUTH MODEL
+
+```text
+ChatGPT
+Research + Analysis
+        ↓
+Claude
+Architecture + Reasoning
+        ↓
+AEGIS Documents
+Approved Specification
+        ↓
+v0
+Visual Exploration
+        ↓
+OpenCode
+Repository Implementation
+        ↓
+Tests
+Verification
+        ↓
+Human Review
+Acceptance
+```
+
+No tool is allowed to silently replace the specification.
+
+---
+
+# 70. AI HANDOFF RULE
+
+When moving work between AI tools:
+
+Always provide:
+
+```text
+current objective
+relevant AEGIS document
+relevant requirements
+constraints
+existing implementation
+known decisions
+known exclusions
+expected output
+```
+
+Do not send:
+
+> "Build AEGIS."
+
+That is an invitation to hallucinate.
+
+---
+
+# 71. OPENCODE MASTER INSTRUCTION
+
+The following instruction governs Phase 0 execution:
+
+> You are the AEGIS Repository Audit Agent.
+>
+> Your job is to establish the factual state of the existing repository before implementation begins.
+>
+> You must read the available AEGIS architecture documents and inspect the repository independently.
+>
+> You must not assume that the repository matches the architecture.
+>
+> You must not invent missing functionality.
+>
+> You must not redesign the system.
+>
+> You must not begin Phase 1 implementation.
+>
+> You must not delete or overwrite existing work.
+>
+> You must not perform broad refactoring.
+>
+> You must not silently resolve architecture conflicts.
+>
+> Your primary responsibility is to identify the exact relationship between the approved AEGIS architecture and the current repository.
+>
+> For every significant conclusion, provide repository evidence.
+>
+> Classify findings as VERIFIED, INFERRED, UNKNOWN, CONFLICT, MISSING, EXTRA, DEPRECATED, DEAD, or DUPLICATE.
+>
+> Audit the repository across:
+>
+> architecture, technology stack, routing, 13 screens, domain model, global state, data architecture, APIs, frontend architecture, design system, security, AI, observability, testing, infrastructure, documentation, dependencies, technical debt, architecture drift, and implementation risks.
+>
+> Produce the required Phase 0 audit artifacts.
+>
+> At the end, produce a concise executive summary containing:
+>
+> 1. What exists
+> 2. What works
+> 3. What is mocked
+> 4. What is incomplete
+> 5. What conflicts
+> 6. What can be reused
+> 7. What requires refactoring
+> 8. What requires rebuilding
+> 9. What must not be touched
+> 10. Highest-risk gaps
+> 11. Recommended implementation order
+> 12. Phase 1 readiness status
+>
+> Stop after the audit.
+>
+> Do not implement Phase 1 until the human project owner reviews and approves the Phase 0 findings.
+
+---
+
+# 72. OPENCODE EXECUTION ORDER
+
+OpenCode must execute Phase 0 in this order:
+
+```text
+STEP 01
+Read repository instructions.
+
+STEP 02
+Inspect git status and current branch.
+
+STEP 03
+Inspect repository tree.
+
+STEP 04
+Identify actual technology stack.
+
+STEP 05
+Inspect dependencies.
+
+STEP 06
+Inspect application entry points.
+
+STEP 07
+Inspect routing.
+
+STEP 08
+Audit the 13 approved screens.
+
+STEP 09
+Audit components and design system.
+
+STEP 10
+Audit domain model.
+
+STEP 11
+Audit global state.
+
+STEP 12
+Audit data architecture.
+
+STEP 13
+Audit API/service architecture.
+
+STEP 14
+Audit authentication and authorization.
+
+STEP 15
+Audit AI functionality.
+
+STEP 16
+Audit observability.
+
+STEP 17
+Audit tests.
+
+STEP 18
+Audit infrastructure/deployment.
+
+STEP 19
+Audit documentation and agent rules.
+
+STEP 20
+Compare repository against Documents 01–20.
+
+STEP 21
+Generate gap matrix.
+
+STEP 22
+Generate conflict register.
+
+STEP 23
+Generate unknown register.
+
+STEP 24
+Generate debt register.
+
+STEP 25
+Generate reuse/refactor/rebuild classification.
+
+STEP 26
+Generate Phase 0 executive summary.
+
+STEP 27
+STOP.
+```
+
+---
+
+# 73. PROHIBITED BEHAVIOR
+
+OpenCode must never:
+
+```text
+"fix" something without documenting the reason
+rename architecture concepts because they sound better
+create a screen because one seems missing
+delete an old component without evidence
+replace dependencies because of personal preference
+change state architecture without approval
+invent API endpoints
+invent domain entities
+invent permissions
+invent threat levels
+invent clinical protocols
+invent pathogen data
+invent AI capabilities
+claim simulated functionality is real
+claim tests exist when they do not
+claim production readiness from visual completeness
+```
+
+---
+
+# 74. AEGIS DATA REALISM RULE
+
+Because AEGIS represents a high-stakes healthcare and biosecurity environment:
+
+> **The interface may simulate operational scenarios for development, but simulated data and simulated behavior must never be represented as validated real-world clinical, epidemiological, or biosecurity intelligence.**
+
+The implementation must clearly distinguish:
+
+```text
+DEMO
+SIMULATION
+MOCK
+TEST
+REAL
+```
+
+where relevant.
+
+---
+
+# 75. AEGIS SAFETY BOUNDARY
+
+AEGIS is a decision-support system architecture.
+
+It must not be represented as independently authorizing:
+
+```text
+clinical treatment
+public-health intervention
+pathogen release response
+laboratory manipulation
+security intervention
+automated real-world containment
+```
+
+without explicitly approved human governance and system boundaries.
+
+The UI may model response workflows.
+
+The architecture must distinguish **simulation/decision support** from actual operational authority.
+
+---
+
+# 76. FINAL PHASE 0 SUCCESS CRITERIA
+
+Phase 0 succeeds when a human can look at the resulting audit and answer:
+
+> **What exactly do we have?**
+
+> **What exactly does AEGIS require?**
+
+> **Where are they different?**
+
+> **Why are they different?**
+
+> **What should we keep?**
+
+> **What should we change?**
+
+> **What should we rebuild?**
+
+> **What should we leave alone?**
+
+> **What should we build first?**
+
+> **What could break if we build it incorrectly?**
+
+> **Are we now ready to implement?**
+
+If these questions cannot be answered, Phase 0 is incomplete.
+
+---
+
+# 77. PHASE 0 EXIT GATE
+
+The project may proceed only when:
+
+```text
+[ ] Repository reality is documented
+[ ] Architecture baseline is documented
+[ ] 13-screen implementation status is known
+[ ] Domain alignment is known
+[ ] State alignment is known
+[ ] Data alignment is known
+[ ] API alignment is known
+[ ] UI alignment is known
+[ ] Security alignment is known
+[ ] AI alignment is known
+[ ] Observability alignment is known
+[ ] Testing alignment is known
+[ ] Infrastructure alignment is known
+[ ] Critical conflicts are identified
+[ ] Unknowns are identified
+[ ] Reuse/refactor/rebuild decisions are identified
+[ ] Critical risks are identified
+[ ] Phase 1 sequence is defined
+[ ] Human approval is obtained
+```
+
+---
+
+# 78. PHASE 0 FINAL PRINCIPLE
+
+**Do not build what you think AEGIS is.**
+
+Build what the approved architecture says AEGIS is.
+
+But before doing that:
+
+**Find out exactly what already exists.**
+
+That is the purpose of Phase 0.
+
+---
+
+# END OF AEGIS IMPLEMENTATION PHASE 0
