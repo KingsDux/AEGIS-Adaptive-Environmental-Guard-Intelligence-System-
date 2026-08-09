@@ -1,0 +1,2770 @@
+# AEGIS
+# Data Architecture + Data Contracts
+
+**System:** AEGIS  
+**Document:** Data Architecture + Data Contracts  
+**Version:** 1.0  
+**Status:** Master Data Specification  
+**Date:** August 2026  
+**Authority:** Derived from AEGIS Master Architecture, Domain Model + Global State Architecture, User Flow + Operational Journey Architecture, Functional Requirements + 13 Screen Master Specification, and Interaction + State Transition Specification.
+
+---
+
+# 01. Purpose
+
+This document defines the authoritative data architecture of AEGIS.
+
+It answers:
+
+1. What information exists in AEGIS?
+2. What are the canonical entities?
+3. Who owns each piece of information?
+4. How are entities related?
+5. Which information is operational truth?
+6. Which information is derived?
+7. Which information is temporary UI state?
+8. What data crosses the frontend/backend boundary?
+9. What must be persisted?
+10. What must be auditable?
+11. What information can change state?
+12. How should real-time events update the system?
+13. What contracts must engineering follow?
+14. What must AI coding agents never invent?
+
+The objective is to create a **single coherent data model** that every AEGIS screen, component, API, service, database table, state store, test, and AI coding agent can follow.
+
+---
+
+# 02. Core Data Principle
+
+AEGIS must operate according to one fundamental rule:
+
+> **Operational truth belongs to the domain model, not to the interface.**
+
+The UI renders domain information.
+
+The UI does not define domain information.
+
+Therefore:
+
+```text
+DATABASE / DOMAIN
+       ↓
+DOMAIN STATE
+       ↓
+API / EVENT CONTRACT
+       ↓
+APPLICATION STATE
+       ↓
+UI
+```
+
+Not:
+
+```text
+UI
+ ↓
+Fake local object
+ ↓
+Pretend database
+```
+
+---
+
+# 03. Data Architecture Layers
+
+AEGIS data is divided into six layers.
+
+```text
+┌──────────────────────────────┐
+│ 01. SOURCE DATA              │
+│ Sensors / observations       │
+└──────────────┬───────────────┘
+               ↓
+┌──────────────────────────────┐
+│ 02. OPERATIONAL DATA         │
+│ Events / threats / cases     │
+└──────────────┬───────────────┘
+               ↓
+┌──────────────────────────────┐
+│ 03. ANALYTICAL DATA          │
+│ Risk / findings / pathways   │
+└──────────────┬───────────────┘
+               ↓
+┌──────────────────────────────┐
+│ 04. ACTION DATA              │
+│ Containment / response       │
+└──────────────┬───────────────┘
+               ↓
+┌──────────────────────────────┐
+│ 05. LEARNING DATA            │
+│ Recovery / lessons / gaps    │
+└──────────────┬───────────────┘
+               ↓
+┌──────────────────────────────┐
+│ 06. GOVERNANCE DATA          │
+│ Users / permissions / audit  │
+└──────────────────────────────┘
+```
+
+These layers are conceptually distinct even if the production database uses different physical structures.
+
+---
+
+# 04. Canonical Entity Registry
+
+AEGIS uses the following canonical entities.
+
+## Core operational entities
+
+```text
+Observation
+Signal
+Anomaly
+Event
+Threat
+RiskAssessment
+Investigation
+Case
+Finding
+TransmissionAssessment
+ContainmentAction
+ResponseAction
+RecoveryAssessment
+PreparednessLesson
+ResilienceGap
+ImprovementItem
+ResearchFinding
+```
+
+## Supporting entities
+
+```text
+Location
+Organization
+Actor
+Evidence
+Notification
+AuditRecord
+DomainEvent
+```
+
+These are the canonical concepts.
+
+Engineering may introduce implementation-level entities where necessary, but must not introduce competing business concepts without updating this document.
+
+---
+
+# 05. Entity Ownership
+
+Each entity has one authoritative domain owner.
+
+| Entity | Primary purpose |
+|---|---|
+| Observation | Raw observed information |
+| Signal | Interpreted/structured signal from an observation source |
+| Anomaly | Signal that requires attention |
+| Event | Operational occurrence being tracked |
+| Threat | Characterized or suspected threat context |
+| RiskAssessment | Assessment of operational risk |
+| Investigation | Structured examination of an event/threat |
+| Case | Individual operational case |
+| Finding | Evidence-backed investigative result |
+| TransmissionAssessment | Assessment of possible transmission relationships |
+| ContainmentAction | Intervention intended to limit spread/exposure |
+| ResponseAction | Operational response activity |
+| RecoveryAssessment | Assessment of stabilization/recovery |
+| PreparednessLesson | Learning captured from an event |
+| ResilienceGap | Identified weakness |
+| ImprovementItem | Action intended to address a gap |
+| ResearchFinding | External/internal research information |
+| Location | Geographic/organizational location context |
+| Actor | Person/system acting within AEGIS |
+| Evidence | Supporting information |
+| Notification | User-facing operational notification |
+| AuditRecord | Historical accountability record |
+| DomainEvent | Record of a meaningful state-changing occurrence |
+
+---
+
+# 06. Observation
+
+An Observation represents information received from a source.
+
+Examples include:
+
+```text
+environmental observation
+patient-related observation
+facility observation
+laboratory observation
+manual observation
+system-generated observation
+```
+
+An Observation is not automatically a threat.
+
+Conceptual structure:
+
+```text
+Observation
+├── id
+├── source
+├── observedAt
+├── location
+├── subject
+├── measurement/context
+├── quality
+├── provenance
+└── createdAt
+```
+
+The exact measurement schema depends on the source domain.
+
+AEGIS must not assume every observation has identical fields.
+
+---
+
+# 07. Signal
+
+A Signal represents structured information derived from one or more observations.
+
+Conceptual structure:
+
+```text
+Signal
+├── id
+├── type
+├── sourceReferences
+├── detectedAt
+├── location
+├── severity/context
+├── confidence
+├── status
+├── metadata
+└── provenance
+```
+
+A Signal is not equivalent to a confirmed threat.
+
+---
+
+# 08. Anomaly
+
+An Anomaly represents a signal or pattern that deviates sufficiently from an expected condition to require attention.
+
+Conceptual structure:
+
+```text
+Anomaly
+├── id
+├── signalReferences
+├── detectedAt
+├── location
+├── description
+├── severity
+├── confidence
+├── status
+├── detectionMethod
+├── supportingEvidence
+└── timestamps
+```
+
+The anomaly lifecycle must remain distinct from the threat lifecycle.
+
+---
+
+# 09. Event
+
+An Event represents the operational occurrence that AEGIS is tracking.
+
+Conceptual structure:
+
+```text
+Event
+├── id
+├── type
+├── title
+├── status
+├── detectedAt
+├── occurredAt
+├── location
+├── severity
+├── description
+├── sourceReferences
+├── evidenceReferences
+├── threatReferences
+├── riskReferences
+├── createdBy
+└── timestamps
+```
+
+An Event may connect multiple domain entities.
+
+---
+
+# 10. Threat
+
+A Threat represents the operational threat context associated with an event.
+
+Conceptual structure:
+
+```text
+Threat
+├── id
+├── eventReferences
+├── classification
+├── status
+├── confidence
+├── severity
+├── evidenceReferences
+├── investigationReferences
+├── riskAssessmentReferences
+├── transmissionAssessmentReferences
+└── timestamps
+```
+
+Critical rule:
+
+> **Threat classification is not the same thing as threat certainty.**
+
+The model must preserve uncertainty.
+
+---
+
+# 11. Threat Classification
+
+Classification must be represented independently from confidence.
+
+For example:
+
+```text
+classification
+confidence
+evidence
+status
+```
+
+must not be collapsed into one field.
+
+This allows AEGIS to represent:
+
+```text
+Classification = Category A
+Confidence = Low
+Status = Under Review
+```
+
+without falsely representing the threat as confirmed.
+
+The exact controlled vocabulary must be defined by the domain/governance layer.
+
+AI agents must not invent pathogen classification systems.
+
+---
+
+# 12. RiskAssessment
+
+RiskAssessment represents a structured assessment of operational risk.
+
+Conceptual structure:
+
+```text
+RiskAssessment
+├── id
+├── targetType
+├── targetId
+├── status
+├── severity
+├── likelihood
+├── impact
+├── confidence
+├── rationale
+├── evidenceReferences
+├── assessedBy
+├── assessedAt
+├── validFrom
+├── validUntil
+└── timestamps
+```
+
+The actual scoring methodology must be configurable rather than hard-coded into UI components.
+
+---
+
+# 13. Risk History
+
+Risk must be historically reconstructable.
+
+Therefore, a new assessment should not simply overwrite the previous assessment.
+
+Conceptually:
+
+```text
+Risk Assessment 01
+        ↓
+Risk Assessment 02
+        ↓
+Risk Assessment 03
+        ↓
+Current Assessment
+```
+
+Each assessment retains:
+
+```text
+actor
+time
+rationale
+evidence
+result
+```
+
+---
+
+# 14. Investigation
+
+Investigation represents a structured process of examining an event, threat, or case.
+
+Conceptual structure:
+
+```text
+Investigation
+├── id
+├── targetReferences
+├── status
+├── objective
+├── hypotheses
+├── findingReferences
+├── evidenceReferences
+├── assignedActors
+├── startedAt
+├── completedAt
+└── timestamps
+```
+
+---
+
+# 15. Investigation Hypothesis
+
+A hypothesis must preserve uncertainty.
+
+Conceptual structure:
+
+```text
+Hypothesis
+├── id
+├── statement
+├── status
+├── confidence
+├── supportingEvidence
+├── contradictingEvidence
+├── createdBy
+├── createdAt
+├── updatedAt
+└── history
+```
+
+Possible conceptual states:
+
+```text
+Proposed
+Under Review
+Supported
+Contradicted
+Rejected
+Unresolved
+```
+
+These values are subject to final domain governance.
+
+---
+
+# 16. Case
+
+A Case represents an individual operational investigation unit.
+
+Conceptual structure:
+
+```text
+Case
+├── id
+├── eventReferences
+├── subjectReference
+├── location
+├── status
+├── timelineReferences
+├── evidenceReferences
+├── findingReferences
+├── relationshipReferences
+├── assignedActors
+└── timestamps
+```
+
+AEGIS must avoid storing sensitive information that is not required for the system's operational purpose.
+
+---
+
+# 17. Finding
+
+A Finding represents a structured conclusion or observation produced during investigation.
+
+Conceptual structure:
+
+```text
+Finding
+├── id
+├── investigationId
+├── type
+├── statement
+├── confidence
+├── evidenceReferences
+├── author
+├── createdAt
+├── updatedAt
+└── status
+```
+
+A Finding must remain traceable to its evidence.
+
+---
+
+# 18. Evidence
+
+Evidence represents information supporting an operational or analytical claim.
+
+Conceptual structure:
+
+```text
+Evidence
+├── id
+├── type
+├── source
+├── reference
+├── collectedAt
+├── observedAt
+├── reliability
+├── provenance
+├── integrity
+├── relatedEntities
+└── timestamps
+```
+
+Evidence must not be confused with interpretation.
+
+```text
+Evidence
+      ↓
+Interpretation
+      ↓
+Finding
+      ↓
+Assessment
+```
+
+These are separate concepts.
+
+---
+
+# 19. Evidence Provenance
+
+Every meaningful evidence object should preserve provenance where available.
+
+Conceptually:
+
+```text
+WHO / WHAT
+     ↓
+WHERE FROM
+     ↓
+WHEN
+     ↓
+HOW ACQUIRED
+     ↓
+INTEGRITY / QUALITY
+```
+
+This is essential for high-stakes environments.
+
+---
+
+# 20. TransmissionAssessment
+
+TransmissionAssessment represents the system's structured understanding of possible relationships or pathways.
+
+Conceptual structure:
+
+```text
+TransmissionAssessment
+├── id
+├── sourceReferences
+├── targetReferences
+├── pathway
+├── evidenceReferences
+├── confidence
+├── status
+├── interventionPoints
+├── assessedBy
+└── timestamps
+```
+
+The system must distinguish:
+
+```text
+observed relationship
+suspected relationship
+inferred relationship
+confirmed relationship
+rejected relationship
+```
+
+where applicable.
+
+---
+
+# 21. ContainmentAction
+
+ContainmentAction represents an intervention intended to limit an identified risk.
+
+Conceptual structure:
+
+```text
+ContainmentAction
+├── id
+├── targetReferences
+├── type
+├── status
+├── proposal
+├── rationale
+├── affectedScope
+├── authorization
+├── execution
+├── verification
+├── outcome
+├── createdBy
+└── timestamps
+```
+
+Containment must preserve the distinction between:
+
+```text
+Proposed
+Authorized
+Executing
+Active
+Verified
+Failed
+Cancelled
+Superseded
+```
+
+Only states approved by the domain governance should become production enum values.
+
+---
+
+# 22. ResponseAction
+
+ResponseAction represents a broader operational response activity.
+
+Conceptual structure:
+
+```text
+ResponseAction
+├── id
+├── targetReferences
+├── type
+├── status
+├── priority
+├── owner
+├── proposal
+├── authorization
+├── execution
+├── outcome
+├── evidenceReferences
+└── timestamps
+```
+
+ResponseAction and ContainmentAction are related but not identical.
+
+Containment describes a specific limiting intervention.
+
+Response describes the broader operational activity.
+
+---
+
+# 23. Authorization
+
+Authorization must be represented as an explicit concept where required.
+
+Conceptual structure:
+
+```text
+Authorization
+├── id
+├── actionId
+├── actor
+├── authorityContext
+├── decision
+├── rationale
+├── decidedAt
+└── auditReference
+```
+
+Do not represent authorization merely as:
+
+```text
+approved: true
+```
+
+when a high-consequence action requires accountability.
+
+---
+
+# 24. RecoveryAssessment
+
+RecoveryAssessment represents the structured assessment of recovery after response activity.
+
+Conceptual structure:
+
+```text
+RecoveryAssessment
+├── id
+├── targetReferences
+├── status
+├── criteria
+├── observations
+├── evidenceReferences
+├── outcome
+├── assessedBy
+├── assessedAt
+└── timestamps
+```
+
+Recovery must be based on evidence rather than simply a manually selected UI status.
+
+---
+
+# 25. PreparednessLesson
+
+PreparednessLesson represents institutional learning generated from an event.
+
+Conceptual structure:
+
+```text
+PreparednessLesson
+├── id
+├── sourceEvent
+├── lesson
+├── evidenceReferences
+├── affectedCapability
+├── priority
+├── owner
+├── status
+└── timestamps
+```
+
+A lesson must be traceable back to its source.
+
+---
+
+# 26. ResilienceGap
+
+A ResilienceGap represents an identified weakness discovered through operational experience.
+
+Conceptual structure:
+
+```text
+ResilienceGap
+├── id
+├── sourceReferences
+├── description
+├── severity
+├── capability
+├── evidenceReferences
+├── status
+├── owner
+└── timestamps
+```
+
+---
+
+# 27. ImprovementItem
+
+An ImprovementItem represents an actionable response to a resilience gap.
+
+Conceptual structure:
+
+```text
+ImprovementItem
+├── id
+├── gapId
+├── objective
+├── owner
+├── priority
+├── status
+├── targetDate
+├── completionEvidence
+└── timestamps
+```
+
+This creates:
+
+```text
+Event
+ ↓
+Lesson
+ ↓
+Gap
+ ↓
+Improvement
+ ↓
+Preparedness
+```
+
+---
+
+# 28. ResearchFinding
+
+ResearchFinding represents research information relevant to AEGIS operations.
+
+Conceptual structure:
+
+```text
+ResearchFinding
+├── id
+├── title
+├── summary
+├── source
+├── publicationMetadata
+├── evidenceReferences
+├── relevance
+├── confidence
+├── relatedEntities
+├── author/context
+└── timestamps
+```
+
+Research must remain distinguishable from operational evidence.
+
+A research finding should not silently become an operational fact.
+
+---
+
+# 29. Location
+
+Location provides geographic or organizational context.
+
+Conceptual structure:
+
+```text
+Location
+├── id
+├── name
+├── type
+├── parentLocation
+├── organizationReference
+├── coordinates
+├── metadata
+└── timestamps
+```
+
+Location data must support hierarchical relationships.
+
+Example:
+
+```text
+Region
+ ↓
+Country
+ ↓
+Facility
+ ↓
+Building
+ ↓
+Ward
+```
+
+The actual hierarchy must remain configurable.
+
+---
+
+# 30. Actor
+
+Actor represents a human or system capable of performing actions.
+
+Conceptual structure:
+
+```text
+Actor
+├── id
+├── type
+├── organization
+├── roleReferences
+├── permissionReferences
+└── status
+```
+
+Actor identity must be separated from authorization.
+
+```text
+Actor
+   ↓
+Role
+   ↓
+Permission
+   ↓
+Allowed Action
+```
+
+---
+
+# 31. Organization
+
+Organization represents an institutional context.
+
+Conceptual structure:
+
+```text
+Organization
+├── id
+├── name
+├── type
+├── parentOrganization
+├── locations
+└── status
+```
+
+AEGIS should support organizational context without assuming one specific institution.
+
+---
+
+# 32. Notification
+
+Notification represents an operational message generated by the system.
+
+Conceptual structure:
+
+```text
+Notification
+├── id
+├── type
+├── severity
+├── title
+├── message
+├── relatedEntity
+├── recipient
+├── createdAt
+├── readAt
+└── status
+```
+
+Notifications should reference domain events where appropriate.
+
+---
+
+# 33. AuditRecord
+
+AuditRecord is a non-negotiable component of AEGIS.
+
+Conceptual structure:
+
+```text
+AuditRecord
+├── id
+├── actor
+├── action
+├── entityType
+├── entityId
+├── previousState
+├── newState
+├── reason
+├── timestamp
+├── source
+└── metadata
+```
+
+Audit records must be append-oriented.
+
+Historical operational truth must not be rewritten merely because the current state changed.
+
+---
+
+# 34. DomainEvent
+
+DomainEvent represents a meaningful state-changing event.
+
+Conceptual structure:
+
+```text
+DomainEvent
+├── id
+├── type
+├── entityType
+├── entityId
+├── actor
+├── occurredAt
+├── previousState
+├── newState
+├── metadata
+└── correlationId
+```
+
+Examples:
+
+```text
+ANOMALY_DETECTED
+THREAT_REVIEW_STARTED
+THREAT_CLASSIFICATION_UPDATED
+RISK_ASSESSMENT_CREATED
+INVESTIGATION_STARTED
+FINDING_ADDED
+TRANSMISSION_ASSESSMENT_UPDATED
+CONTAINMENT_PROPOSED
+CONTAINMENT_AUTHORIZED
+CONTAINMENT_EXECUTING
+CONTAINMENT_VERIFIED
+RESPONSE_STARTED
+RESPONSE_COMPLETED
+RECOVERY_STARTED
+RECOVERY_CONFIRMED
+LESSON_CREATED
+RESILIENCE_GAP_IDENTIFIED
+```
+
+The final production event registry must be maintained centrally.
+
+---
+
+# 35. Entity Relationship Architecture
+
+The core relationship graph is:
+
+```text
+Observation
+    ↓
+Signal
+    ↓
+Anomaly
+    ↓
+Event
+    ↓
+Threat
+    ↓
+RiskAssessment
+    ↓
+Investigation
+    ↓
+Case
+    ↓
+Finding
+    ↓
+TransmissionAssessment
+    ↓
+ContainmentAction
+    ↓
+ResponseAction
+    ↓
+RecoveryAssessment
+    ↓
+PreparednessLesson
+    ↓
+ResilienceGap
+    ↓
+ImprovementItem
+```
+
+Supporting:
+
+```text
+Evidence ───────────────→ almost every analytical entity
+Location ────────────────→ events / cases / signals / actions
+Actor ───────────────────→ investigations / assessments / actions
+ResearchFinding ─────────→ evidence/context
+AuditRecord ─────────────→ consequential state changes
+DomainEvent ─────────────→ state transitions
+Notification ────────────→ relevant operational events
+```
+
+---
+
+# 36. Relationship Rule
+
+Relationships must be explicit.
+
+Do not encode complex relationships merely through strings.
+
+Bad:
+
+```text
+relatedCases: "C001,C002,C003"
+```
+
+Preferred conceptual model:
+
+```text
+CaseRelationship
+├── sourceCase
+├── targetCase
+├── relationshipType
+├── confidence
+├── evidenceReferences
+├── status
+└── timestamps
+```
+
+---
+
+# 37. Current State vs History
+
+AEGIS must maintain a distinction between:
+
+```text
+CURRENT STATE
+```
+
+and:
+
+```text
+STATE HISTORY
+```
+
+Example:
+
+```text
+Threat
+Current Status = Under Review
+```
+
+does not mean previous states disappear.
+
+History should preserve:
+
+```text
+Candidate
+ ↓
+Under Review
+ ↓
+Characterized
+```
+
+with corresponding events/audit records.
+
+---
+
+# 38. Temporal Data Principle
+
+Important operational data should carry temporal information.
+
+At minimum where relevant:
+
+```text
+occurredAt
+observedAt
+createdAt
+updatedAt
+startedAt
+completedAt
+```
+
+Do not collapse all temporal concepts into:
+
+```text
+timestamp
+```
+
+when different meanings exist.
+
+---
+
+# 39. Identity Rules
+
+Every persisted domain entity must have a stable identifier.
+
+Conceptually:
+
+```text
+entity.id
+```
+
+Identifiers must:
+
+- be unique
+- remain stable
+- not depend on UI position
+- not be generated from display names
+- not change when the entity is renamed
+
+---
+
+# 40. Display Identifier vs Internal Identifier
+
+Where operationally useful, AEGIS may expose human-readable identifiers.
+
+Example:
+
+```text
+Internal ID:
+UUID
+
+Display ID:
+AEGIS-THR-001
+```
+
+The display identifier must not become the database identity.
+
+---
+
+# 41. Enumerations
+
+Controlled values must be centralized.
+
+Examples:
+
+```text
+ThreatStatus
+RiskStatus
+InvestigationStatus
+CaseStatus
+ActionStatus
+RecoveryStatus
+NotificationSeverity
+EvidenceType
+ActorType
+```
+
+No screen should independently define its own version of an enum.
+
+Bad:
+
+```text
+ThreatOverview:
+"active"
+
+ThreatDiscovery:
+"ACTIVE"
+
+Executive:
+"ongoing"
+```
+
+Instead:
+
+```text
+Canonical enum
+      ↓
+All consumers
+```
+
+---
+
+# 42. Unknown and Uncertain Values
+
+AEGIS must represent uncertainty explicitly.
+
+Avoid forcing:
+
+```text
+unknown
+```
+
+into:
+
+```text
+false
+```
+
+or:
+
+```text
+not available
+```
+
+into:
+
+```text
+zero
+```
+
+Examples:
+
+```text
+confidence = unknown
+risk = not_assessed
+classification = unresolved
+```
+
+are conceptually different states.
+
+---
+
+# 43. Null Semantics
+
+Null must have a defined meaning.
+
+Possible meanings include:
+
+```text
+not collected
+not applicable
+not yet assessed
+temporarily unavailable
+unknown
+redacted
+```
+
+These must not be treated as interchangeable.
+
+The final backend contract must define where explicit status fields are preferable to null values.
+
+---
+
+# 44. Data Provenance
+
+Data must preserve where it came from.
+
+Conceptually:
+
+```text
+Source
+ ↓
+Observation
+ ↓
+Interpretation
+ ↓
+Assessment
+ ↓
+Decision
+```
+
+The system should be able to trace important claims backward.
+
+---
+
+# 45. Data Lineage
+
+AEGIS should support a lineage chain:
+
+```text
+SOURCE
+ ↓
+OBSERVATION
+ ↓
+SIGNAL
+ ↓
+ANOMALY
+ ↓
+EVENT
+ ↓
+THREAT
+ ↓
+ASSESSMENT
+ ↓
+ACTION
+ ↓
+OUTCOME
+```
+
+This is one of the most important properties of a high-stakes system.
+
+---
+
+# 46. Evidence Does Not Equal Truth
+
+The data architecture must preserve the distinction between:
+
+```text
+source data
+```
+
+and:
+
+```text
+system interpretation
+```
+
+For example:
+
+```text
+Evidence:
+Observed pattern X
+
+Interpretation:
+Possible relationship Y
+
+Assessment:
+Confidence = moderate
+```
+
+The system must not collapse these into:
+
+```text
+Confirmed Y
+```
+
+without appropriate evidence and authorization.
+
+---
+
+# 47. Frontend Data Model
+
+The frontend should consume normalized domain data and derive display models where necessary.
+
+Conceptually:
+
+```text
+API Response
+      ↓
+Domain Adapter
+      ↓
+Application State
+      ↓
+Selector / Derived State
+      ↓
+View Model
+      ↓
+Component
+```
+
+This prevents presentation-specific data structures from becoming backend truth.
+
+---
+
+# 48. View Model
+
+A view model is allowed to combine data for presentation.
+
+Example:
+
+```text
+ThreatOverviewViewModel
+├── threat
+├── latestRisk
+├── activeInvestigation
+├── latestEvidence
+├── currentActions
+└── timeline
+```
+
+But:
+
+> A ViewModel is not a new domain entity.
+
+---
+
+# 49. API Contract Principle
+
+APIs should expose explicit contracts.
+
+Avoid endpoints that return arbitrary database objects directly.
+
+Bad conceptual pattern:
+
+```text
+GET /everything
+```
+
+Preferred:
+
+```text
+GET /events/:id
+GET /threats/:id
+GET /risk-assessments/:id
+GET /investigations/:id
+GET /cases/:id
+```
+
+The exact API surface will be defined in the API architecture document.
+
+---
+
+# 50. Command vs Query
+
+AEGIS should conceptually distinguish:
+
+## Query
+
+Requests information.
+
+```text
+GET /threats/:id
+```
+
+## Command
+
+Requests a state-changing action.
+
+```text
+START_INVESTIGATION
+AUTHORIZE_CONTAINMENT
+COMPLETE_RESPONSE
+```
+
+A command is not simply a database update.
+
+It represents an intended domain action.
+
+---
+
+# 51. Command Contract
+
+Conceptually:
+
+```text
+Command
+├── commandId
+├── commandType
+├── actor
+├── target
+├── payload
+├── reason
+├── correlationId
+└── timestamp
+```
+
+Example:
+
+```text
+START_INVESTIGATION
+
+target:
+Threat T-001
+
+actor:
+Actor A-001
+
+reason:
+Operational review required
+```
+
+---
+
+# 52. Command Processing
+
+```text
+COMMAND
+ ↓
+AUTHENTICATION
+ ↓
+AUTHORIZATION
+ ↓
+VALIDATION
+ ↓
+DOMAIN RULES
+ ↓
+STATE TRANSITION
+ ↓
+PERSISTENCE
+ ↓
+DOMAIN EVENT
+ ↓
+AUDIT
+ ↓
+RESPONSE
+```
+
+---
+
+# 53. API Response Contract
+
+Successful response:
+
+```text
+{
+  "data": {},
+  "meta": {}
+}
+```
+
+Error response:
+
+```text
+{
+  "error": {
+    "code": "",
+    "message": "",
+    "details": {}
+  }
+}
+```
+
+The exact production schema will be standardized in the API specification.
+
+---
+
+# 54. Error Contract
+
+Errors must be machine-readable.
+
+Examples:
+
+```text
+INVALID_TRANSITION
+UNAUTHORIZED_ACTION
+VALIDATION_FAILED
+ENTITY_NOT_FOUND
+CONFLICT
+PERSISTENCE_FAILURE
+DEPENDENCY_UNAVAILABLE
+STALE_DATA
+RATE_LIMITED
+SYSTEM_UNAVAILABLE
+```
+
+The UI should translate these into appropriate human-readable feedback.
+
+---
+
+# 55. Optimistic Concurrency
+
+For consequential entities, the system should support detection of stale updates.
+
+Conceptually:
+
+```text
+Entity Version = 7
+```
+
+User submits update based on:
+
+```text
+Version = 7
+```
+
+But server now has:
+
+```text
+Version = 8
+```
+
+The operation should not silently overwrite Version 8.
+
+Instead:
+
+```text
+CONFLICT
+```
+
+must be returned and handled explicitly.
+
+---
+
+# 56. Idempotency
+
+Consequential commands should support idempotency where appropriate.
+
+Example:
+
+```text
+AUTHORIZE_CONTAINMENT
+commandId = CMD-123
+```
+
+If the same command is submitted twice:
+
+```text
+CMD-123
+CMD-123
+```
+
+the system must not accidentally perform two independent operations.
+
+---
+
+# 57. Real-Time Data Contract
+
+Real-time updates should use domain events rather than arbitrary UI messages.
+
+Conceptually:
+
+```text
+Domain Event
+ ↓
+Event Transport
+ ↓
+Subscribed Client
+ ↓
+State Update
+ ↓
+Affected UI
+```
+
+Example:
+
+```text
+THREAT_STATUS_UPDATED
+```
+
+may cause:
+
+```text
+Threat Overview
+Risk Overview
+Executive View
+Notifications
+```
+
+to update.
+
+---
+
+# 58. Real-Time Event Payload
+
+Conceptually:
+
+```text
+{
+  "eventId": "...",
+  "eventType": "THREAT_STATUS_UPDATED",
+  "entityType": "Threat",
+  "entityId": "...",
+  "occurredAt": "...",
+  "version": 4,
+  "data": {}
+}
+```
+
+The production event envelope must be standardized before implementation.
+
+---
+
+# 59. Data Freshness
+
+AEGIS must communicate data freshness when real-time accuracy matters.
+
+Conceptually:
+
+```text
+LIVE
+RECENT
+STALE
+UNKNOWN
+OFFLINE
+```
+
+Freshness is separate from data correctness.
+
+A stale dataset can still be historically correct.
+
+---
+
+# 60. Data Synchronization
+
+The system should support:
+
+```text
+Initial Load
+ ↓
+Current State
+ ↓
+Incremental Updates
+ ↓
+Reconciliation
+```
+
+A client should not need to reload the entire application after every event.
+
+---
+
+# 61. Offline / Degraded Mode
+
+If AEGIS supports degraded operation, the data architecture must distinguish:
+
+```text
+locally known state
+```
+
+from:
+
+```text
+authoritative server state
+```
+
+The UI must never falsely imply that an offline mutation has become authoritative unless the system explicitly supports and reconciles it.
+
+---
+
+# 62. Security Classification
+
+Data sensitivity must be classified at the architecture level.
+
+Potential conceptual categories:
+
+```text
+Public
+Internal
+Sensitive
+Restricted
+```
+
+The final classification system must be determined by the deployment organization and applicable governance.
+
+Do not invent a classification policy inside frontend code.
+
+---
+
+# 63. Data Minimization
+
+AEGIS must only collect and retain information necessary for legitimate operational purposes.
+
+Especially for patient-related information:
+
+```text
+minimum necessary
+purpose limitation
+access control
+auditability
+retention policy
+```
+
+must be enforced at the system level.
+
+AEGIS should not become a general-purpose patient information warehouse.
+
+---
+
+# 64. Sensitive Data Separation
+
+Where sensitive information is required, architecture should separate:
+
+```text
+operational metadata
+```
+
+from:
+
+```text
+sensitive subject information
+```
+
+This enables broader operational visibility while limiting unnecessary exposure.
+
+---
+
+# 65. Access Control
+
+Access to an entity must depend on:
+
+```text
+Actor
++
+Role
++
+Organization
++
+Permission
++
+Context
+```
+
+not merely:
+
+```text
+isAdmin = true
+```
+
+The exact authorization model belongs in the security architecture.
+
+---
+
+# 66. Audit Requirements by Data Class
+
+| Data | Audit requirement |
+|---|---|
+| UI filter | No |
+| UI selection | No |
+| Threat classification | Yes |
+| Risk assessment | Yes |
+| Investigation finding | Yes |
+| Case relationship | Yes |
+| Containment proposal | Yes |
+| Containment authorization | Yes |
+| Containment execution | Yes |
+| Response action | Yes |
+| Recovery confirmation | Yes |
+| Preparedness lesson | Yes |
+| Permission change | Yes |
+| User access | According to deployment policy |
+
+---
+
+# 67. Data Retention
+
+Retention must be configurable according to deployment requirements.
+
+Do not hard-code:
+
+```text
+delete after 30 days
+```
+
+without an approved policy.
+
+Operational and audit data may require different retention strategies.
+
+---
+
+# 68. Database Architecture Principle
+
+The production database should optimize for:
+
+```text
+integrity
+traceability
+queryability
+auditability
+consistency
+security
+```
+
+not merely:
+
+```text
+fast UI rendering
+```
+
+The frontend must not dictate the entire persistence model.
+
+---
+
+# 69. Recommended Logical Storage Boundaries
+
+At the logical level, data can be organized into:
+
+```text
+/observations
+/signals
+/anomalies
+/events
+/threats
+/risk-assessments
+/investigations
+/cases
+/findings
+/transmission-assessments
+/containment-actions
+/response-actions
+/recovery-assessments
+/preparedness-lessons
+/resilience-gaps
+/improvement-items
+/research-findings
+/evidence
+/locations
+/organizations
+/actors
+/notifications
+/audit
+/domain-events
+```
+
+These are logical boundaries, not mandatory physical database table names.
+
+---
+
+# 70. Data Lifecycle
+
+Each important entity follows:
+
+```text
+CREATE
+ ↓
+UPDATE
+ ↓
+TRANSITION
+ ↓
+REFERENCE
+ ↓
+RESOLVE
+ ↓
+ARCHIVE
+```
+
+Deletion should be treated carefully for high-stakes operational records.
+
+---
+
+# 71. Deletion Principle
+
+AEGIS should avoid destructive deletion of consequential operational records.
+
+Prefer:
+
+```text
+Archived
+Cancelled
+Rejected
+Superseded
+Resolved
+```
+
+where appropriate.
+
+Historical traceability must survive state changes.
+
+---
+
+# 72. Referential Integrity
+
+Relationships between entities must remain valid.
+
+For example:
+
+```text
+Threat
+ ↓
+RiskAssessment
+```
+
+must not reference a non-existent threat.
+
+The system must enforce relationship integrity at the appropriate layer.
+
+---
+
+# 73. Orphan Prevention
+
+The system must prevent orphaned operational records.
+
+Examples:
+
+```text
+Finding → missing Investigation
+Action → missing Target
+AuditRecord → missing Entity reference
+Lesson → missing Source Event
+```
+
+Where historical records reference deleted or archived entities, the architecture must define explicit archival/reference behavior.
+
+---
+
+# 74. Data Versioning
+
+Important domain structures should be versioned when changes could affect interpretation.
+
+Conceptually:
+
+```text
+Schema Version
+Domain Model Version
+Assessment Method Version
+Event Contract Version
+```
+
+This becomes especially important as AEGIS evolves.
+
+---
+
+# 75. Backward Compatibility
+
+When API contracts change:
+
+```text
+Old Client
++
+New Backend
+```
+
+must not unexpectedly break.
+
+Breaking changes require:
+
+```text
+versioning
+migration
+or coordinated deployment
+```
+
+---
+
+# 76. Seed / Demo Data
+
+During development, AEGIS may use synthetic data.
+
+Synthetic data must be clearly identifiable.
+
+Example conceptual marker:
+
+```text
+environment = demo
+dataOrigin = synthetic
+```
+
+Never mix fictional development records with real operational data.
+
+---
+
+# 77. Demo Data Rule
+
+The demo dataset should demonstrate the complete operational journey:
+
+```text
+Detection
+ ↓
+Threat
+ ↓
+Risk
+ ↓
+Investigation
+ ↓
+Transmission
+ ↓
+Containment
+ ↓
+Response
+ ↓
+Recovery
+ ↓
+Preparedness
+```
+
+The dataset must be internally consistent.
+
+A threat displayed in Threat Overview should have coherent relationships with the risk, investigation, actions, and recovery data shown elsewhere.
+
+---
+
+# 78. No Orphaned Mock Data
+
+AI-generated mock data must never produce:
+
+```text
+Threat A
+```
+
+with:
+
+```text
+Risk B
+Investigation C
+Case D
+```
+
+that have no actual relationship.
+
+All demo relationships must follow the domain graph.
+
+---
+
+# 79. Data Contract Traceability
+
+Every screen should consume identifiable domain data.
+
+Example:
+
+```text
+Live Surveillance
+→ Observation
+→ Signal
+→ Anomaly
+
+Threat Discovery
+→ Anomaly
+→ Event
+→ Threat
+
+Threat Overview
+→ Threat
+→ Evidence
+→ RiskAssessment
+
+Risk Overview
+→ RiskAssessment
+→ Threat
+→ Evidence
+
+Investigation
+→ Investigation
+→ Finding
+→ Evidence
+
+Case Investigation
+→ Case
+→ Finding
+→ Relationship
+
+Transmission
+→ TransmissionAssessment
+→ Case
+→ Evidence
+
+Containment
+→ ContainmentAction
+→ Risk
+→ TransmissionAssessment
+
+Response
+→ ResponseAction
+→ ContainmentAction
+→ Outcome
+
+Recovery
+→ RecoveryAssessment
+→ ResponseAction
+→ Evidence
+
+Preparedness
+→ PreparednessLesson
+→ ResilienceGap
+→ ImprovementItem
+
+Research
+→ ResearchFinding
+→ Evidence
+
+Executive
+→ Derived operational summaries
+```
+
+---
+
+# 80. Screen Data Contract
+
+Every screen implementation must answer:
+
+```text
+What entity does this screen read?
+
+What entity does it write?
+
+What relationships does it display?
+
+What commands can it issue?
+
+What events can update it?
+
+What data is derived?
+
+What data is temporary?
+```
+
+If these questions cannot be answered, the screen is not ready for implementation.
+
+---
+
+# 81. Data Fetching Principle
+
+Do not fetch massive unrelated datasets simply because the frontend can.
+
+Each query should have a clear purpose.
+
+Conceptually:
+
+```text
+Screen
+ ↓
+Required data
+ ↓
+Query
+ ↓
+Relevant response
+```
+
+This improves:
+
+- performance
+- security
+- maintainability
+- clarity
+- testing
+
+---
+
+# 82. Derived Data
+
+Some UI values should be derived rather than persisted.
+
+Examples:
+
+```text
+activeThreatCount
+openInvestigationCount
+responseCompletionRate
+currentRiskSummary
+```
+
+These can be calculated from authoritative data.
+
+Do not persist derived values unless there is a deliberate reason.
+
+---
+
+# 83. Derived State Rule
+
+If:
+
+```text
+X = function(A, B, C)
+```
+
+then avoid storing:
+
+```text
+X
+A
+B
+C
+```
+
+as independently mutable values unless required.
+
+Otherwise:
+
+```text
+A/B/C change
+ ↓
+X becomes stale
+```
+
+---
+
+# 84. Aggregate Data
+
+Executive View may require aggregate information.
+
+Examples:
+
+```text
+active threats
+elevated risks
+open investigations
+active responses
+recovery status
+preparedness gaps
+```
+
+Aggregates should be derived from canonical domain data or authoritative analytical projections.
+
+They must not become competing sources of truth.
+
+---
+
+# 85. Materialized / Analytical Views
+
+If performance requires precomputed aggregates, they must be treated as:
+
+```text
+derived projections
+```
+
+not primary operational truth.
+
+Conceptually:
+
+```text
+Canonical Domain Data
+       ↓
+Projection
+       ↓
+Executive Summary
+```
+
+---
+
+# 86. Data Contract Testing
+
+Every API/data contract should eventually be tested for:
+
+```text
+shape
+required fields
+types
+enum values
+relationships
+authorization
+error behavior
+versioning
+null semantics
+```
+
+---
+
+# 87. Contract Testing Principle
+
+Frontend and backend must not independently guess the same schema.
+
+There must be one authoritative contract.
+
+Conceptually:
+
+```text
+Canonical Contract
+      ↓
+Backend
+      ↓
+Frontend
+      ↓
+Tests
+      ↓
+AI Coding Agents
+```
+
+---
+
+# 88. AI Coding Agent Data Rules
+
+AI agents working on AEGIS must follow these rules:
+
+### Rule 01
+
+Never invent a new domain entity because a component needs one.
+
+### Rule 02
+
+Never invent a new status without checking the canonical state model.
+
+### Rule 03
+
+Never rename an existing field casually.
+
+### Rule 04
+
+Never change a domain relationship without updating the architecture.
+
+### Rule 05
+
+Never use local component state as operational truth.
+
+### Rule 06
+
+Never create fake API responses that contradict the canonical model.
+
+### Rule 07
+
+Never create unrelated mock entities.
+
+### Rule 08
+
+Never silently remove required fields.
+
+### Rule 09
+
+Never bypass authorization for convenience.
+
+### Rule 10
+
+Never represent uncertainty as certainty.
+
+---
+
+# 89. Data Contract Change Procedure
+
+Any proposed data model change must follow:
+
+```text
+PROPOSAL
+ ↓
+IDENTIFY AFFECTED ENTITY
+ ↓
+IDENTIFY DEPENDENCIES
+ ↓
+UPDATE DOMAIN MODEL
+ ↓
+UPDATE DATA CONTRACT
+ ↓
+UPDATE API CONTRACT
+ ↓
+UPDATE STATE MODEL
+ ↓
+UPDATE TESTS
+ ↓
+IMPLEMENT
+```
+
+Do not modify production schemas first and document them afterward.
+
+---
+
+# 90. Canonical Data Flow
+
+The complete AEGIS data lifecycle is:
+
+```text
+SOURCE
+  ↓
+OBSERVATION
+  ↓
+SIGNAL
+  ↓
+ANOMALY
+  ↓
+EVENT
+  ↓
+THREAT
+  ↓
+RISK
+  ↓
+INVESTIGATION
+  ↓
+CASE / FINDING
+  ↓
+TRANSMISSION
+  ↓
+CONTAINMENT
+  ↓
+RESPONSE
+  ↓
+OUTCOME
+  ↓
+RECOVERY
+  ↓
+LESSON
+  ↓
+RESILIENCE GAP
+  ↓
+IMPROVEMENT
+  ↓
+PREPAREDNESS
+```
+
+With:
+
+```text
+EVIDENCE
+```
+
+supporting the chain.
+
+And:
+
+```text
+AUDIT
+```
+
+recording consequential changes.
+
+---
+
+# 91. Master Data Integrity Rules
+
+AEGIS data must satisfy these invariants.
+
+## Invariant 01
+
+Every persisted operational entity has a stable ID.
+
+## Invariant 02
+
+Every consequential state change is traceable.
+
+## Invariant 03
+
+Every assessment has an actor and time where required.
+
+## Invariant 04
+
+Historical state cannot be silently rewritten.
+
+## Invariant 05
+
+Evidence remains distinguishable from interpretation.
+
+## Invariant 06
+
+Unknown is not equivalent to false.
+
+## Invariant 07
+
+Unassessed is not equivalent to low risk.
+
+## Invariant 08
+
+Proposed is not equivalent to authorized.
+
+## Invariant 09
+
+Authorized is not equivalent to executed.
+
+## Invariant 10
+
+Executed is not equivalent to verified.
+
+## Invariant 11
+
+Current state must be reconstructable from authoritative data.
+
+## Invariant 12
+
+Derived data cannot silently become operational truth.
+
+---
+
+# 92. AEGIS Data Contract Hierarchy
+
+The implementation hierarchy is:
+
+```text
+AEGIS MASTER ARCHITECTURE
+          ↓
+DOMAIN MODEL
+          ↓
+DATA MODEL
+          ↓
+DATA CONTRACT
+          ↓
+API CONTRACT
+          ↓
+APPLICATION STATE
+          ↓
+VIEW MODEL
+          ↓
+UI COMPONENT
+```
+
+Lower layers must not contradict higher layers.
+
+---
+
+# 93. What This Document Does Not Define
+
+This document intentionally does not finalize:
+
+```text
+specific database vendor
+specific ORM
+specific API framework
+specific authentication provider
+specific cloud infrastructure
+specific sensor protocol
+specific pathogen classification taxonomy
+specific clinical protocol
+specific public-health policy
+specific institutional approval hierarchy
+```
+
+Those belong in the relevant architecture documents and deployment governance.
+
+This prevents AEGIS from prematurely locking itself into assumptions that have not been validated.
+
+---
+
+# 94. Data Architecture Completion Criteria
+
+Document 06 is considered successfully implemented when engineering can answer:
+
+```text
+What entities exist?
+Who owns them?
+What fields do they contain?
+How are they related?
+Which fields are authoritative?
+Which values are derived?
+What must be persisted?
+What must be audited?
+What can change state?
+What events cause changes?
+What does each screen consume?
+What commands can each screen issue?
+How are errors represented?
+How is real-time state propagated?
+How are stale updates detected?
+How is historical state preserved?
+```
+
+without inventing answers independently.
+
+---
+
+# 95. Final AEGIS Data Principle
+
+The entire data architecture can be reduced to one model:
+
+```text
+             EVIDENCE
+                ↓
+            KNOWLEDGE
+                ↓
+             ASSESSMENT
+                ↓
+              DECISION
+                ↓
+               ACTION
+                ↓
+              OUTCOME
+                ↓
+              LEARNING
+                ↓
+           PREPAREDNESS
+                ↓
+          FUTURE SIGNALS
+```
+
+AEGIS must preserve the distinction between every layer.
+
+It must never turn:
+
+```text
+signal → threat
+```
+
+without appropriate interpretation.
+
+It must never turn:
+
+```text
+threat → certainty
+```
+
+without evidence.
+
+It must never turn:
+
+```text
+recommendation → action
+```
+
+without authorization.
+
+It must never turn:
+
+```text
+action → success
+```
+
+without verification.
+
+And it must never turn:
+
+```text
+history → forgotten state
+```
+
+merely because the current state changed.
+
+That is the foundation of trustworthy AEGIS data architecture.
+
+---
+
+# 96. Master Data Contract
+
+The final contract between the product, design, engineering, and AI systems is:
+
+```text
+ONE DOMAIN
+      ↓
+ONE CANONICAL DATA MODEL
+      ↓
+ONE STATE MODEL
+      ↓
+ONE CONTRACT
+      ↓
+MANY SCREENS
+      ↓
+MANY COMPONENTS
+      ↓
+MANY USERS
+```
+
+The interface may change.
+
+The visualization may change.
+
+The technology stack may change.
+
+The database implementation may change.
+
+But the **meaning of the operational data must remain coherent**.
+
+AEGIS is not successful because it contains a beautiful dashboard.
+
+AEGIS is successful when every visualization, interaction, decision, action, and learning loop can be traced back to trustworthy, structured, auditable data.
