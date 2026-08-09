@@ -1,0 +1,2507 @@
+# AEGIS
+# Design System + UI Component Architecture
+
+**System:** AEGIS  
+**Document:** 09 — Design System + UI Component Architecture  
+**Version:** 1.0  
+**Status:** Master Product Design Specification  
+**Date:** August 2026
+
+---
+
+# 01. Purpose
+
+This document defines the visual language, design tokens, interaction primitives, component architecture, information-density rules, visualization patterns, accessibility rules, and interface composition principles for AEGIS.
+
+The objective is not simply to make AEGIS visually impressive.
+
+The objective is to create an interface that allows expert users to:
+
+```text
+detect
+understand
+investigate
+assess
+decide
+authorize
+respond
+verify
+recover
+learn
+```
+
+with minimal ambiguity.
+
+AEGIS is designed for:
+
+- healthcare environments
+- pandemic preparedness teams
+- biosecurity professionals
+- public-health organizations
+- health workers
+- technical experts
+- institutional decision makers
+- global health stakeholders
+
+The interface therefore prioritizes:
+
+> **Clinical Authority over visual spectacle.**
+
+---
+
+# 02. Design System Principle
+
+AEGIS must feel like a serious operational instrument.
+
+It should communicate:
+
+```text
+precision
+calm
+situational awareness
+trust
+evidence
+control
+traceability
+resilience
+```
+
+It must not communicate:
+
+```text
+entertainment
+gaming
+cyberpunk
+military cosplay
+science-fiction fantasy
+visual noise
+```
+
+---
+
+# 03. Visual Design Direction
+
+The primary visual direction is:
+
+> **Minimalist Tactical Clinical Interface**
+
+with:
+
+```text
+high information density
+restrained HUD influence
+precise geometry
+strong hierarchy
+controlled motion
+data-first composition
+dark operational environment
+high legibility
+```
+
+HUD characteristics may be used selectively.
+
+AEGIS must never look like a video game.
+
+---
+
+# 04. Design Philosophy
+
+AEGIS follows five design principles.
+
+## 04.1 Signal Over Decoration
+
+Every visual element must communicate something.
+
+## 04.2 Hierarchy Over Density
+
+Information density must remain readable.
+
+## 04.3 Evidence Over Drama
+
+Threat information must feel measured rather than sensational.
+
+## 04.4 State Over Style
+
+System state determines visual treatment.
+
+## 04.5 Action Over Ornament
+
+Controls must make the next appropriate action obvious.
+
+---
+
+# 05. The AEGIS Visual Language
+
+AEGIS visual language consists of:
+
+```text
+COLOR
+TYPOGRAPHY
+SPACING
+GEOMETRY
+SURFACES
+BORDERS
+ICONS
+STATUS
+DATA VISUALIZATION
+MOTION
+LAYOUT
+```
+
+These become the foundation of every screen.
+
+---
+
+# 06. Primary Palette
+
+The core palette is intentionally restrained.
+
+## Deep Obsidian
+
+Primary application environment.
+
+Use for:
+
+```text
+application background
+navigation
+large surfaces
+operational workspace
+```
+
+Conceptual role:
+
+> depth / stability / concentration
+
+---
+
+## Surgical White
+
+Primary information color.
+
+Use for:
+
+```text
+headings
+critical values
+primary labels
+high-priority information
+```
+
+Conceptual role:
+
+> clarity / precision / legibility
+
+---
+
+## Antigen Amber
+
+AEGIS signature accent.
+
+Use for:
+
+```text
+alerts
+anomalies
+attention states
+active detection
+risk emphasis
+selected operational signals
+```
+
+Conceptual role:
+
+> biological signal / attention / emerging threat
+
+Amber must not be used for everything.
+
+If everything is amber, nothing is an alert.
+
+---
+
+# 07. Semantic Colors
+
+Additional colors may exist where operational semantics require them.
+
+Examples:
+
+```text
+Success
+Warning
+Critical
+Informational
+Neutral
+```
+
+However, semantic colors must be carefully controlled.
+
+The exact token values should be finalized during visual implementation and validated for accessibility.
+
+---
+
+# 08. Color Semantic Rule
+
+Color is semantic.
+
+It is not decorative.
+
+Example:
+
+```text
+Amber
+= attention / anomaly / emerging concern
+
+Red
+= critical / immediate concern
+
+Green
+= verified positive / completed / stable
+
+Blue or equivalent informational tone
+= information / system context
+
+Neutral
+= inactive / baseline
+```
+
+These meanings must remain consistent throughout the application.
+
+---
+
+# 09. Color Accessibility
+
+No critical state may depend solely on color.
+
+Use:
+
+```text
+color
++
+icon
++
+label
++
+position
+```
+
+where appropriate.
+
+Example:
+
+```text
+AMBER
+⚠
+ANOMALOUS
+```
+
+is stronger than amber alone.
+
+---
+
+# 10. Surface Architecture
+
+AEGIS should use a small number of deliberate surface levels.
+
+Conceptually:
+
+```text
+LEVEL 0
+Application background
+
+LEVEL 1
+Primary surface
+
+LEVEL 2
+Elevated panel
+
+LEVEL 3
+Focused / active panel
+
+LEVEL 4
+Modal / command surface
+```
+
+Do not create dozens of subtly different surfaces.
+
+---
+
+# 11. Surface Rule
+
+Elevation should be communicated primarily through:
+
+```text
+contrast
+border
+spacing
+layering
+```
+
+rather than excessive shadows.
+
+AEGIS should feel engineered rather than glossy.
+
+---
+
+# 12. Border Architecture
+
+Borders should be:
+
+```text
+thin
+precise
+subtle
+functional
+```
+
+Use borders to communicate:
+
+```text
+containment
+grouping
+separation
+focus
+status
+```
+
+Do not put borders around every element simply because the interface is a dashboard.
+
+---
+
+# 13. Corner Geometry
+
+AEGIS should use restrained corner radii.
+
+Avoid:
+
+```text
+large pill cards
+bubble interfaces
+excessively rounded panels
+```
+
+Preferred geometry:
+
+```text
+small radius
+controlled corners
+strong rectangular structure
+```
+
+The exact radius tokens are defined centrally.
+
+---
+
+# 14. Typography
+
+Typography must optimize for:
+
+```text
+legibility
+information density
+scanning
+hierarchy
+numerical clarity
+```
+
+The typography system should include:
+
+```text
+Display
+Heading
+Subheading
+Body
+Label
+Caption
+Metric
+Telemetry
+```
+
+---
+
+# 15. Typography Hierarchy
+
+Conceptually:
+
+```text
+DISPLAY
+Major operational context
+
+H1
+Screen title
+
+H2
+Major section
+
+H3
+Subsection
+
+BODY
+Explanatory information
+
+LABEL
+Interface metadata
+
+CAPTION
+Supporting information
+
+TELEMETRY
+Dense numerical/system data
+```
+
+---
+
+# 16. Numerical Typography
+
+Numbers are operational information.
+
+Metrics should use typography optimized for:
+
+```text
+rapid scanning
+alignment
+comparison
+```
+
+Where appropriate, use tabular numerical formatting.
+
+Examples:
+
+```text
+01:42:18
+37.4
+84%
+142
+```
+
+---
+
+# 17. Telemetry Typography
+
+Telemetry should feel precise but remain readable.
+
+Avoid excessive:
+
+```text
+ALL CAPS
+tiny text
+decorative monospace
+```
+
+Monospace may be used selectively for:
+
+```text
+IDs
+timestamps
+system values
+technical identifiers
+```
+
+It must not become the default font for the entire interface.
+
+---
+
+# 18. Spacing System
+
+AEGIS must use a consistent spacing scale.
+
+Conceptually:
+
+```text
+XS
+SM
+MD
+LG
+XL
+2XL
+```
+
+Every component should use spacing tokens rather than arbitrary pixel values.
+
+---
+
+# 19. Density Modes
+
+AEGIS should support controlled information density.
+
+Conceptually:
+
+```text
+COMPACT
+DEFAULT
+COMFORTABLE
+```
+
+Default operational mode should prioritize high information density without sacrificing readability.
+
+---
+
+# 20. Grid System
+
+The primary workspace should use a consistent grid.
+
+The grid should support:
+
+```text
+full-width
+two-column
+three-column
+asymmetric
+split-pane
+```
+
+layouts.
+
+Avoid arbitrary positioning.
+
+---
+
+# 21. Dashboard Anatomy
+
+A typical AEGIS screen should follow:
+
+```text
+┌─────────────────────────────────────────────┐
+│ GLOBAL HEADER                               │
+├───────────┬─────────────────────────────────┤
+│           │ SCREEN CONTEXT                  │
+│           ├─────────────────────────────────┤
+│ NAV       │ PRIMARY INFORMATION             │
+│           │                                 │
+│           ├─────────────────────────────────┤
+│           │ SUPPORTING INFORMATION           │
+│           │                                 │
+└───────────┴─────────────────────────────────┘
+```
+
+The exact composition varies by screen.
+
+---
+
+# 22. Information Hierarchy
+
+Every screen must establish:
+
+```text
+1. Where am I?
+2. What is happening?
+3. Why does it matter?
+4. What evidence supports it?
+5. What can I do?
+6. What happens next?
+```
+
+If a screen cannot answer these questions appropriately, the hierarchy is incomplete.
+
+---
+
+# 23. Primary vs Secondary Information
+
+Primary information should receive:
+
+```text
+stronger contrast
+larger typography
+more whitespace
+more prominent positioning
+```
+
+Secondary information should be visually quieter.
+
+Do not make everything equally loud.
+
+---
+
+# 24. Component Architecture
+
+AEGIS components are organized into:
+
+```text
+FOUNDATIONS
+↓
+PRIMITIVES
+↓
+COMPOSITES
+↓
+DOMAIN COMPONENTS
+↓
+PATTERNS
+↓
+SCREEN COMPOSITIONS
+```
+
+---
+
+# 25. Foundations
+
+Foundations include:
+
+```text
+color
+typography
+spacing
+grid
+radius
+border
+shadow
+motion
+icons
+breakpoints
+```
+
+---
+
+# 26. UI Primitives
+
+Core primitives include:
+
+```text
+Button
+IconButton
+Input
+Select
+Checkbox
+Radio
+Switch
+Badge
+Tag
+Tooltip
+Divider
+Avatar
+Spinner
+Skeleton
+Progress
+```
+
+---
+
+# 27. Data Components
+
+AEGIS requires specialized data components.
+
+Examples:
+
+```text
+Metric
+MetricGroup
+DataTable
+DataRow
+StatusCell
+TrendIndicator
+Timeline
+EventList
+KeyValueList
+EvidenceList
+```
+
+---
+
+# 28. Operational Components
+
+Core operational components include:
+
+```text
+AlertBanner
+ThreatIndicator
+RiskIndicator
+ActionPanel
+CommandBar
+CommandButton
+DecisionPanel
+StatusTimeline
+ResponseStep
+ContainmentControl
+VerificationPanel
+```
+
+---
+
+# 29. Navigation Components
+
+Navigation components include:
+
+```text
+AppShell
+Sidebar
+TopBar
+Breadcrumbs
+Tabs
+ContextSwitcher
+Pagination
+BackNavigation
+EntityNavigation
+```
+
+---
+
+# 30. Overlay Components
+
+Overlays include:
+
+```text
+Modal
+Drawer
+Popover
+Tooltip
+CommandPalette
+ContextMenu
+Toast
+```
+
+Each has a defined purpose.
+
+---
+
+# 31. Visualization Components
+
+AEGIS visualization components may include:
+
+```text
+LivingMap
+ThreatMap
+TimelineChart
+TrendChart
+RiskMatrix
+TransmissionGraph
+SignalGraph
+StatusDistribution
+```
+
+Visualizations must remain domain-driven.
+
+---
+
+# 32. Component Naming
+
+Names must communicate intent.
+
+Prefer:
+
+```text
+ThreatStatusBadge
+RiskScore
+InvestigationTimeline
+ContainmentActionPanel
+```
+
+over:
+
+```text
+YellowBox
+BigCard
+FancyPanel
+DashboardThing
+```
+
+---
+
+# 33. Button Architecture
+
+Buttons represent actions.
+
+Variants should communicate action hierarchy.
+
+Conceptually:
+
+```text
+Primary
+Secondary
+Tertiary
+Destructive
+Ghost
+Icon
+```
+
+---
+
+# 34. Primary Action
+
+A primary action should represent the most important safe next step.
+
+Do not create multiple competing primary buttons in the same visual region without a strong reason.
+
+---
+
+# 35. Destructive / Consequential Actions
+
+High-consequence actions require stronger treatment.
+
+Examples:
+
+```text
+Authorize
+Execute
+Terminate
+Escalate
+Invalidate
+```
+
+The interface must make consequence clear.
+
+---
+
+# 36. Button Labels
+
+Use explicit verbs.
+
+Prefer:
+
+```text
+Review Threat
+Start Investigation
+Authorize Containment
+Begin Recovery Assessment
+```
+
+Avoid:
+
+```text
+Continue
+Proceed
+Go
+Do It
+```
+
+when the actual consequence matters.
+
+---
+
+# 37. Status Badge Architecture
+
+Status badges must represent domain states.
+
+Example:
+
+```text
+DETECTED
+UNDER REVIEW
+CLASSIFIED
+ESCALATED
+CONTAINMENT ACTIVE
+VERIFICATION
+RECOVERED
+CLOSED
+```
+
+Do not create arbitrary visual statuses that do not exist in the domain model.
+
+---
+
+# 38. Risk Indicator
+
+Risk should communicate:
+
+```text
+severity
+confidence
+trend
+```
+
+where the data exists.
+
+Do not reduce complex risk into a decorative colored circle.
+
+---
+
+# 39. Threat Card
+
+A threat card should prioritize:
+
+```text
+Threat identity
+Threat status
+Risk
+Confidence
+Time
+Location
+Recommended next action
+```
+
+Additional metadata should remain secondary.
+
+---
+
+# 40. Metric Card
+
+Metric cards should answer:
+
+> "Why should I care about this number?"
+
+A metric should ideally contain:
+
+```text
+label
+value
+unit
+time context
+trend
+status
+```
+
+where appropriate.
+
+---
+
+# 41. Alert Architecture
+
+Alerts must distinguish:
+
+```text
+information
+attention
+warning
+critical
+```
+
+Each level must have:
+
+```text
+visual treatment
+icon
+label
+message
+optional action
+```
+
+---
+
+# 42. Alert Rule
+
+An alert should answer:
+
+```text
+What happened?
+Why does it matter?
+What should the user do?
+```
+
+Avoid vague alerts.
+
+Bad:
+
+```text
+System alert detected.
+```
+
+Better:
+
+```text
+Respiratory anomaly detected in Ward 04.
+Review linked observations.
+```
+
+---
+
+# 43. Notification Architecture
+
+Notifications are lightweight.
+
+Alerts are operationally significant.
+
+Do not treat every notification as an alert.
+
+---
+
+# 44. Tables
+
+Tables are primary information-dense components.
+
+They should support:
+
+```text
+sorting
+filtering
+pagination
+selection
+row expansion
+row navigation
+status
+actions
+```
+
+only where required.
+
+---
+
+# 45. Table Hierarchy
+
+Column order should follow:
+
+```text
+identity
+status
+priority/risk
+context
+time
+action
+```
+
+unless the specific screen requires another order.
+
+---
+
+# 46. Table Row Interaction
+
+Rows should have one predictable interaction model.
+
+Possible models:
+
+```text
+click row → detail
+select checkbox → bulk action
+action menu → contextual command
+```
+
+Avoid having five different click targets all trigger different outcomes without clear affordances.
+
+---
+
+# 47. Filtering
+
+Filters should communicate:
+
+```text
+what is being filtered
+current values
+number of active filters
+clear/reset capability
+```
+
+---
+
+# 48. Search
+
+Search should be visually distinct from filtering.
+
+Search:
+
+> "Find this entity."
+
+Filter:
+
+> "Show only entities matching these conditions."
+
+---
+
+# 49. Timeline
+
+Timelines are critical for investigations and operational history.
+
+A timeline should communicate:
+
+```text
+event
+time
+actor/system
+evidence/context
+state change
+```
+
+---
+
+# 50. Evidence Presentation
+
+Evidence should distinguish:
+
+```text
+observation
+inference
+classification
+decision
+```
+
+This is essential for expert trust.
+
+Do not visually present an inference as if it were a directly observed fact.
+
+---
+
+# 51. Confidence Presentation
+
+Where confidence exists, display it explicitly.
+
+Example:
+
+```text
+Classification
+HIGH CONFIDENCE
+```
+
+rather than making users infer confidence from color.
+
+---
+
+# 52. Recommendation Presentation
+
+Recommendations must be visually distinguished from facts.
+
+For example:
+
+```text
+OBSERVED
+Respiratory anomaly detected.
+
+ASSESSMENT
+Pattern is inconsistent with baseline.
+
+RECOMMENDATION
+Initiate targeted investigation.
+```
+
+This distinction is fundamental to trustworthy AI-assisted interfaces.
+
+---
+
+# 53. AI-Assisted Interface Rule
+
+If AEGIS later includes AI-generated recommendations, the interface must clearly distinguish:
+
+```text
+observed data
+computed analysis
+AI interpretation
+human decision
+executed action
+```
+
+Never collapse these into one visual state.
+
+---
+
+# 54. Decision Panel
+
+A decision panel should communicate:
+
+```text
+decision required
+context
+evidence
+recommended action
+available alternatives
+authority
+consequence
+```
+
+---
+
+# 55. Command Panel
+
+The command panel is where an authorized user initiates a consequential system action.
+
+It should contain:
+
+```text
+action
+target
+current state
+required authorization
+confirmation
+execution status
+result
+```
+
+---
+
+# 56. Confirmation Dialog
+
+Confirmation dialogs should not merely ask:
+
+```text
+Are you sure?
+```
+
+They should state:
+
+```text
+You are about to authorize containment for Ward 04.
+```
+
+Then communicate the relevant consequence.
+
+---
+
+# 57. Drawer Architecture
+
+Drawers are for contextual detail.
+
+Example:
+
+```text
+Threat table
+ ↓
+Threat selected
+ ↓
+Threat detail drawer
+```
+
+A drawer should allow the user to maintain awareness of the underlying list.
+
+---
+
+# 58. Modal Architecture
+
+Modals are for focused decisions.
+
+Do not use modals for large investigations.
+
+---
+
+# 59. Empty States
+
+Empty states should explain why the absence matters.
+
+Examples:
+
+```text
+No active threats
+No investigations assigned
+No containment actions
+No recovery events recorded
+```
+
+Avoid excessive illustration.
+
+---
+
+# 60. Loading States
+
+Loading states should preserve layout.
+
+Use skeletons when content structure is known.
+
+Avoid screen-wide spinners for every request.
+
+---
+
+# 61. Error States
+
+Error components must include:
+
+```text
+what failed
+scope of failure
+whether data may be stale
+recovery action
+```
+
+---
+
+# 62. Skeleton Architecture
+
+Skeletons should mimic the actual component structure.
+
+Do not use random gray rectangles.
+
+---
+
+# 63. HUD Pattern
+
+HUD elements may be used for:
+
+```text
+system status
+telemetry
+connection state
+timestamp
+environment status
+```
+
+They should remain secondary to operational content.
+
+---
+
+# 64. HUD Restrictions
+
+Avoid:
+
+```text
+animated scanlines
+fake radar
+random grids
+decorative crosshairs
+unnecessary glowing borders
+fake terminal text
+```
+
+unless they convey actual information.
+
+---
+
+# 65. Living Map Design
+
+The Living Map is one of AEGIS's signature visual systems.
+
+Its purpose is:
+
+```text
+spatial situational awareness
+```
+
+not spectacle.
+
+---
+
+# 66. Map Layers
+
+Potential layers include:
+
+```text
+facility
+location
+population
+environmental signal
+patient signal
+anomaly
+threat
+transmission
+response
+```
+
+Only layers defined by product requirements should be implemented.
+
+---
+
+# 67. Map Layer Control
+
+Users must be able to understand:
+
+```text
+which layers are active
+what each layer means
+how layers affect interpretation
+```
+
+---
+
+# 68. Map Legend
+
+A map must provide an explicit legend whenever visual encoding is not self-evident.
+
+---
+
+# 69. Map Selection
+
+Selecting an entity should establish context.
+
+Example:
+
+```text
+Map entity
+ ↓
+selected location
+ ↓
+related events
+ ↓
+related threat
+```
+
+The relationship must be visible.
+
+---
+
+# 70. Data Visualization Rules
+
+Every chart must have:
+
+```text
+title
+units
+time context
+legend where necessary
+source/context
+```
+
+when applicable.
+
+---
+
+# 71. No Decorative Charts
+
+Do not add a chart simply to fill empty space.
+
+Every chart must answer a decision-support question.
+
+---
+
+# 72. Motion System
+
+Motion should be:
+
+```text
+subtle
+fast
+purposeful
+consistent
+interruptible
+```
+
+---
+
+# 73. Motion Purpose
+
+Motion may communicate:
+
+```text
+navigation
+entry
+exit
+state change
+attention
+relationship
+progress
+```
+
+---
+
+# 74. Critical Alert Motion
+
+Critical alerts should not endlessly flash.
+
+Use restrained attention cues.
+
+Users working long shifts must not be subjected to visual fatigue.
+
+---
+
+# 75. Reduced Motion
+
+If reduced-motion preferences are enabled:
+
+```text
+complex transitions
+parallax
+large movement
+```
+
+must be reduced or removed.
+
+---
+
+# 76. Iconography
+
+Icons must be:
+
+```text
+simple
+consistent
+recognizable
+functional
+```
+
+Avoid mixing multiple icon styles.
+
+---
+
+# 77. Icon Rules
+
+Icons should not replace labels for unfamiliar operational actions.
+
+Use:
+
+```text
+icon + label
+```
+
+for important commands.
+
+---
+
+# 78. Tooltips
+
+Tooltips may explain:
+
+```text
+unfamiliar icon
+technical abbreviation
+secondary metadata
+```
+
+They should not contain essential information required to complete a task.
+
+---
+
+# 79. Forms
+
+Forms should minimize cognitive load.
+
+Group fields by:
+
+```text
+identity
+context
+evidence
+assessment
+action
+```
+
+where relevant.
+
+---
+
+# 80. Form Validation
+
+Validation should happen:
+
+```text
+during appropriate interaction
+before submission
+on server
+```
+
+Client validation improves UX.
+
+Server validation determines truth.
+
+---
+
+# 81. Validation Messages
+
+Messages must explain what needs correction.
+
+Bad:
+
+```text
+Invalid input.
+```
+
+Better:
+
+```text
+A classification is required before the investigation can be finalized.
+```
+
+---
+
+# 82. Progressive Disclosure
+
+AEGIS should expose complexity progressively.
+
+Users should first see:
+
+```text
+signal
+status
+priority
+```
+
+then:
+
+```text
+evidence
+analysis
+history
+```
+
+then:
+
+```text
+technical detail
+```
+
+where appropriate.
+
+---
+
+# 83. Expert Mode
+
+AEGIS is designed for expert users.
+
+This does not mean every piece of technical information must be visible at once.
+
+Expert interfaces should provide:
+
+```text
+depth on demand
+```
+
+rather than:
+
+```text
+everything everywhere
+```
+
+---
+
+# 84. Information Traceability
+
+Where possible, users should be able to move:
+
+```text
+summary
+ ↓
+detail
+ ↓
+evidence
+ ↓
+source
+```
+
+This is essential for stakeholder trust.
+
+---
+
+# 85. Cross-Screen Visual Consistency
+
+The following must remain consistent across all 13 screens:
+
+```text
+header
+navigation
+status semantics
+button hierarchy
+typography
+spacing
+tables
+alerts
+drawers
+modals
+timestamps
+entity identifiers
+```
+
+---
+
+# 86. Entity Identity Pattern
+
+Entities should have a consistent identity pattern.
+
+Example:
+
+```text
+THR-0042
+Respiratory Cluster
+HIGH
+UNDER REVIEW
+```
+
+The identifier should never be visually stronger than the actual human-readable name.
+
+---
+
+# 87. Timestamp Pattern
+
+Operational timestamps should communicate:
+
+```text
+when
+timezone/context where relevant
+freshness
+```
+
+Examples:
+
+```text
+12:42 UTC
+4 min ago
+Updated 18 sec ago
+```
+
+Avoid ambiguous dates in critical contexts.
+
+---
+
+# 88. Data Freshness
+
+Where real-time freshness matters, provide a visible indication.
+
+Example:
+
+```text
+LIVE
+Updated 8 sec ago
+```
+
+If the connection is degraded:
+
+```text
+STALE
+Last update 4 min ago
+```
+
+---
+
+# 89. Status Transition Visualization
+
+When an entity changes state, the interface should make the change understandable.
+
+Example:
+
+```text
+DETECTED
+↓
+UNDER REVIEW
+↓
+CLASSIFIED
+```
+
+The visual transition should not hide the previous state.
+
+---
+
+# 90. Operational Journey Pattern
+
+The visual system should support the complete journey:
+
+```text
+DETECT
+ ↓
+IDENTIFY
+ ↓
+ASSESS
+ ↓
+DECIDE
+ ↓
+RESPOND
+ ↓
+VERIFY
+ ↓
+RECOVER
+ ↓
+LEARN
+```
+
+This is the visual expression of the AEGIS Bio-Resilience methodology.
+
+---
+
+# 91. Biological Analogy Rule
+
+The immune-system analogy is an architectural and conceptual model.
+
+It should not become literal visual decoration.
+
+Avoid filling the interface with:
+
+```text
+antibodies
+cells
+DNA graphics
+microscopic imagery
+biological illustrations
+```
+
+unless specifically used to explain a concept.
+
+The analogy should primarily influence:
+
+```text
+system behavior
+layering
+feedback
+response
+memory
+```
+
+---
+
+# 92. Design Token Architecture
+
+All visual values should ultimately come from tokens.
+
+Conceptually:
+
+```text
+tokens/
+├── color
+├── typography
+├── spacing
+├── radius
+├── border
+├── shadow
+├── motion
+├── breakpoint
+└── density
+```
+
+---
+
+# 93. Token Naming
+
+Tokens should describe semantic purpose.
+
+Prefer:
+
+```text
+color.background.primary
+color.text.primary
+color.status.warning
+```
+
+over:
+
+```text
+yellow500
+gray900
+white
+```
+
+Semantic tokens allow the visual system to evolve without rewriting components.
+
+---
+
+# 94. Component Tokens
+
+Components may define component-level semantic tokens.
+
+Example:
+
+```text
+button.primary.background
+button.primary.text
+button.primary.border
+```
+
+---
+
+# 95. No Hard-Coded Styling
+
+Screen-level components should not contain arbitrary values such as:
+
+```text
+#ffb000
+17px
+13px
+23px
+```
+
+when a design token exists.
+
+---
+
+# 96. Component States
+
+Every reusable interactive component must define appropriate states.
+
+Examples:
+
+```text
+default
+hover
+focus
+active
+disabled
+loading
+error
+selected
+```
+
+Not every component needs every state.
+
+---
+
+# 97. Focus State
+
+Keyboard focus must remain clearly visible.
+
+Do not remove browser focus indicators without replacing them with an equally clear system.
+
+---
+
+# 98. Disabled State
+
+Disabled controls must remain understandable.
+
+Do not rely on opacity alone.
+
+Where useful, explain why an action is unavailable.
+
+---
+
+# 99. Responsive Component Behavior
+
+Components should define behavior at different widths.
+
+Example:
+
+```text
+desktop
+→ full control set
+
+medium
+→ compressed control set
+
+small
+→ progressive disclosure
+```
+
+Do not simply shrink typography indefinitely.
+
+---
+
+# 100. Component Documentation
+
+Every major component should document:
+
+```text
+purpose
+usage
+variants
+states
+anatomy
+props
+accessibility
+examples
+do not use when
+```
+
+---
+
+# 101. Storybook / Component Laboratory
+
+A component laboratory such as Storybook may be used to develop and validate the design system.
+
+It should allow isolated testing of:
+
+```text
+buttons
+cards
+tables
+alerts
+forms
+modals
+drawers
+status states
+```
+
+---
+
+# 102. Component Acceptance Criteria
+
+A reusable component is complete when:
+
+```text
+✓ Correct anatomy
+✓ Correct variants
+✓ Correct states
+✓ Correct typography
+✓ Correct spacing
+✓ Correct semantic colors
+✓ Keyboard accessible
+✓ Responsive
+✓ No unnecessary domain logic
+✓ Documented
+```
+
+---
+
+# 103. Design-to-Code Contract
+
+Design and engineering must share the same vocabulary.
+
+For example:
+
+```text
+Design:
+ThreatStatusBadge / Critical
+
+Engineering:
+ThreatStatusBadge status="critical"
+```
+
+not:
+
+```text
+Design:
+red thing
+
+Engineering:
+dangerBox
+```
+
+---
+
+# 104. v0 Design Contract
+
+v0 may:
+
+```text
+explore layouts
+generate component candidates
+prototype interactions
+produce visual variants
+```
+
+v0 may not:
+
+```text
+invent domain states
+invent screen architecture
+invent API behavior
+invent business rules
+replace approved components
+```
+
+---
+
+# 105. OpenCode Design Contract
+
+OpenCode must:
+
+```text
+consume design tokens
+reuse components
+follow component contracts
+preserve domain semantics
+connect UI to real state
+implement approved interactions
+```
+
+---
+
+# 106. AI Visual Drift Prevention
+
+If AI generates a component that conflicts with this document:
+
+```text
+DO NOT PATCH AROUND THE CONFLICT.
+```
+
+Instead:
+
+```text
+identify conflict
+compare against design system
+retain approved system rule
+correct generated component
+```
+
+---
+
+# 107. Design Review Checklist
+
+Before approving a screen, ask:
+
+### Hierarchy
+
+- Is the primary information obvious?
+- Is the next action obvious?
+- Is secondary information appropriately quiet?
+
+### Semantics
+
+- Do colors communicate the correct state?
+- Are facts distinguishable from recommendations?
+
+### Density
+
+- Is information dense but readable?
+- Is anything unnecessary?
+
+### Interaction
+
+- Are actions predictable?
+- Are consequential actions explicit?
+
+### Consistency
+
+- Does the screen use existing components?
+- Does it follow the token system?
+
+---
+
+# 108. Clinical Authority Test
+
+Every major screen should pass this question:
+
+> If a hospital, public-health, or biosecurity expert saw this interface without knowing the design process, would it look like a serious professional operational system?
+
+If the answer is no:
+
+```text
+remove decoration
+strengthen hierarchy
+improve evidence presentation
+reduce visual noise
+```
+
+---
+
+# 109. Anti-Gaming Test
+
+Reject visual treatment that resembles:
+
+```text
+video-game HUD
+cyberpunk interface
+spaceship cockpit
+military shooter
+sci-fi movie dashboard
+```
+
+unless the element has a legitimate information function.
+
+---
+
+# 110. Anti-Dribbble Test
+
+The interface must not optimize for screenshots.
+
+A beautiful static screen that becomes confusing during a real workflow is a failed AEGIS interface.
+
+The system is judged by:
+
+```text
+decision quality
+speed
+clarity
+traceability
+error prevention
+```
+
+not screenshots.
+
+---
+
+# 111. Stakeholder Trust Test
+
+An expert should be able to answer:
+
+```text
+What happened?
+How certain are we?
+What evidence supports it?
+What changed?
+What is recommended?
+Who can act?
+What has already been done?
+What happens next?
+```
+
+without hunting through the interface.
+
+---
+
+# 112. Global Component Registry
+
+The implementation should maintain one authoritative component registry.
+
+Conceptually:
+
+```text
+FOUNDATIONS
+├── Typography
+├── Color
+├── Spacing
+└── Motion
+
+PRIMITIVES
+├── Button
+├── Input
+├── Badge
+├── Tooltip
+└── Icon
+
+DATA
+├── Metric
+├── Table
+├── Timeline
+└── Evidence
+
+OPERATIONAL
+├── ThreatIndicator
+├── RiskIndicator
+├── ActionPanel
+├── DecisionPanel
+└── CommandPanel
+
+VISUALIZATION
+├── LivingMap
+├── RiskMatrix
+├── TransmissionGraph
+└── TimelineChart
+
+NAVIGATION
+├── AppShell
+├── Sidebar
+├── TopBar
+├── Tabs
+└── Breadcrumbs
+```
+
+---
+
+# 113. Component Dependency Rule
+
+Components should depend downward.
+
+```text
+Screen
+ ↓
+Pattern
+ ↓
+Domain Component
+ ↓
+Composite
+ ↓
+Primitive
+ ↓
+Foundation
+```
+
+A primitive must not depend on a screen.
+
+---
+
+# 114. Circular Dependency Prevention
+
+Avoid:
+
+```text
+ThreatCard
+→ ThreatScreen
+→ ThreatCard
+```
+
+Components must remain composable.
+
+---
+
+# 115. Domain Component Boundary
+
+Domain components may understand:
+
+```text
+Threat
+Risk
+Investigation
+Containment
+Recovery
+```
+
+but should not directly own:
+
+```text
+API authentication
+database communication
+global navigation
+```
+
+unless explicitly defined as an application-level orchestrator.
+
+---
+
+# 116. Component Reuse Rule
+
+Reuse components when:
+
+```text
+same purpose
+same interaction model
+same semantic meaning
+```
+
+Do not force reuse when two elements only look visually similar but have different meanings.
+
+---
+
+# 117. Duplication Rule
+
+Before creating a new component, ask:
+
+```text
+Does an existing component already solve this problem?
+```
+
+If yes:
+
+```text
+extend existing component
+```
+
+If no:
+
+```text
+create new component
+document why
+```
+
+---
+
+# 118. One-Off Exception Rule
+
+A one-off visual element is acceptable when it is genuinely unique to a screen.
+
+However, repeated one-off patterns indicate a design-system gap.
+
+---
+
+# 119. Design System Evolution
+
+The design system must evolve through controlled changes.
+
+Change process:
+
+```text
+Identify need
+ ↓
+Check existing pattern
+ ↓
+Propose change
+ ↓
+Validate impact
+ ↓
+Update token/component
+ ↓
+Update documentation
+ ↓
+Refactor affected screens
+```
+
+---
+
+# 120. Breaking Design Changes
+
+A change is breaking when it modifies:
+
+```text
+semantic meaning
+component behavior
+state representation
+interaction expectations
+critical visual encoding
+```
+
+Breaking changes must be deliberate.
+
+---
+
+# 121. Design System Quality Gate
+
+Before a new screen is approved:
+
+```text
+✓ Uses existing tokens
+✓ Uses existing primitives
+✓ Uses established status semantics
+✓ Uses established typography
+✓ Uses established spacing
+✓ Uses approved interaction patterns
+✓ Uses consistent data presentation
+✓ Has accessibility states
+✓ Has loading/error/empty states
+✓ Does not introduce unnecessary visual language
+```
+
+---
+
+# 122. Master Visual Invariants
+
+### Invariant 01
+
+AEGIS is not a game.
+
+### Invariant 02
+
+Amber means attention and must remain scarce.
+
+### Invariant 03
+
+Clinical readability beats visual spectacle.
+
+### Invariant 04
+
+Color never carries critical meaning alone.
+
+### Invariant 05
+
+Every consequential action is explicit.
+
+### Invariant 06
+
+Facts, analysis, recommendations, and actions remain visually distinguishable.
+
+### Invariant 07
+
+The design system is token-driven.
+
+### Invariant 08
+
+Screens compose existing components rather than inventing new visual languages.
+
+### Invariant 09
+
+Motion communicates meaning.
+
+### Invariant 10
+
+Every visualization must support a real operational question.
+
+### Invariant 11
+
+The biological analogy influences system behavior more than decoration.
+
+### Invariant 12
+
+The interface optimizes for expert decision-making, not screenshots.
+
+---
+
+# 123. Final AEGIS Design System Model
+
+The entire system can be represented as:
+
+```text
+                         AEGIS DESIGN SYSTEM
+                                  │
+             ┌────────────────────┼────────────────────┐
+             │                    │                    │
+             ▼                    ▼                    ▼
+        FOUNDATIONS          COMPONENTS           PATTERNS
+             │                    │                    │
+             ▼                    ▼                    ▼
+       Tokens / Type       UI / Data / Ops      Screen Composition
+             │                    │                    │
+             └────────────────────┼────────────────────┘
+                                  ▼
+                           AEGIS SCREENS
+                                  │
+                                  ▼
+                       OPERATIONAL JOURNEYS
+                                  │
+                                  ▼
+                       HUMAN DECISION MAKING
+```
+
+The design system therefore exists for one reason:
+
+> **To make the complexity of AEGIS understandable without hiding the complexity that experts actually need.**
+
+---
+
+# 124. Definition of Done
+
+The AEGIS design system is ready for production implementation when:
+
+```text
+✓ Core tokens defined
+✓ Typography system defined
+✓ Color semantics defined
+✓ Surface system defined
+✓ Spacing system defined
+✓ Grid defined
+✓ Navigation components defined
+✓ Core primitives defined
+✓ Data components defined
+✓ Operational components defined
+✓ Visualization patterns defined
+✓ Loading states defined
+✓ Error states defined
+✓ Empty states defined
+✓ Interaction states defined
+✓ Accessibility rules defined
+✓ Motion rules defined
+✓ Component naming defined
+✓ Component documentation defined
+✓ v0 usage boundaries defined
+✓ OpenCode implementation boundaries defined
+✓ 13-screen consistency validated
+```
+
+# 125. Final Principle
+
+AEGIS should never feel like thirteen dashboards designed separately.
+
+It should feel like:
+
+> **One instrument with thirteen operational views.**
+
+That is the standard this design system exists to enforce.
