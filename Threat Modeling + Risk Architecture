@@ -1,0 +1,1890 @@
+# AEGIS
+# Threat Modeling + Risk Architecture
+
+**System:** AEGIS  
+**Document:** 13 — Threat Modeling + Risk Architecture  
+**Version:** 1.0  
+**Status:** Master Architecture  
+**Date:** August 2026
+
+---
+
+# 01. Purpose
+
+This document defines the security, safety, reliability, misuse, and operational risk architecture for AEGIS.
+
+AEGIS is intended for high-stakes healthcare, biosecurity, pandemic preparedness, and biological resilience environments.
+
+Because of that, the architecture must assume:
+
+```text
+systems fail
+data can be wrong
+sensors can fail
+users can make mistakes
+models can be wrong
+integrations can fail
+attackers exist
+insiders exist
+configurations drift
+assumptions become outdated
+```
+
+The objective is not to create a system that never fails.
+
+The objective is to create a system that:
+
+```text
+anticipates failure
+detects failure
+contains failure
+communicates uncertainty
+limits consequences
+recovers safely
+learns from failure
+```
+
+---
+
+# 02. Core Risk Principle
+
+AEGIS must be designed around:
+
+> **Assume failure. Contain failure. Expose failure. Recover from failure. Learn from failure.**
+
+A hidden failure is more dangerous than an obvious failure.
+
+---
+
+# 03. Security and Safety Objective
+
+AEGIS must protect:
+
+```text
+CONFIDENTIALITY
+INTEGRITY
+AVAILABILITY
+AUTHENTICITY
+TRACEABILITY
+SAFETY
+HUMAN CONTROL
+```
+
+Traditional cybersecurity focuses heavily on the first three.
+
+AEGIS must explicitly add:
+
+```text
+SAFETY
+HUMAN CONTROL
+```
+
+because incorrect information or unauthorized decisions can create real-world consequences.
+
+---
+
+# 04. Threat Model Scope
+
+Threat modeling covers:
+
+```text
+frontend
+backend
+APIs
+databases
+authentication
+authorization
+AI services
+data pipelines
+telemetry
+external integrations
+users
+administrators
+deployment infrastructure
+third-party dependencies
+operational workflows
+audit systems
+notification systems
+```
+
+---
+
+# 05. Threat Model Boundaries
+
+AEGIS should be analyzed across these boundaries:
+
+```text
+User
+ ↓
+Frontend
+ ↓
+API
+ ↓
+Application Services
+ ↓
+Data Layer
+ ↓
+Intelligence Layer
+ ↓
+External Systems
+ ↓
+Operational Environment
+```
+
+Every boundary is a potential trust boundary.
+
+---
+
+# 06. High-Level Trust Architecture
+
+```text
+UNTRUSTED / EXTERNAL
+        │
+        ▼
+┌──────────────────────┐
+│ Security Boundary    │
+│ Authentication       │
+│ Authorization        │
+│ Validation           │
+└──────────┬───────────┘
+           ▼
+┌──────────────────────┐
+│ AEGIS Application    │
+└──────────┬───────────┘
+           ▼
+┌──────────────────────┐
+│ Intelligence Layer   │
+└──────────┬───────────┘
+           ▼
+┌──────────────────────┐
+│ Controlled Data      │
+└──────────────────────┘
+```
+
+---
+
+# 07. Critical Assets
+
+AEGIS assets include:
+
+## Identity
+
+```text
+user accounts
+roles
+permissions
+sessions
+credentials
+authentication tokens
+```
+
+## Operational Data
+
+```text
+telemetry
+events
+investigations
+assessments
+recommendations
+decisions
+```
+
+## Intelligence
+
+```text
+models
+model outputs
+rules
+baselines
+knowledge
+institutional memory
+```
+
+## Infrastructure
+
+```text
+servers
+databases
+queues
+storage
+network
+deployment systems
+```
+
+## Governance
+
+```text
+audit records
+configuration
+approval records
+security policies
+```
+
+---
+
+# 08. Asset Criticality
+
+Not every asset has the same consequence if compromised.
+
+AEGIS should classify assets conceptually as:
+
+```text
+CRITICAL
+HIGH
+MODERATE
+LOW
+```
+
+Criticality should consider:
+
+```text
+operational impact
+safety impact
+security impact
+privacy impact
+decision impact
+recovery difficulty
+```
+
+---
+
+# 09. Threat Actors
+
+The architecture should consider:
+
+```text
+external attacker
+malicious insider
+compromised account
+careless user
+privileged administrator
+compromised integration
+malicious dependency
+automated attacker
+misconfigured system
+faulty sensor
+faulty AI model
+```
+
+Threat modeling should not assume every failure is malicious.
+
+---
+
+# 10. Threat Categories
+
+AEGIS threat categories include:
+
+```text
+unauthorized access
+privilege escalation
+data manipulation
+data corruption
+data leakage
+spoofed telemetry
+AI manipulation
+model failure
+service failure
+availability attack
+configuration error
+human error
+workflow error
+integration failure
+supply-chain compromise
+audit manipulation
+notification failure
+```
+
+---
+
+# 11. STRIDE Alignment
+
+AEGIS should use a structured threat-modeling methodology such as STRIDE for applicable software components.
+
+Conceptually:
+
+```text
+Spoofing
+Tampering
+Repudiation
+Information Disclosure
+Denial of Service
+Elevation of Privilege
+```
+
+This should be supplemented with AEGIS-specific safety and AI risk categories.
+
+---
+
+# 12. AEGIS-Specific Risk Extension
+
+Traditional application threat modeling is insufficient.
+
+AEGIS adds:
+
+```text
+MISINTERPRETATION
+FALSE CONFIDENCE
+DATA QUALITY FAILURE
+MODEL FAILURE
+AUTOMATION BIAS
+DECISION SUPPORT FAILURE
+SENSOR FAILURE
+HUMAN WORKFLOW FAILURE
+```
+
+---
+
+# 13. Spoofing Risk
+
+A malicious or compromised actor could attempt to appear as:
+
+```text
+authorized user
+trusted service
+approved sensor
+trusted integration
+valid data source
+```
+
+Controls include:
+
+```text
+strong authentication
+service identity
+authorization
+source validation
+cryptographic verification where appropriate
+audit logging
+```
+
+---
+
+# 14. Tampering Risk
+
+Potential targets include:
+
+```text
+telemetry
+investigations
+assessments
+recommendations
+configuration
+model outputs
+audit records
+```
+
+Controls:
+
+```text
+integrity validation
+authorization
+immutable or append-only records where appropriate
+versioning
+audit trails
+change approval
+```
+
+---
+
+# 15. Repudiation Risk
+
+A user may deny performing an action.
+
+AEGIS must therefore preserve:
+
+```text
+actor
+action
+timestamp
+authorization context
+object affected
+previous state where appropriate
+result
+```
+
+Document 10 remains authoritative for the audit implementation.
+
+---
+
+# 16. Information Disclosure
+
+Potentially sensitive information may include:
+
+```text
+operational data
+health-related information
+investigation details
+security information
+organizational configuration
+system architecture
+user identity information
+```
+
+Controls:
+
+```text
+least privilege
+data minimization
+encryption
+redaction
+access logging
+segmentation
+```
+
+---
+
+# 17. Denial of Service
+
+AEGIS must consider attacks or failures that prevent users from accessing:
+
+```text
+dashboard
+investigations
+alerts
+telemetry
+intelligence
+authentication
+APIs
+```
+
+Availability is a safety concern when users depend on the system during time-sensitive operations.
+
+---
+
+# 18. Elevation of Privilege
+
+A user or compromised service must not gain permissions beyond its assigned authority.
+
+Controls:
+
+```text
+RBAC
+least privilege
+server-side authorization
+permission checks
+privileged access monitoring
+session controls
+```
+
+---
+
+# 19. Trust Boundary: User → Frontend
+
+Threats include:
+
+```text
+malicious input
+session theft
+client manipulation
+browser compromise
+unauthorized UI actions
+```
+
+The frontend must never be treated as a trusted security boundary.
+
+---
+
+# 20. Trust Boundary: Frontend → API
+
+All security-critical validation must occur server-side.
+
+The API must independently verify:
+
+```text
+identity
+authorization
+input validity
+resource access
+operation permission
+```
+
+Never trust the frontend to enforce security.
+
+---
+
+# 21. Trust Boundary: API → Services
+
+Internal services must also authenticate and authorize requests where required.
+
+Internal traffic must not automatically be considered trusted.
+
+---
+
+# 22. Trust Boundary: Services → Database
+
+Services should access only the data required for their responsibilities.
+
+Controls:
+
+```text
+least privilege
+service identities
+parameterized queries
+input validation
+database auditing
+```
+
+---
+
+# 23. Trust Boundary: AEGIS → External Systems
+
+External systems must be treated as potentially unreliable.
+
+Possible conditions:
+
+```text
+unavailable
+incorrect
+delayed
+duplicated
+malformed
+compromised
+incompatible
+```
+
+AEGIS must validate incoming data.
+
+---
+
+# 24. Sensor Spoofing Risk
+
+AEGIS may receive operational telemetry from external sources.
+
+The architecture must account for:
+
+```text
+false readings
+missing readings
+duplicate readings
+delayed readings
+unexpected readings
+source identity failure
+```
+
+AEGIS should never assume that a sensor is truthful simply because it is registered.
+
+---
+
+# 25. Source Trust
+
+A telemetry source should have an identifiable trust and quality state.
+
+Conceptually:
+
+```text
+TRUSTED
+DEGRADED
+UNVERIFIED
+UNAVAILABLE
+REVOKED
+```
+
+The exact trust model must be defined with stakeholders and security requirements.
+
+---
+
+# 26. Data Integrity Risk
+
+Incorrect data can be more dangerous than unavailable data.
+
+Therefore AEGIS must detect:
+
+```text
+unexpected changes
+schema violations
+duplicate records
+invalid values
+source inconsistencies
+timestamp anomalies
+```
+
+---
+
+# 27. Data Poisoning Risk
+
+AI and analytical systems may be affected by deliberately or accidentally corrupted input data.
+
+AEGIS should mitigate through:
+
+```text
+source validation
+quality monitoring
+provenance
+anomaly detection
+data review
+controlled training data
+model governance
+```
+
+---
+
+# 28. AI Threat Surface
+
+The AI intelligence layer introduces additional risks:
+
+```text
+hallucination
+prompt injection
+malicious retrieved content
+data poisoning
+model drift
+model misuse
+overconfidence
+automation bias
+incorrect summarization
+incorrect classification
+```
+
+---
+
+# 29. AI Output Integrity
+
+AI output must not automatically become trusted system state.
+
+The architecture should preserve:
+
+```text
+generated
+reviewed
+approved
+rejected
+superseded
+```
+
+states where applicable.
+
+---
+
+# 30. Prompt Injection
+
+If AEGIS uses generative AI with external or user-provided content, malicious instructions embedded inside retrieved content may attempt to manipulate the model.
+
+Controls include:
+
+```text
+trusted retrieval boundaries
+input separation
+instruction hierarchy
+output validation
+tool permission restrictions
+human review
+```
+
+---
+
+# 31. AI Tool Access
+
+AI systems should receive only the minimum tools and permissions required.
+
+For example:
+
+```text
+AI may read approved evidence
+```
+
+does not imply:
+
+```text
+AI may modify evidence
+```
+
+and:
+
+```text
+AI may recommend an action
+```
+
+does not imply:
+
+```text
+AI may execute the action
+```
+
+---
+
+# 32. AI Permission Boundary
+
+The architecture should enforce:
+
+```text
+AI
+ ↓
+READ
+ ↓
+ANALYZE
+ ↓
+EXPLAIN
+ ↓
+RECOMMEND
+```
+
+while consequential operations remain behind explicit authorization.
+
+---
+
+# 33. AI Hallucination Risk
+
+The system must assume that generative AI can produce unsupported statements.
+
+Controls:
+
+```text
+retrieval grounding
+structured outputs
+source attribution
+confidence
+uncertainty
+validation
+human review
+restricted action permissions
+```
+
+---
+
+# 34. False Confidence
+
+A highly polished interface can create excessive trust.
+
+AEGIS must therefore avoid:
+
+```text
+false precision
+unexplained scores
+unqualified certainty
+```
+
+The UI should make uncertainty visible.
+
+---
+
+# 35. Automation Bias
+
+Users may accept system recommendations simply because they came from AEGIS.
+
+Mitigations:
+
+```text
+show evidence
+show uncertainty
+show alternatives where appropriate
+require human confirmation
+record decisions
+```
+
+---
+
+# 36. Confirmation Bias
+
+The system must avoid presenting only evidence supporting an initial hypothesis.
+
+Where appropriate, users should be able to inspect:
+
+```text
+supporting evidence
+conflicting evidence
+unknowns
+alternative interpretations
+```
+
+---
+
+# 37. Premature Closure
+
+AEGIS should not force an investigation into a definitive classification when evidence remains incomplete.
+
+Possible state:
+
+```text
+INSUFFICIENT EVIDENCE
+```
+
+must be valid.
+
+---
+
+# 38. Alert Manipulation
+
+Attackers or faulty systems could attempt to create:
+
+```text
+false alerts
+alert floods
+alert suppression
+```
+
+Controls include:
+
+```text
+source validation
+rate controls
+correlation
+deduplication
+alert prioritization
+audit logging
+```
+
+---
+
+# 39. Alert Suppression Risk
+
+Alert suppression can become dangerous if legitimate events are hidden.
+
+Therefore suppression should be:
+
+```text
+explicit
+authorized
+auditable
+time-bounded where appropriate
+reversible
+```
+
+---
+
+# 40. Notification Failure
+
+A notification system can fail even when the underlying AEGIS system is functioning.
+
+Therefore:
+
+```text
+alert created
+≠
+notification successfully delivered
+```
+
+These states must remain separate.
+
+---
+
+# 41. Decision Support Risk
+
+AEGIS may produce a technically correct recommendation that is inappropriate because of missing context.
+
+Therefore recommendations should expose:
+
+```text
+evidence
+constraints
+uncertainty
+required authority
+```
+
+---
+
+# 42. Human Decision Risk
+
+Users can:
+
+```text
+misunderstand
+misread
+ignore
+over-trust
+incorrectly modify
+incorrectly authorize
+```
+
+system outputs.
+
+Human-centered safety must therefore be treated as an architectural requirement.
+
+---
+
+# 43. Critical Action Protection
+
+Consequential actions must require appropriate authorization.
+
+Examples of potentially consequential operations include:
+
+```text
+changing operational controls
+initiating restricted workflows
+changing access permissions
+publishing authoritative assessments
+```
+
+AEGIS should not assume that technical capability equals authorization.
+
+---
+
+# 44. Separation of Duties
+
+Where appropriate, high-impact actions may require different roles for:
+
+```text
+analysis
+approval
+execution
+review
+```
+
+The exact separation must be determined by stakeholder governance.
+
+---
+
+# 45. Insider Threat
+
+AEGIS must consider malicious or careless insiders.
+
+Controls include:
+
+```text
+least privilege
+role separation
+audit
+anomaly detection
+access reviews
+privileged-user monitoring
+```
+
+---
+
+# 46. Compromised Account
+
+If an account is compromised, the attacker should not automatically gain unrestricted access.
+
+Controls:
+
+```text
+least privilege
+session controls
+MFA
+anomalous access detection
+revocation
+reauthentication
+```
+
+---
+
+# 47. Supply Chain Risk
+
+AEGIS depends on:
+
+```text
+libraries
+frameworks
+AI models
+containers
+cloud services
+third-party APIs
+development tools
+```
+
+Compromise of dependencies can compromise AEGIS.
+
+Controls include:
+
+```text
+dependency scanning
+version pinning
+software inventory
+trusted sources
+security updates
+build integrity
+```
+
+---
+
+# 48. Configuration Risk
+
+A secure architecture can become insecure through configuration.
+
+Examples:
+
+```text
+incorrect permissions
+disabled logging
+wrong environment variables
+exposed service
+incorrect thresholds
+incorrect integrations
+```
+
+Configuration changes must be governed.
+
+---
+
+# 49. Secrets Management
+
+Secrets must not be stored in:
+
+```text
+source code
+frontend bundles
+logs
+public repositories
+plain-text configuration
+```
+
+Use an appropriate secrets-management mechanism in production.
+
+---
+
+# 50. Environment Separation
+
+AEGIS should separate:
+
+```text
+DEVELOPMENT
+TEST
+STAGING
+PRODUCTION
+```
+
+Production credentials and data must not casually flow into development environments.
+
+---
+
+# 51. Development Data
+
+Development environments should use:
+
+```text
+synthetic data
+approved anonymized data
+safe fixtures
+```
+
+where possible.
+
+---
+
+# 52. Production Data Protection
+
+Production operational information must have explicit controls for:
+
+```text
+access
+storage
+transmission
+retention
+backup
+deletion
+```
+
+---
+
+# 53. Backup Risk
+
+Backups can become an attack target.
+
+Controls include:
+
+```text
+access control
+encryption
+backup integrity checks
+retention policy
+restore testing
+```
+
+---
+
+# 54. Recovery Risk
+
+A backup that has never been successfully restored is not a proven recovery mechanism.
+
+AEGIS must eventually test:
+
+```text
+backup
+ ↓
+restore
+ ↓
+validation
+```
+
+---
+
+# 55. Availability Risk
+
+AEGIS should identify critical dependencies.
+
+Conceptually:
+
+```text
+Authentication
+Database
+API
+Telemetry
+Intelligence
+Notification
+```
+
+Each should have a defined failure mode.
+
+---
+
+# 56. Graceful Degradation
+
+AEGIS should degrade rather than collapse when non-critical services fail.
+
+Example:
+
+```text
+AI unavailable
+↓
+manual assessment remains available
+```
+
+---
+
+# 57. Fail-Safe Principle
+
+When uncertainty is high, AEGIS should avoid silently performing irreversible consequential operations.
+
+Preferred:
+
+```text
+UNCERTAIN
+↓
+SURFACE UNCERTAINTY
+↓
+REQUEST HUMAN REVIEW
+```
+
+---
+
+# 58. Fail-Closed vs Fail-Open
+
+Security-sensitive permissions should generally fail closed.
+
+Example:
+
+```text
+Authorization unavailable
+↓
+Do not grant privileged access
+```
+
+Operational visibility may require different degraded behavior.
+
+The appropriate mode must be defined per subsystem.
+
+---
+
+# 59. Risk of Stale Data
+
+A stale dashboard can create false operational confidence.
+
+Therefore:
+
+```text
+fresh
+aging
+stale
+unknown
+```
+
+must be distinguishable.
+
+This directly inherits the requirement from Document 12.
+
+---
+
+# 60. Risk of Missing Data
+
+Missing data must never automatically become:
+
+```text
+NORMAL
+```
+
+Instead:
+
+```text
+UNKNOWN
+```
+
+or an appropriate degraded state.
+
+---
+
+# 61. Risk of Conflicting Sources
+
+When sources disagree:
+
+```text
+Source A → condition X
+
+Source B → condition Y
+```
+
+AEGIS should preserve the conflict.
+
+It must not silently select one without an established methodology.
+
+---
+
+# 62. Risk of Model Drift
+
+Model performance can degrade because the operating environment changes.
+
+Controls:
+
+```text
+performance monitoring
+drift monitoring
+validation
+versioning
+rollback
+```
+
+---
+
+# 63. Risk of Baseline Drift
+
+A changing environment may cause old baselines to become inappropriate.
+
+AEGIS should support:
+
+```text
+baseline version
+baseline review
+baseline change history
+```
+
+---
+
+# 64. Risk of Threshold Misconfiguration
+
+Thresholds may be changed incorrectly.
+
+Controls:
+
+```text
+authorization
+validation
+versioning
+change audit
+testing
+rollback
+```
+
+---
+
+# 65. Risk of Silent Architecture Drift
+
+As the project evolves, implementation may diverge from architecture.
+
+AEGIS must treat documentation as an architectural contract.
+
+If implementation differs:
+
+```text
+STOP
+↓
+identify deviation
+↓
+review
+↓
+approve or reject
+↓
+update source of truth
+```
+
+---
+
+# 66. Risk Register
+
+AEGIS should maintain a structured risk register.
+
+Conceptually:
+
+```text
+Risk {
+    id
+    category
+    description
+    asset
+    likelihood
+    impact
+    severity
+    controls
+    owner
+    residualRisk
+    status
+}
+```
+
+---
+
+# 67. Likelihood
+
+Use a controlled scale:
+
+```text
+RARE
+UNLIKELY
+POSSIBLE
+LIKELY
+ALMOST_CERTAIN
+```
+
+---
+
+# 68. Impact
+
+Use:
+
+```text
+NEGLIGIBLE
+MINOR
+MODERATE
+MAJOR
+CRITICAL
+```
+
+---
+
+# 69. Risk Severity
+
+Risk can conceptually be evaluated using:
+
+```text
+Likelihood × Impact
+```
+
+However, the final risk methodology should be approved by the appropriate organizational security and safety stakeholders.
+
+---
+
+# 70. Residual Risk
+
+After controls are applied:
+
+```text
+Initial Risk
+ ↓
+Controls
+ ↓
+Residual Risk
+```
+
+AEGIS should not claim that controls eliminate risk completely.
+
+---
+
+# 71. Risk Acceptance
+
+Some risks may remain.
+
+Risk acceptance must be:
+
+```text
+explicit
+authorized
+documented
+reviewable
+```
+
+---
+
+# 72. Risk Ownership
+
+Every significant risk should have an owner.
+
+Possible ownership domains:
+
+```text
+security
+engineering
+data
+AI
+clinical governance
+operations
+privacy
+infrastructure
+```
+
+---
+
+# 73. Threat Detection
+
+Security monitoring should detect indicators such as:
+
+```text
+repeated failed authentication
+unusual privilege usage
+unexpected configuration changes
+abnormal API behavior
+unexpected data access
+integration anomalies
+```
+
+---
+
+# 74. Security Incident Lifecycle
+
+```text
+DETECT
+ ↓
+TRIAGE
+ ↓
+CONTAIN
+ ↓
+INVESTIGATE
+ ↓
+RECOVER
+ ↓
+REVIEW
+ ↓
+LEARN
+```
+
+---
+
+# 75. Incident Separation
+
+AEGIS should distinguish:
+
+```text
+SECURITY INCIDENT
+TECHNICAL INCIDENT
+OPERATIONAL INCIDENT
+BIOLOGICAL / HEALTH EVENT
+```
+
+They may interact, but they are not automatically the same event.
+
+---
+
+# 76. Cascading Failure
+
+AEGIS must consider chains such as:
+
+```text
+Sensor failure
+ ↓
+Missing telemetry
+ ↓
+Incorrect assessment confidence
+ ↓
+Poor prioritization
+ ↓
+Delayed human review
+```
+
+Threat modeling should examine the entire chain, not isolated components.
+
+---
+
+# 77. Common-Cause Failure
+
+Multiple components may depend on the same underlying service.
+
+Example:
+
+```text
+Frontend
+API
+Intelligence
+Notifications
+```
+
+all depend on:
+
+```text
+Database
+```
+
+The database becomes a common point of failure.
+
+Architecture must identify such dependencies.
+
+---
+
+# 78. Single Points of Failure
+
+AEGIS should identify:
+
+```text
+single database
+single authentication service
+single notification provider
+single integration
+single AI provider
+single network path
+```
+
+and determine appropriate resilience strategies.
+
+---
+
+# 79. Dependency Concentration
+
+Reliance on one external provider can create:
+
+```text
+availability risk
+cost risk
+vendor lock-in
+security risk
+operational dependency
+```
+
+This should be considered during infrastructure design.
+
+---
+
+# 80. Human Factors Risk
+
+AEGIS must account for:
+
+```text
+cognitive overload
+alert fatigue
+ambiguity
+poor information hierarchy
+misleading visualization
+unclear status
+false confidence
+workflow interruption
+```
+
+---
+
+# 81. Clinical Authority Principle
+
+The visual system must communicate authority without communicating false certainty.
+
+The interface should feel:
+
+```text
+precise
+calm
+evidence-driven
+professional
+controlled
+```
+
+not:
+
+```text
+dramatic
+gamified
+alarmist
+sensational
+```
+
+This preserves the Clinical Authority principle established in the Master Architecture.
+
+---
+
+# 82. Risky Visualization
+
+Avoid visualizations that exaggerate risk through:
+
+```text
+unexplained giant numbers
+constant flashing
+decorative threat effects
+ambiguous color semantics
+animations that obscure state
+```
+
+Visual emphasis must correspond to meaningful operational priority.
+
+---
+
+# 83. Accessibility Risk
+
+Critical information must not depend solely on color.
+
+For example:
+
+```text
+amber = alert
+```
+
+should be accompanied by:
+
+```text
+label
+icon
+status
+text
+```
+
+where appropriate.
+
+---
+
+# 84. Localization Risk
+
+If AEGIS eventually operates across regions:
+
+```text
+timezone
+date format
+measurement units
+language
+regulatory context
+```
+
+must be handled explicitly.
+
+---
+
+# 85. Risk Communication
+
+The system should communicate risk using structured language.
+
+Example:
+
+```text
+Assessment:
+Moderate concern
+
+Confidence:
+Moderate
+
+Uncertainty:
+Recent source data unavailable
+
+Reason:
+Observed deviation from established baseline
+```
+
+This is preferable to:
+
+```text
+HIGH THREAT!!!
+```
+
+without context.
+
+---
+
+# 86. Security vs Usability
+
+Security controls must not unnecessarily prevent authorized users from performing critical work.
+
+AEGIS should optimize:
+
+```text
+strong security
++
+usable workflows
+```
+
+rather than treating them as opposites.
+
+---
+
+# 87. Zero Trust Principle
+
+AEGIS should not automatically trust:
+
+```text
+user
+device
+service
+network
+integration
+data source
+```
+
+based solely on location or network position.
+
+Trust should be continuously evaluated where appropriate.
+
+---
+
+# 88. Least Privilege
+
+Every identity should receive only the permissions required.
+
+This applies to:
+
+```text
+users
+services
+AI agents
+integrations
+automation
+administrators
+```
+
+---
+
+# 89. AI Least Privilege
+
+AI systems should have particularly constrained permissions.
+
+For example:
+
+```text
+read evidence
+=
+not
+modify evidence
+
+generate recommendation
+=
+not
+execute response
+```
+
+---
+
+# 90. Defense in Depth
+
+AEGIS should not depend on one security control.
+
+For example:
+
+```text
+Authentication
++
+Authorization
++
+Input validation
++
+Monitoring
++
+Audit
++
+Rate limiting
++
+Incident response
+```
+
+---
+
+# 91. Security Control Mapping
+
+Each major threat should map to one or more controls.
+
+Conceptually:
+
+```text
+Threat
+ ↓
+Risk
+ ↓
+Control
+ ↓
+Validation Test
+ ↓
+Evidence
+```
+
+This connects threat modeling to Document 14.
+
+---
+
+# 92. Threat Modeling Definition of Done
+
+This architecture is complete when:
+
+```text
+✓ Critical assets identified
+✓ Trust boundaries identified
+✓ Threat actors identified
+✓ STRIDE risks considered
+✓ AI-specific risks considered
+✓ Data integrity risks considered
+✓ Sensor risks considered
+✓ Human-factor risks considered
+✓ Availability risks considered
+✓ Insider risks considered
+✓ Supply-chain risks considered
+✓ Risk register exists
+✓ Controls map to threats
+✓ Residual risk is recognized
+✓ Security incidents have lifecycle
+✓ Technical incidents are separated from operational events
+✓ AI cannot independently execute consequential actions
+✓ Human authority is explicit
+✓ Degraded modes are defined
+✓ Failure propagation is considered
+✓ Audit requirements align with Document 10
+✓ Observability requirements align with Document 12
+✓ Testing requirements can be derived from this architecture
+```
+
+---
+
+# 93. Cross-Document Dependencies
+
+Document 13 must remain consistent with:
+
+```text
+01 — Master Architecture
+02 — Domain Model + Global State
+03 — User Flow + Operational Journey
+04 — Functional Requirements + 13 Screens
+05 — Interaction + State Transitions
+06 — Data Architecture + Data Contracts
+07 — API Architecture + Service Contracts
+08 — Frontend + Application Architecture
+09 — Design System + Component Architecture
+10 — Security + Authentication + Authorization + Audit
+11 — AI Intelligence + Decision Support
+12 — Observability + Telemetry
+```
+
+---
+
+# 94. Architectural Change Rule
+
+If future implementation introduces a new:
+
+```text
+data source
+AI model
+integration
+privileged action
+external service
+user role
+automation
+security boundary
+```
+
+the threat model must be revisited.
+
+Do not assume the original threat model remains complete.
+
+---
+
+# 95. Final Risk Principle
+
+AEGIS must not be designed around the fantasy that:
+
+> "If the software is correct, the system is safe."
+
+A high-stakes system can fail even when the code works exactly as written.
+
+The real risk surface includes:
+
+```text
+software
+data
+models
+people
+organizations
+sensors
+integrations
+workflows
+assumptions
+```
+
+Therefore:
+
+> **AEGIS safety is a system property, not merely a software property.**
+
+The strongest AEGIS architecture is one where a failure is:
+
+```text
+detected
+understood
+bounded
+communicated
+recoverable
+auditable
+learnable
+```
+
+rather than hidden behind a polished interface.
