@@ -1,0 +1,3436 @@
+# AEGIS
+
+## Master System Architecture
+
+### Bio-Resilient Pathogen Defense & Health Security Decision-Support System
+
+**Project:** AEGIS  
+**Architecture Status:** Master Architecture / New Baseline  
+**Version:** 1.0  
+**Date:** 4 August 2026  
+**Primary Domain:** Healthcare resilience, infection prevention, outbreak preparedness, health security  
+**Design Methodology:** Bio-Resilience  
+**Core Biological Analog:** Human immune response to infection  
+**Primary Users:** Healthcare decision-makers, infection prevention and control teams, health workers, public-health teams, pandemic preparedness teams, biosecurity experts, emergency operations personnel, authorized analysts  
+**Primary Stakeholders:** Healthcare organizations, public-health institutions, pandemic preparedness organizations, global health organizations, biosecurity organizations, researchers, health-system leadership
+
+---
+
+# 00. DOCUMENT STATUS
+
+This document establishes the **new architectural source of truth for AEGIS**.
+
+It supersedes conceptual confusion from previous iterations.
+
+The purpose of this document is not to describe a visual mockup.
+
+It defines the system that the visual interface must represent.
+
+The architecture establishes:
+
+1. What AEGIS is.
+2. What AEGIS is not.
+3. Who uses it.
+4. What operational problem it solves.
+5. How information moves through the system.
+6. How the biological immune-response analogy maps to software.
+7. How detection becomes evidence.
+8. How evidence becomes a threat assessment.
+9. How threat assessment becomes a human-reviewed response.
+10. How response outcomes become institutional learning.
+11. How the system handles uncertainty, missing data, conflicting evidence, and degraded conditions.
+12. How the frontend, backend, state model, event model, and data model should relate.
+13. What must be true before implementation is considered successful.
+
+This document intentionally **does not invent a screen registry**.
+
+Screens will be derived from this architecture and bound to the authoritative AEGIS screen registry separately.
+
+---
+
+# 01. EXECUTIVE DEFINITION
+
+## 1.1 What is AEGIS?
+
+AEGIS is a **Bio-Resilient health-security decision-support system** designed to help authorized teams detect abnormal biological or environmental signals, assemble evidence, assess potential threats, coordinate appropriate responses, monitor response status, and convert completed events into institutional memory.
+
+AEGIS treats the healthcare environment as a dynamic biological system.
+
+Instead of viewing a hospital or health network as a collection of disconnected dashboards, AEGIS models it as a living defensive system:
+
+**sense → detect → investigate → identify → assess → respond → verify → recover → learn**
+
+The human immune system provides the conceptual architecture.
+
+It does not provide literal biological computation.
+
+The biological analogy is therefore an **architectural metaphor and design framework**, not a claim that AEGIS reproduces human immunology.
+
+---
+
+# 02. THE CENTRAL DESIGN THESIS
+
+Traditional monitoring systems frequently behave like passive observation surfaces.
+
+They tell users:
+
+> "Something changed."
+
+AEGIS is intended to answer the next questions:
+
+> What changed?
+
+> Where did it change?
+
+> How confident are we?
+
+> Is the signal meaningful?
+
+> What evidence supports that interpretation?
+
+> What could explain it?
+
+> What should the responsible team investigate?
+
+> What response options are available?
+
+> Who authorized the response?
+
+> Did the response work?
+
+> What did the organization learn?
+
+This creates a fundamental architecture:
+
+```text
+OBSERVE
+   ↓
+DETECT
+   ↓
+CORRELATE
+   ↓
+INVESTIGATE
+   ↓
+IDENTIFY
+   ↓
+ASSESS
+   ↓
+RECOMMEND
+   ↓
+AUTHORIZE
+   ↓
+RESPOND
+   ↓
+VERIFY
+   ↓
+RECOVER
+   ↓
+LEARN
+   ↓
+REMEMBER
+```
+
+AEGIS therefore should not be designed as:
+
+```text
+DATA → DASHBOARD
+```
+
+It should be designed as:
+
+```text
+DATA → EVIDENCE → DECISION → ACTION → OUTCOME → MEMORY
+```
+
+That is the core architecture.
+
+---
+
+# 03. WHY THE IMMUNE SYSTEM IS THE ARCHITECTURAL ANALOG
+
+The immune system is useful as a design model because it demonstrates several properties that conventional monitoring systems often lack:
+
+- distributed sensing
+- continuous surveillance
+- baseline awareness
+- anomaly detection
+- contextual interpretation
+- threat discrimination
+- graduated response
+- coordination
+- feedback
+- adaptation
+- memory
+- resilience after disruption
+
+The important design lesson is not:
+
+> "Make the dashboard look biological."
+
+The lesson is:
+
+> "Design the system so that information behaves like a coordinated defensive response."
+
+This distinction is fundamental.
+
+AEGIS should therefore avoid decorative DNA graphics, generic biotechnology imagery, excessive particle effects, or "sci-fi biology" aesthetics that do not improve comprehension.
+
+The biological model belongs primarily in the **system logic, information architecture, state model, and interaction model**.
+
+---
+
+# 04. AEGIS BIO-RESILIENCE MODEL
+
+The AEGIS architecture consists of four primary biological layers.
+
+## Layer 1 — Innate
+
+### Detection
+
+Equivalent biological concept:
+
+**Skin / mucosa / innate sensing**
+
+AEGIS equivalent:
+
+**Environmental and patient signal detection**
+
+Purpose:
+
+Identify deviations from expected conditions as early as possible.
+
+Inputs may include, where legitimately available and authorized:
+
+- environmental measurements
+- patient observations
+- clinical signals
+- laboratory results
+- infection-prevention observations
+- facility conditions
+- surveillance indicators
+- device-generated observations
+- epidemiological signals
+- manually reported events
+- external intelligence feeds
+
+The system does not automatically assume that an anomaly is an outbreak.
+
+It creates a **signal requiring interpretation**.
+
+---
+
+# 05. LAYER 1 — DETECTION ARCHITECTURE
+
+## 5.1 Detection Principle
+
+Detection must answer:
+
+> "Is the current observation sufficiently different from the expected baseline to warrant attention?"
+
+The detection engine therefore requires a baseline.
+
+Conceptually:
+
+```text
+EXPECTED STATE
+      +
+CURRENT OBSERVATION
+      ↓
+DEVIATION ANALYSIS
+      ↓
+SIGNAL
+      ↓
+CONTEXT
+      ↓
+ALERT / WATCH / INFORMATION
+```
+
+The baseline must not be treated as universally static.
+
+A hospital changes over time.
+
+A ward changes.
+
+Seasonality changes.
+
+Patient populations change.
+
+Equipment changes.
+
+Workflows change.
+
+Therefore:
+
+```text
+Baseline = Context + Time + Location + Population + Historical Pattern
+```
+
+The architecture should support baseline versioning and provenance.
+
+---
+
+# 06. SENSOR / OBSERVATION MODEL
+
+AEGIS should treat incoming measurements as **observations**, not unquestionable truth.
+
+This aligns conceptually with healthcare interoperability models such as HL7 FHIR, where Observation represents measurements or assertions about a subject and includes metadata surrounding the observation. citeturn0search2turn0search9
+
+A conceptual AEGIS observation contains:
+
+```text
+Observation
+├── observation_id
+├── source_id
+├── source_type
+├── subject_id
+├── location_id
+├── timestamp
+├── metric
+├── value
+├── unit
+├── quality
+├── provenance
+├── status
+├── confidence
+└── contextual_metadata
+```
+
+Example:
+
+```text
+Observation
+ID: OBS-000184
+Source: ENV-SENSOR-17
+Location: ICU-03
+Metric: environmental_measurement
+Timestamp: 14:03:17
+Value: [measurement]
+Quality: verified
+Status: active
+Confidence: high
+```
+
+The exact medical/environmental metrics are **domain-configurable**.
+
+AEGIS architecture should not hard-code one hospital's sensor ecosystem.
+
+---
+
+# 07. SENSOR TRUST
+
+A dangerous dashboard is one that treats every incoming number as equally trustworthy.
+
+AEGIS therefore needs a **signal-quality layer**.
+
+Every observation should have enough metadata to answer:
+
+- Where did it come from?
+- When was it collected?
+- Is the source operational?
+- Is the measurement complete?
+- Has the source recently failed?
+- Is the observation delayed?
+- Is the value anomalous?
+- Is there corroborating evidence?
+- Has the observation been manually validated?
+- What confidence should the operator assign to it?
+
+This creates:
+
+```text
+SIGNAL VALUE
+     +
+SIGNAL QUALITY
+     +
+SOURCE TRUST
+     +
+CONTEXT
+     ↓
+USABLE EVIDENCE
+```
+
+A missing sensor should not silently become "normal."
+
+That is a critical resilience requirement.
+
+---
+
+# 08. DETECTION STATES
+
+AEGIS should distinguish between:
+
+### NORMAL
+
+No meaningful deviation detected.
+
+### WATCH
+
+Weak or emerging deviation.
+
+### ANOMALY
+
+A meaningful deviation from expected conditions.
+
+### INVESTIGATE
+
+Evidence warrants human investigation.
+
+### ESCALATED
+
+Evidence or contextual factors justify elevated operational attention.
+
+### RESOLVED
+
+The signal has been sufficiently explained or the event has ended.
+
+These are **system states**, not necessarily disease classifications.
+
+That distinction prevents the interface from turning statistical anomalies into false diagnoses.
+
+---
+
+# 09. LAYER 2 — ADAPTIVE
+
+# IDENTIFICATION
+
+Equivalent biological concept:
+
+**Adaptive immune recognition**
+
+AEGIS equivalent:
+
+**Evidence-based threat identification and characterization**
+
+The Adaptive Layer answers:
+
+> "What could this signal represent?"
+
+It does not simply ask:
+
+> "Is this dangerous?"
+
+The architecture must separate:
+
+1. Observation
+2. Interpretation
+3. Classification
+4. Risk assessment
+
+These are not the same thing.
+
+---
+
+# 10. THE IDENTIFICATION PIPELINE
+
+```text
+DETECTED SIGNAL
+      ↓
+EVIDENCE COLLECTION
+      ↓
+EVIDENCE NORMALIZATION
+      ↓
+CORRELATION
+      ↓
+REFERENCE COMPARISON
+      ↓
+CANDIDATE INTERPRETATIONS
+      ↓
+CONFIDENCE ASSESSMENT
+      ↓
+HUMAN REVIEW
+      ↓
+THREAT CHARACTERIZATION
+```
+
+AEGIS should never imply certainty where the evidence does not support certainty.
+
+The interface should make uncertainty visible.
+
+---
+
+# 11. ROUTINE VS HIGH-THREAT DISCRIMINATION
+
+The system should not use a simplistic rule such as:
+
+```text
+unusual = dangerous
+```
+
+Instead:
+
+```text
+ANOMALY
+  ↓
+CONTEXT
+  ↓
+EVIDENCE
+  ↓
+CORROBORATION
+  ↓
+EXPOSURE / IMPACT CONTEXT
+  ↓
+TEMPORAL PATTERN
+  ↓
+SPATIAL PATTERN
+  ↓
+REFERENCE KNOWLEDGE
+  ↓
+RISK ASSESSMENT
+```
+
+Routine biological variation may produce anomalies.
+
+Environmental changes may produce anomalies.
+
+Sensor failures may produce anomalies.
+
+Clinical workflow changes may produce anomalies.
+
+Seasonal patterns may produce anomalies.
+
+Therefore AEGIS must preserve a distinction between:
+
+**signal → event → threat**
+
+A signal is not automatically an event.
+
+An event is not automatically an outbreak.
+
+An outbreak signal is not automatically a confirmed pathogen.
+
+---
+
+# 12. EVIDENCE MODEL
+
+Every important assessment should be explainable through an evidence chain.
+
+Conceptually:
+
+```text
+THREAT ASSESSMENT
+│
+├── Supporting Evidence
+│
+├── Contradicting Evidence
+│
+├── Missing Evidence
+│
+├── Source Quality
+│
+├── Confidence
+│
+├── Time Context
+│
+├── Location Context
+│
+└── Human Assessment
+```
+
+The interface should never simply display:
+
+> HIGH THREAT
+
+without answering:
+
+> Why?
+
+The user should be able to inspect the evidence supporting the assessment.
+
+---
+
+# 13. CONFIDENCE IS NOT RISK
+
+AEGIS must distinguish:
+
+**Confidence**
+
+from
+
+**Risk**
+
+These are different dimensions.
+
+For example:
+
+```text
+High confidence + low risk
+```
+
+may represent a well-understood benign anomaly.
+
+While:
+
+```text
+Low confidence + potentially high consequence
+```
+
+may justify investigation.
+
+Therefore the architecture should not collapse everything into one number.
+
+Conceptually:
+
+```text
+CONFIDENCE
+“How sure are we about the interpretation?”
+
+RISK
+“What is the potential significance if the interpretation is correct?”
+```
+
+---
+
+# 14. THREAT ASSESSMENT MODEL
+
+The assessment layer combines:
+
+```text
+Evidence
++
+Context
++
+Confidence
++
+Potential impact
++
+Extent
++
+Trajectory
++
+Uncertainty
+```
+
+Output:
+
+```text
+Operational Assessment
+```
+
+Not:
+
+```text
+Medical Diagnosis
+```
+
+The distinction should exist in both the backend model and UI language.
+
+---
+
+# 15. THREAT INTELLIGENCE
+
+The Threat Intelligence architecture should allow authorized users to move from:
+
+```text
+WHAT HAPPENED?
+```
+
+to:
+
+```text
+WHAT DO WE KNOW?
+```
+
+to:
+
+```text
+WHAT DO WE NOT KNOW?
+```
+
+to:
+
+```text
+WHAT DOES THE EVIDENCE SUGGEST?
+```
+
+to:
+
+```text
+WHAT SHOULD BE INVESTIGATED NEXT?
+```
+
+This is where external information may become useful.
+
+AEGIS should be capable of integrating multiple sources rather than creating an isolated intelligence silo.
+
+WHO's epidemic intelligence work explicitly emphasizes combining event-based and indicator-based information for early detection, verification, and assessment. citeturn0search10turn0search19
+
+---
+
+# 16. LAYER 3 — EFFECTOR
+
+# RESPONSE / NEUTRALIZATION
+
+Equivalent biological concept:
+
+**Antibodies / effector mechanisms**
+
+AEGIS equivalent:
+
+**Coordinated response workflows**
+
+This is where the architecture changes from:
+
+```text
+understanding the event
+```
+
+to:
+
+```text
+managing the response
+```
+
+But this layer must be human-governed.
+
+The correct architecture is:
+
+```text
+ASSESSMENT
+    ↓
+RESPONSE OPTIONS
+    ↓
+RATIONALE
+    ↓
+AUTHORIZATION
+    ↓
+EXECUTION
+    ↓
+VERIFICATION
+```
+
+Not:
+
+```text
+ASSESSMENT
+    ↓
+AUTOMATIC INTERVENTION
+```
+
+---
+
+# 17. RESPONSE MODEL
+
+A response should be represented as a structured operational object.
+
+Conceptually:
+
+```text
+Response
+├── response_id
+├── linked_event
+├── objective
+├── recommended_actions
+├── responsible_team
+├── authorization_status
+├── execution_status
+├── start_time
+├── verification_status
+├── exceptions
+├── completion_time
+└── outcome
+```
+
+This enables the system to understand not only what was recommended but what actually happened.
+
+---
+
+# 18. RESPONSE ACTIONS
+
+AEGIS may represent authorized response workflows at an abstract operational level, including examples such as:
+
+- isolation workflow
+- escalation workflow
+- environmental-control workflow
+- infection-prevention workflow
+- clinical coordination workflow
+- laboratory coordination workflow
+- communications workflow
+- emergency-management workflow
+
+The system should not assume that a response can be automatically executed.
+
+Some actions may be:
+
+```text
+INFORMATION ONLY
+```
+
+Some:
+
+```text
+RECOMMENDATION
+```
+
+Some:
+
+```text
+REQUIRES AUTHORIZATION
+```
+
+Some:
+
+```text
+EXECUTED EXTERNALLY
+```
+
+Some:
+
+```text
+VERIFIED
+```
+
+This distinction is essential.
+
+---
+
+# 19. RESPONSE STATE MACHINE
+
+```text
+PROPOSED
+   ↓
+REVIEWING
+   ↓
+APPROVED
+   ↓
+IN EXECUTION
+   ↓
+PARTIALLY COMPLETED
+   ↓
+COMPLETED
+   ↓
+VERIFIED
+```
+
+Possible exception states:
+
+```text
+REJECTED
+CANCELLED
+BLOCKED
+FAILED
+EXPIRED
+SUPERSEDED
+```
+
+Every state transition should be auditable.
+
+---
+
+# 20. RESPONSE VERIFICATION
+
+A response is not successful because someone clicked:
+
+> EXECUTE
+
+AEGIS must distinguish:
+
+```text
+ACTION REQUESTED
+```
+
+from:
+
+```text
+ACTION EXECUTED
+```
+
+from:
+
+```text
+ACTION VERIFIED
+```
+
+This is one of the most important architectural principles in the system.
+
+---
+
+# 21. BIOLOGICAL FEEDBACK LOOP
+
+# LAYER 4 — IMMUNE MEMORY
+
+Equivalent biological concept:
+
+**Memory B-cell**
+
+AEGIS equivalent:
+
+**Institutional memory**
+
+This is the feature that transforms AEGIS from a monitoring dashboard into a resilience system.
+
+The system should not simply close incidents.
+
+It should learn from them at the organizational level.
+
+---
+
+# 22. THE EVENT MEMORY LOOP
+
+```text
+EVENT
+ ↓
+DETECTION
+ ↓
+ASSESSMENT
+ ↓
+RESPONSE
+ ↓
+OUTCOME
+ ↓
+POST-EVENT REVIEW
+ ↓
+LESSONS
+ ↓
+SYSTEM MEMORY
+ ↓
+FUTURE BASELINE / KNOWLEDGE
+```
+
+This creates:
+
+```text
+EXPERIENCE → MEMORY → BETTER PREPAREDNESS
+```
+
+---
+
+# 23. WHAT "LEARNING" MEANS IN AEGIS
+
+The word "learning" must be controlled carefully.
+
+It does not necessarily mean:
+
+> "AI retrains itself automatically."
+
+Instead, institutional learning may include:
+
+- event summaries
+- confirmed outcomes
+- response effectiveness
+- false-positive patterns
+- false-negative investigations
+- recurring environmental patterns
+- workflow bottlenecks
+- response delays
+- resource constraints
+- lessons learned
+- policy updates
+- protocol revisions
+- baseline revisions
+- preparedness recommendations
+
+This makes the system resilient without pretending that every event should automatically modify an algorithm.
+
+---
+
+# 24. MEMORY OBJECT
+
+Conceptually:
+
+```text
+InstitutionalMemory
+├── memory_id
+├── source_event
+├── observation_summary
+├── assessment_summary
+├── response_summary
+├── outcome
+├── lessons
+├── confirmed_facts
+├── unresolved_questions
+├── recommendations
+├── affected_context
+├── author
+├── reviewer
+├── review_status
+├── created_at
+└── updated_at
+```
+
+This creates an auditable knowledge trail.
+
+---
+
+# 25. AEGIS CORE OPERATIONAL LOOP
+
+The complete biological architecture becomes:
+
+```text
+                 ┌───────────────────────┐
+                 │      ENVIRONMENT      │
+                 │     + PATIENTS        │
+                 │     + NETWORKS        │
+                 └───────────┬───────────┘
+                             ↓
+                    ┌────────────────┐
+                    │ INNATE LAYER   │
+                    │    DETECTION   │
+                    └───────┬────────┘
+                            ↓
+                    ┌────────────────┐
+                    │ EVIDENCE       │
+                    │ CORRELATION    │
+                    └───────┬────────┘
+                            ↓
+                    ┌────────────────┐
+                    │ ADAPTIVE LAYER │
+                    │ IDENTIFICATION │
+                    └───────┬────────┘
+                            ↓
+                    ┌────────────────┐
+                    │ THREAT         │
+                    │ ASSESSMENT     │
+                    └───────┬────────┘
+                            ↓
+                    ┌────────────────┐
+                    │ HUMAN REVIEW   │
+                    │ + AUTHORIZATION│
+                    └───────┬────────┘
+                            ↓
+                    ┌────────────────┐
+                    │ EFFECTOR LAYER │
+                    │ RESPONSE       │
+                    └───────┬────────┘
+                            ↓
+                    ┌────────────────┐
+                    │ VERIFICATION   │
+                    └───────┬────────┘
+                            ↓
+                    ┌────────────────┐
+                    │ RECOVERY       │
+                    └───────┬────────┘
+                            ↓
+                    ┌────────────────┐
+                    │ MEMORY         │
+                    │ FEEDBACK       │
+                    └───────┬────────┘
+                            │
+                            └──────────────→ FUTURE BASELINE
+```
+
+That is the central AEGIS loop.
+
+---
+
+# 26. PRODUCT ARCHITECTURE
+
+AEGIS should be understood as a product ecosystem rather than one dashboard page.
+
+The product has six conceptual capabilities.
+
+## Capability A — Sensing
+
+Answers:
+
+> What is happening?
+
+## Capability B — Intelligence
+
+Answers:
+
+> What could it mean?
+
+## Capability C — Assessment
+
+Answers:
+
+> How significant is it?
+
+## Capability D — Response
+
+Answers:
+
+> What should the organization do?
+
+## Capability E — Verification
+
+Answers:
+
+> Did the response work?
+
+## Capability F — Memory
+
+Answers:
+
+> What should the organization remember?
+
+Therefore:
+
+```text
+AEGIS
+│
+├── SENSE
+├── UNDERSTAND
+├── ASSESS
+├── RESPOND
+├── VERIFY
+└── REMEMBER
+```
+
+These six capabilities should drive product architecture.
+
+They should not be interpreted as six invented screens.
+
+---
+
+# 27. USER / STAKEHOLDER ARCHITECTURE
+
+AEGIS has multiple classes of users.
+
+## 27.1 Health Worker
+
+Primary concern:
+
+> "Is something affecting my operational environment or patients?"
+
+Needs:
+
+- clear alerts
+- relevant context
+- minimal cognitive overload
+- actionable information
+- escalation pathways
+
+---
+
+## 27.2 Infection Prevention / Control Team
+
+Primary concern:
+
+> "Is this signal consistent with a potential infection-control problem?"
+
+Needs:
+
+- spatial patterns
+- temporal patterns
+- evidence
+- clusters
+- response status
+- intervention tracking
+
+---
+
+## 27.3 Clinical Leadership
+
+Primary concern:
+
+> "What is the operational significance?"
+
+Needs:
+
+- high-level status
+- affected areas
+- confidence
+- operational impact
+- resource implications
+- decision history
+
+---
+
+## 27.4 Public Health / Pandemic Preparedness Team
+
+Primary concern:
+
+> "Does this event have implications beyond the immediate facility?"
+
+Needs:
+
+- trend
+- geographic context
+- cross-facility signals
+- external intelligence
+- event escalation
+- reporting context
+
+---
+
+## 27.5 Biosecurity Expert
+
+Primary concern:
+
+> "Could this represent a meaningful biological security or health-security concern?"
+
+Needs:
+
+- provenance
+- evidence chain
+- uncertainty
+- threat characterization
+- anomalous patterns
+- audit history
+
+---
+
+## 27.6 Emergency Operations / Incident Leadership
+
+Primary concern:
+
+> "What is happening, who is responsible, and what is the response status?"
+
+Needs:
+
+- event state
+- response state
+- ownership
+- dependencies
+- escalation
+- timeline
+- verification
+
+---
+
+## 27.7 Global Health Stakeholder
+
+Primary concern:
+
+> "Can this information be understood consistently across organizations and jurisdictions?"
+
+Needs:
+
+- standardized terminology
+- provenance
+- interoperability
+- confidence
+- geographic context
+- temporal context
+- data lineage
+
+---
+
+# 28. HUMAN-IN-THE-LOOP ARCHITECTURE
+
+Human judgment is not an exception inside AEGIS.
+
+It is part of the architecture.
+
+```text
+SYSTEM DETECTS
+      ↓
+SYSTEM EXPLAINS
+      ↓
+HUMAN REVIEWS
+      ↓
+HUMAN DECIDES
+      ↓
+SYSTEM RECORDS
+      ↓
+SYSTEM MONITORS
+      ↓
+HUMAN REVIEWS OUTCOME
+```
+
+This makes AEGIS accountable.
+
+The interface must clearly distinguish:
+
+- system-generated
+- source-generated
+- imported
+- analyst-entered
+- human-verified
+- inferred
+- uncertain
+- historical
+- simulated
+
+No important piece of information should appear to have more authority than its provenance warrants.
+
+---
+
+# 29. INFORMATION HIERARCHY
+
+AEGIS should prioritize information according to operational consequence.
+
+## Level 1 — Immediate Situation
+
+What requires attention now?
+
+## Level 2 — Location
+
+Where is it happening?
+
+## Level 3 — Evidence
+
+Why are we seeing it?
+
+## Level 4 — Assessment
+
+What might it mean?
+
+## Level 5 — Response
+
+What is being done?
+
+## Level 6 — Outcome
+
+Is it improving?
+
+## Level 7 — Memory
+
+What was learned?
+
+This creates a hierarchy:
+
+```text
+NOW
+↓
+WHERE
+↓
+WHY
+↓
+WHAT IT MEANS
+↓
+WHAT WE ARE DOING
+↓
+DID IT WORK
+↓
+WHAT WE LEARNED
+```
+
+---
+
+# 30. GLOBAL STATE ARCHITECTURE
+
+AEGIS should maintain a coherent system state.
+
+The most important global entities are:
+
+```text
+SystemState
+├── EnvironmentState
+├── SurveillanceState
+├── EventState
+├── ThreatState
+├── ResponseState
+├── VerificationState
+├── MemoryState
+├── UserState
+├── PermissionState
+└── ConnectivityState
+```
+
+---
+
+# 31. EVENT STATE
+
+An event may move through:
+
+```text
+DETECTED
+↓
+OPEN
+↓
+INVESTIGATING
+↓
+CHARACTERIZING
+↓
+ASSESSED
+↓
+RESPONDING
+↓
+MONITORING
+↓
+RESOLVING
+↓
+CLOSED
+↓
+MEMORIALIZED
+```
+
+Not every event must pass through every state.
+
+The architecture should support valid branching.
+
+---
+
+# 32. CONNECTIVITY STATE
+
+Because resilience systems cannot assume perfect connectivity, AEGIS must explicitly represent:
+
+```text
+ONLINE
+DEGRADED
+DELAYED
+PARTIAL DATA
+OFFLINE
+RECOVERING
+```
+
+A disconnected system should never display stale information as if it were live.
+
+For example:
+
+```text
+LIVE
+```
+
+must mean something different from:
+
+```text
+LAST RECEIVED 17 MINUTES AGO
+```
+
+This is not cosmetic.
+
+It is operational truth.
+
+---
+
+# 33. DATA ARCHITECTURE
+
+AEGIS data should be organized around the operational lifecycle.
+
+Core conceptual entities:
+
+```text
+Organization
+Facility
+Location
+User
+Role
+Device
+Observation
+Signal
+Event
+Evidence
+Assessment
+Threat
+Response
+Action
+Verification
+IncidentTimeline
+InstitutionalMemory
+AuditRecord
+```
+
+Relationships:
+
+```text
+Device
+   ↓
+Observation
+   ↓
+Signal
+   ↓
+Event
+   ↓
+Evidence
+   ↓
+Assessment
+   ↓
+Response
+   ↓
+Action
+   ↓
+Verification
+   ↓
+Memory
+```
+
+---
+
+# 34. DATA PROVENANCE
+
+Every critical data object should be traceable.
+
+The system must be able to answer:
+
+> Where did this come from?
+
+> When did it arrive?
+
+> Who entered it?
+
+> Was it transformed?
+
+> Was it verified?
+
+> What decision used it?
+
+Conceptually:
+
+```text
+SOURCE
+ ↓
+RAW DATA
+ ↓
+NORMALIZATION
+ ↓
+CORRELATION
+ ↓
+INTERPRETATION
+ ↓
+DECISION
+```
+
+The chain should be preserved.
+
+---
+
+# 35. EVENT ARCHITECTURE
+
+AEGIS should use an event-driven conceptual architecture.
+
+Examples:
+
+```text
+ObservationReceived
+SignalDetected
+AnomalyEscalated
+EvidenceAdded
+AssessmentUpdated
+ThreatAssessmentChanged
+ResponseProposed
+ResponseApproved
+ResponseRejected
+ResponseStarted
+ResponseCompleted
+ResponseVerified
+EventResolved
+MemoryCreated
+MemoryReviewed
+```
+
+These are architectural event names.
+
+They are not yet implementation-specific API contracts.
+
+---
+
+# 36. CROSS-SYSTEM EVENT FLOW
+
+The canonical AEGIS operational journey is:
+
+```text
+ENVIRONMENT / PATIENT SIGNAL
+            ↓
+     OBSERVATION RECEIVED
+            ↓
+      ANOMALY DETECTED
+            ↓
+       EVENT CREATED
+            ↓
+     EVIDENCE ASSEMBLED
+            ↓
+     THREAT CHARACTERIZED
+            ↓
+     RISK ASSESSED
+            ↓
+    RESPONSE RECOMMENDED
+            ↓
+      HUMAN AUTHORIZATION
+            ↓
+      RESPONSE EXECUTED
+            ↓
+      RESPONSE MONITORED
+            ↓
+      OUTCOME VERIFIED
+            ↓
+        EVENT RESOLVED
+            ↓
+      POST-EVENT REVIEW
+            ↓
+   INSTITUTIONAL MEMORY
+            ↓
+     FUTURE RESILIENCE
+```
+
+This is the canonical AEGIS journey.
+
+---
+
+# 37. SYSTEM ARCHITECTURE
+
+At the technical level:
+
+```text
+┌─────────────────────────────────────────────┐
+│                  AEGIS UI                   │
+│                                             │
+│ Situational Awareness                       │
+│ Intelligence                                │
+│ Event Investigation                         │
+│ Response Coordination                       │
+│ Verification                                │
+│ Institutional Memory                        │
+└──────────────────────┬──────────────────────┘
+                       │
+                       ↓
+┌─────────────────────────────────────────────┐
+│              APPLICATION LAYER              │
+│                                             │
+│ Event Management                            │
+│ Evidence Management                         │
+│ Assessment                                  │
+│ Response Workflow                           │
+│ Timeline                                    │
+│ Memory                                      │
+│ Permissions                                 │
+└──────────────────────┬──────────────────────┘
+                       │
+                       ↓
+┌─────────────────────────────────────────────┐
+│               DOMAIN SERVICES               │
+│                                             │
+│ Detection                                   │
+│ Correlation                                 │
+│ Intelligence                                │
+│ Risk Assessment                             │
+│ Response Orchestration                      │
+│ Verification                                │
+│ Learning / Memory                           │
+└──────────────────────┬──────────────────────┘
+                       │
+                       ↓
+┌─────────────────────────────────────────────┐
+│              DATA / EVENT LAYER             │
+│                                             │
+│ Observations                               │
+│ Events                                     │
+│ Evidence                                   │
+│ Assessments                                │
+│ Responses                                  │
+│ Audit                                      │
+│ Institutional Memory                        │
+└──────────────────────┬──────────────────────┘
+                       │
+                       ↓
+┌─────────────────────────────────────────────┐
+│             EXTERNAL SOURCES                │
+│                                             │
+│ Healthcare systems                          │
+│ Laboratory systems                          │
+│ Environmental systems                       │
+│ Authorized devices                          │
+│ Public-health sources                       │
+│ External intelligence                       │
+└─────────────────────────────────────────────┘
+```
+
+---
+
+# 38. FRONTEND ARCHITECTURE
+
+The frontend should not contain domain truth.
+
+It should render domain state.
+
+Conceptually:
+
+```text
+UI
+ ↓
+Application State
+ ↓
+Domain State
+ ↓
+API / Event Layer
+```
+
+The frontend should therefore avoid:
+
+- duplicated business logic
+- arbitrary page-local state
+- hard-coded threat conclusions
+- fake system status presented as real
+- independent versions of the same event
+- hidden state transitions
+
+---
+
+# 39. FRONTEND STATE CATEGORIES
+
+Separate:
+
+### UI State
+
+Examples:
+
+- selected facility
+- selected event
+- open panel
+- active filter
+- map position
+
+### Domain State
+
+Examples:
+
+- event status
+- assessment
+- response status
+- evidence
+- verification
+
+### Session State
+
+Examples:
+
+- authenticated user
+- permissions
+- session status
+
+### System State
+
+Examples:
+
+- data freshness
+- connectivity
+- ingestion health
+
+This prevents the interface from becoming an accidental database.
+
+---
+
+# 40. BACKEND ARCHITECTURE
+
+The backend should own:
+
+- event lifecycle
+- validation
+- authorization
+- state transitions
+- audit records
+- evidence relationships
+- response records
+- provenance
+- persistence
+- integration boundaries
+
+The frontend may request:
+
+```text
+"Show me the current event."
+```
+
+But the backend remains responsible for determining:
+
+```text
+"What is the authoritative state of this event?"
+```
+
+---
+
+# 41. API DESIGN PRINCIPLE
+
+API contracts should reflect domain concepts.
+
+Bad:
+
+```text
+/getDashboardData
+```
+
+Better conceptual boundaries:
+
+```text
+/events
+/events/{id}
+/events/{id}/evidence
+/events/{id}/assessment
+/events/{id}/responses
+/events/{id}/timeline
+/events/{id}/memory
+```
+
+The exact API implementation should be established later in the engineering specification.
+
+---
+
+# 42. AUDIT ARCHITECTURE
+
+AEGIS is a high-consequence decision-support environment.
+
+Therefore important actions must be auditable.
+
+Audit events should capture:
+
+```text
+WHO
+WHAT
+WHEN
+WHY
+FROM STATE
+TO STATE
+SOURCE
+AUTHORIZATION
+RESULT
+```
+
+Examples:
+
+```text
+User reviewed event
+User changed assessment
+User approved response
+User rejected response
+User added evidence
+User closed event
+System received observation
+System detected anomaly
+System generated recommendation
+```
+
+---
+
+# 43. EXPLAINABILITY ARCHITECTURE
+
+Every consequential system recommendation should have an explanation path.
+
+Conceptually:
+
+```text
+RECOMMENDATION
+     ↓
+RATIONALE
+     ↓
+SUPPORTING EVIDENCE
+     ↓
+CONFIDENCE
+     ↓
+KNOWN LIMITATIONS
+     ↓
+HUMAN DECISION
+```
+
+The goal is not to expose hidden algorithmic internals to every user.
+
+The goal is to provide enough context for a qualified operator to understand:
+
+> "Why is AEGIS showing me this?"
+
+---
+
+# 44. FAILURE ARCHITECTURE
+
+A resilient system is defined partly by what happens when things go wrong.
+
+AEGIS must explicitly model:
+
+### Missing data
+
+Do not silently substitute "normal."
+
+### Stale data
+
+Show freshness.
+
+### Conflicting data
+
+Expose the conflict.
+
+### Sensor failure
+
+Show source degradation.
+
+### Integration failure
+
+Show affected data streams.
+
+### Algorithmic uncertainty
+
+Show uncertainty.
+
+### Human disagreement
+
+Preserve competing assessments where appropriate.
+
+### Response failure
+
+Record the failed action and current state.
+
+### Connectivity loss
+
+Enter a degraded state.
+
+---
+
+# 45. THE GOLDEN RULE OF AEGIS DATA
+
+> **Absence of evidence must never be silently represented as evidence of absence.**
+
+If AEGIS has not received information:
+
+```text
+UNKNOWN
+```
+
+is often more correct than:
+
+```text
+NORMAL
+```
+
+This principle should be reflected in:
+
+- database models
+- API responses
+- frontend components
+- alert states
+- analytics
+- QA
+- acceptance tests
+
+---
+
+# 46. SPATIAL ARCHITECTURE
+
+The previous AEGIS concept included a "Living Map."
+
+That concept is retained as a **candidate architectural visualization pattern**, not as permission to invent an implementation.
+
+The map's architectural purpose is:
+
+```text
+WHERE?
+```
+
+not:
+
+```text
+DECORATION
+```
+
+It should support spatial understanding of:
+
+- facilities
+- zones
+- affected areas
+- signal distribution
+- event progression
+- response status
+- environmental context
+
+If a 3D representation is used, it must improve spatial comprehension.
+
+A 3D map that makes the system harder to operate is a design failure.
+
+---
+
+# 47. TEMPORAL ARCHITECTURE
+
+Biological events evolve over time.
+
+AEGIS therefore needs time as a first-class dimension.
+
+Users should be able to understand:
+
+```text
+WHEN DID IT START?
+WHEN WAS IT DETECTED?
+WHEN WAS IT VERIFIED?
+WHEN DID THE ASSESSMENT CHANGE?
+WHEN WAS THE RESPONSE AUTHORIZED?
+WHEN DID RESPONSE BEGIN?
+WHEN DID CONDITIONS CHANGE?
+WHEN WAS IT RESOLVED?
+```
+
+The event timeline becomes an important system object.
+
+---
+
+# 48. EVENT TIMELINE
+
+Conceptually:
+
+```text
+T0  Observation
+ ↓
+T1  Signal detected
+ ↓
+T2  Event created
+ ↓
+T3  Investigation started
+ ↓
+T4  Evidence added
+ ↓
+T5  Assessment updated
+ ↓
+T6  Response authorized
+ ↓
+T7  Response started
+ ↓
+T8  Outcome measured
+ ↓
+T9  Event resolved
+ ↓
+T10 Post-event review
+```
+
+This timeline should be reconstructable from system events rather than manually fabricated by the UI.
+
+---
+
+# 49. SECURITY ARCHITECTURE
+
+AEGIS should assume that different users have different authority.
+
+Conceptually:
+
+```text
+IDENTITY
+ ↓
+AUTHENTICATION
+ ↓
+ROLE
+ ↓
+PERMISSION
+ ↓
+DATA SCOPE
+ ↓
+ACTION AUTHORITY
+```
+
+Examples of permission classes:
+
+```text
+VIEW
+INVESTIGATE
+ANNOTATE
+ASSESS
+RECOMMEND
+APPROVE
+EXECUTE
+VERIFY
+ADMINISTER
+```
+
+These are architectural concepts, not final role names.
+
+---
+
+# 50. LEAST PRIVILEGE
+
+A user should receive only the information and action authority required for their role.
+
+This matters especially when AEGIS integrates:
+
+- patient information
+- laboratory information
+- environmental information
+- organizational information
+- security-sensitive information
+
+The architecture must therefore support data minimization and access boundaries.
+
+---
+
+# 51. INTEROPERABILITY
+
+AEGIS should not become another isolated health-data silo.
+
+Healthcare interoperability standards should be considered at the integration boundary.
+
+HL7 FHIR provides established models for resources such as Observation and Device that can inform how AEGIS represents healthcare observations and device provenance. citeturn0search2turn0search6
+
+This does **not** mean:
+
+> "AEGIS must implement all of FHIR."
+
+It means:
+
+> "AEGIS should be architected so that standards-based integration is possible rather than designing proprietary data structures that make future interoperability unnecessarily difficult."
+
+The same principle applies to public-health surveillance.
+
+CDC's current modernization work emphasizes integrated data platforms and standards-based exchange to support faster detection and response. citeturn0search0turn0search17
+
+---
+
+# 52. MULTISOURCE SURVEILLANCE
+
+AEGIS should be architecturally capable of combining multiple signal classes.
+
+Conceptually:
+
+```text
+PATIENT SIGNALS
+       +
+ENVIRONMENT
+       +
+LABORATORY
+       +
+FACILITY
+       +
+PUBLIC HEALTH
+       +
+EXTERNAL INTELLIGENCE
+       ↓
+MULTISOURCE EVIDENCE
+       ↓
+ASSESSMENT
+```
+
+This is consistent with modern public-health thinking around multisource collaborative surveillance, where the objective is to synthesize information from multiple sources around concrete decision questions. citeturn0search12
+
+---
+
+# 53. AEGIS AS A DECISION SYSTEM
+
+The architecture should be designed backward from decisions.
+
+For every important AEGIS capability, ask:
+
+```text
+WHAT DECISION MUST THE USER MAKE?
+        ↓
+WHAT INFORMATION IS REQUIRED?
+        ↓
+WHAT EVIDENCE SUPPORTS IT?
+        ↓
+WHAT ACTION FOLLOWS?
+        ↓
+HOW IS THE OUTCOME VERIFIED?
+```
+
+This prevents the classic dashboard mistake:
+
+> collecting lots of data because it is available rather than because someone needs it to make a decision.
+
+---
+
+# 54. THE DECISION MATRIX
+
+Every future AEGIS feature should pass this test:
+
+| Question | Requirement |
+|---|---|
+| What decision does this support? | Must be explicit |
+| Who makes the decision? | Must be identified |
+| What evidence is needed? | Must be identifiable |
+| What happens after the decision? | Must be traceable |
+| How is the outcome measured? | Must be defined |
+| Does the feature reduce uncertainty? | Preferably |
+| Does it reduce response time? | Preferably |
+| Does it improve resilience? | Must contribute |
+| Is it merely decorative? | Remove it |
+
+---
+
+# 55. VISUAL SYSTEM ARCHITECTURE
+
+The established visual direction remains:
+
+### Deep Obsidian
+
+Primary environmental foundation.
+
+### Surgical White
+
+Primary information and typography surface.
+
+### Antigen Amber
+
+Alert / attention / threat emphasis.
+
+The previous AEGIS visual direction of:
+
+**Minimalist + HUD + high-density telemetry + Clinical Authority**
+
+is retained.
+
+However:
+
+> HUD styling must never become visual noise.
+
+AEGIS should look like a serious operational healthcare system, not a video game.
+
+---
+
+# 56. CLINICAL AUTHORITY
+
+Clinical authority comes from:
+
+- information hierarchy
+- precision
+- restraint
+- provenance
+- confidence
+- consistency
+- clear states
+- readable typography
+- operational relevance
+- trustworthy interaction patterns
+
+It does not come from:
+
+- glowing borders everywhere
+- excessive animations
+- sci-fi grids
+- unnecessary 3D
+- dramatic red warnings
+- decorative biological imagery
+
+The visual language should communicate:
+
+> "This system can be trusted to help me understand a difficult situation."
+
+Not:
+
+> "This system looks futuristic."
+
+---
+
+# 57. MOTION PRINCIPLE
+
+Motion should communicate system change.
+
+Good uses:
+
+- new signal arrival
+- state transition
+- event progression
+- map movement
+- evidence updates
+- response status
+- data freshness
+
+Bad uses:
+
+- decorative perpetual animation
+- unnecessary particle systems
+- excessive transitions
+- animation that delays access to information
+
+Motion must answer:
+
+> "What changed?"
+
+---
+
+# 58. DENSITY PRINCIPLE
+
+AEGIS is a high-density environment.
+
+But:
+
+**high density ≠ clutter.**
+
+The design objective is:
+
+```text
+Maximum relevant information
++
+Minimum unnecessary cognitive load
+```
+
+Information should be progressively disclosed.
+
+---
+
+# 59. THE AEGIS COGNITIVE MODEL
+
+Users should not have to mentally assemble the situation from twenty unrelated widgets.
+
+AEGIS should progressively answer:
+
+```text
+WHAT?
+↓
+WHERE?
+↓
+WHEN?
+↓
+HOW CONFIDENT?
+↓
+WHY?
+↓
+WHAT DOES IT MEAN?
+↓
+WHAT IS BEING DONE?
+↓
+DID IT WORK?
+```
+
+That sequence should guide the information architecture.
+
+---
+
+# 60. PRODUCT BOUNDARIES
+
+AEGIS is:
+
+- a decision-support system
+- a surveillance interface
+- an event intelligence system
+- a response coordination interface
+- a resilience learning system
+- a bio-resilience design experiment
+- a health-security information architecture
+
+AEGIS is not, by default:
+
+- an autonomous clinical decision-maker
+- a pathogen engineering platform
+- a laboratory protocol engine
+- an autonomous medical treatment system
+- an autonomous infrastructure-control system
+- a replacement for infection-prevention professionals
+- a replacement for epidemiologists
+- a replacement for public-health authorities
+- a substitute for validated clinical systems
+
+These boundaries are part of the architecture.
+
+---
+
+# 61. SIMULATION ARCHITECTURE
+
+Because the AEGIS portfolio/project implementation may not initially have access to real healthcare infrastructure, the system should support a clearly marked simulation environment.
+
+Simulation data must be explicitly identified.
+
+For example:
+
+```text
+DATA MODE
+LIVE
+SIMULATED
+HISTORICAL
+TEST
+```
+
+The interface must never make simulated telemetry look indistinguishable from verified live operational data.
+
+---
+
+# 62. SIMULATION PURPOSE
+
+Simulation should allow AEGIS to demonstrate:
+
+```text
+Detection
+→ Investigation
+→ Assessment
+→ Response
+→ Verification
+→ Learning
+```
+
+without pretending that a portfolio prototype is operating a real hospital.
+
+This is especially important for stakeholder credibility.
+
+---
+
+# 63. ENGINEERING ENVIRONMENT
+
+The previous AEGIS engineering direction is compatible with a modern web architecture using:
+
+- Next.js
+- TypeScript
+- Tailwind CSS
+- Motion
+- Three.js where spatial visualization genuinely requires it
+
+However, technology choices remain **implementation decisions subordinate to the architecture**.
+
+The technology stack must not dictate the product model.
+
+The rule is:
+
+> Architecture first. Technology second. Screens third. Visual polish last.
+
+---
+
+# 64. COMPONENT ARCHITECTURE
+
+AEGIS components should be organized around domain concepts rather than random visual widgets.
+
+Conceptual component families:
+
+```text
+Situation
+├── Status
+├── Signal
+├── Alert
+├── Metric
+└── Freshness
+
+Intelligence
+├── Evidence
+├── Assessment
+├── Confidence
+├── Timeline
+└── Context
+
+Response
+├── Recommendation
+├── Authorization
+├── Action
+├── Progress
+└── Verification
+
+Memory
+├── Event Summary
+├── Outcome
+├── Lesson
+├── Recommendation
+└── Historical Context
+```
+
+This structure makes the design system reusable.
+
+---
+
+# 65. DESIGN SYSTEM PRINCIPLE
+
+Every major component should have defined:
+
+- purpose
+- anatomy
+- hierarchy
+- data requirements
+- states
+- interaction
+- accessibility behavior
+- loading state
+- empty state
+- error state
+- degraded state
+- permission behavior
+
+A component is not complete because it looks good in the happy path.
+
+---
+
+# 66. STATE DESIGN
+
+Every major AEGIS component should account for:
+
+```text
+DEFAULT
+LOADING
+LIVE
+STALE
+EMPTY
+ERROR
+DEGRADED
+DISABLED
+LOCKED
+PERMISSION LIMITED
+SELECTED
+ACTIVE
+RESOLVED
+```
+
+Not every component requires every state.
+
+But every state that can occur must have a deliberate representation.
+
+---
+
+# 67. ACCESSIBILITY
+
+High-stakes systems cannot rely exclusively on:
+
+- color
+- animation
+- shape
+- position
+
+to communicate meaning.
+
+For example:
+
+Amber should not be the only indication of an alert.
+
+The system should combine:
+
+```text
+Color
++
+Label
++
+Iconography
++
+Position
++
+Text
++
+State
+```
+
+This supports rapid comprehension and accessibility.
+
+---
+
+# 68. GLOBAL NAVIGATION PRINCIPLE
+
+Navigation should reflect the user's mental model of the operation.
+
+Not the internal database structure.
+
+The user should understand:
+
+```text
+Where am I?
+What am I investigating?
+What changed?
+What can I do?
+What happened previously?
+```
+
+Navigation must remain stable while contextual content changes.
+
+---
+
+# 69. AEGIS INFORMATION ARCHITECTURE
+
+At the highest level:
+
+```text
+AEGIS
+│
+├── SITUATION
+│
+├── INTELLIGENCE
+│
+├── EVENTS
+│
+├── RESPONSE
+│
+├── VERIFICATION
+│
+└── MEMORY
+```
+
+Again, these are **architectural capability domains**.
+
+They are not a replacement for the authoritative 13-screen registry.
+
+---
+
+# 70. THE CANONICAL USER JOURNEY
+
+The most important AEGIS journey is:
+
+```text
+USER ENTERS SYSTEM
+        ↓
+UNDERSTANDS CURRENT SITUATION
+        ↓
+NOTICES ANOMALY
+        ↓
+OPENS EVENT
+        ↓
+REVIEWS EVIDENCE
+        ↓
+UNDERSTANDS CONTEXT
+        ↓
+REVIEWS ASSESSMENT
+        ↓
+REVIEWS UNCERTAINTY
+        ↓
+REVIEWS RESPONSE OPTIONS
+        ↓
+AUTHORIZES / ESCALATES
+        ↓
+MONITORS RESPONSE
+        ↓
+VERIFIES OUTCOME
+        ↓
+REVIEWS EVENT
+        ↓
+CAPTURES LESSON
+```
+
+If the product cannot support this journey coherently, the architecture has failed.
+
+---
+
+# 71. CROSS-SCREEN ARCHITECTURAL CONTRACT
+
+Every future AEGIS screen must answer:
+
+### Purpose
+
+Why does this screen exist?
+
+### User
+
+Who needs it?
+
+### Decision
+
+What decision does it support?
+
+### Data
+
+What information does it consume?
+
+### State
+
+What global state does it read?
+
+### Actions
+
+What can the user change?
+
+### Events
+
+What does the screen emit?
+
+### Navigation
+
+Where can the user go next?
+
+### Dependencies
+
+What other systems does it depend upon?
+
+### Failure
+
+What happens when the data is missing?
+
+### Completion
+
+What does "done" mean?
+
+This becomes mandatory for the eventual screen specification.
+
+---
+
+# 72. NO SCREEN MAY INVENT ITS OWN TRUTH
+
+If the same event appears in multiple screens:
+
+```text
+Screen A
+Screen B
+Screen C
+```
+
+they must reference the same underlying domain entity.
+
+They must not each maintain independent versions.
+
+Example:
+
+If an event changes from:
+
+```text
+INVESTIGATING
+```
+
+to:
+
+```text
+ASSESSED
+```
+
+every relevant part of AEGIS should eventually reflect the same authoritative state.
+
+This is the cure for cross-screen inconsistency.
+
+---
+
+# 73. SYSTEM OF RECORD
+
+For each domain entity, AEGIS must eventually define a single authoritative source.
+
+Example:
+
+```text
+Event
+→ Event Service / authoritative store
+
+Assessment
+→ Assessment state
+
+Response
+→ Response state
+
+Observation
+→ Observation store
+
+Audit
+→ Immutable audit record
+```
+
+The UI is not the system of record.
+
+---
+
+# 74. PERFORMANCE ARCHITECTURE
+
+AEGIS should prioritize:
+
+1. Time to meaningful information
+2. Perceived responsiveness
+3. Stable interaction
+4. Data freshness visibility
+5. Progressive loading
+6. Graceful degradation
+
+Heavy visualizations should not block critical information.
+
+A beautiful map that takes ten seconds to load while an operator waits to understand an alert is bad engineering.
+
+---
+
+# 75. DATA FRESHNESS
+
+Every live-data view should have a freshness model.
+
+Conceptually:
+
+```text
+LAST UPDATED
+DATA AGE
+SOURCE STATUS
+SYNC STATUS
+```
+
+A "live" indicator should only exist if the system has evidence that the underlying data is current enough for the intended use.
+
+---
+
+# 76. OBSERVABILITY OF AEGIS ITSELF
+
+A resilience system must be observable.
+
+AEGIS should therefore eventually expose internal health indicators such as:
+
+```text
+Data ingestion health
+Integration health
+Event processing health
+Storage health
+Notification health
+System availability
+Data freshness
+```
+
+This represents another biological analogy:
+
+> The immune system must itself remain functional.
+
+---
+
+# 77. META-RESILIENCE
+
+AEGIS therefore operates at two levels.
+
+### Level 1
+
+Protect the healthcare environment.
+
+### Level 2
+
+Protect the reliability of the system doing the protecting.
+
+This is **meta-resilience**.
+
+If the dashboard itself is malfunctioning, users must know.
+
+---
+
+# 78. TRUST ARCHITECTURE
+
+Trust should emerge from:
+
+```text
+PROVENANCE
++
+TRANSPARENCY
++
+CONSISTENCY
++
+AUDITABILITY
++
+UNCERTAINTY
++
+HUMAN OVERSIGHT
++
+VERIFICATION
+```
+
+Not from branding.
+
+Not from visual sophistication.
+
+Not from AI claims.
+
+---
+
+# 79. AEGIS SUCCESS MODEL
+
+AEGIS succeeds if it can reduce:
+
+### Detection latency
+
+How quickly can a meaningful signal be recognized?
+
+### Interpretation latency
+
+How quickly can relevant evidence be assembled?
+
+### Decision latency
+
+How quickly can responsible humans understand the situation and decide?
+
+### Response latency
+
+How quickly can an authorized response begin?
+
+### Recovery latency
+
+How quickly can the organization establish whether conditions are improving?
+
+### Learning latency
+
+How quickly does the organization convert the event into usable institutional knowledge?
+
+This creates:
+
+```text
+DETECT FASTER
+UNDERSTAND FASTER
+DECIDE BETTER
+RESPOND COORDINATEDLY
+VERIFY EARLIER
+LEARN PERMANENTLY
+```
+
+---
+
+# 80. STAKEHOLDER VALUE
+
+## Healthcare organizations
+
+AEGIS provides a unified operational picture instead of fragmented monitoring.
+
+## Infection prevention teams
+
+AEGIS connects environmental, clinical, and operational signals.
+
+## Pandemic preparedness teams
+
+AEGIS creates a continuous detection-to-response model.
+
+## Biosecurity experts
+
+AEGIS emphasizes evidence, provenance, uncertainty, escalation, and auditability.
+
+## Global health organizations
+
+AEGIS's architecture is designed around multisource information, interoperability, and cross-organizational understanding.
+
+## Health workers
+
+AEGIS reduces the need to manually reconstruct a situation from disconnected information.
+
+---
+
+# 81. WHY THIS IS MORE RESILIENT THAN STATIC MONITORING
+
+A static monitoring system often follows:
+
+```text
+DATA
+ ↓
+ALERT
+ ↓
+HUMAN
+```
+
+AEGIS proposes:
+
+```text
+DATA
+ ↓
+SIGNAL
+ ↓
+CONTEXT
+ ↓
+EVIDENCE
+ ↓
+ASSESSMENT
+ ↓
+HUMAN DECISION
+ ↓
+RESPONSE
+ ↓
+VERIFICATION
+ ↓
+MEMORY
+```
+
+The difference is not merely more features.
+
+It is a different system philosophy.
+
+The system becomes capable of preserving the relationship between:
+
+**what happened → what was believed → what was done → what happened next.**
+
+That relationship is the foundation of institutional resilience.
+
+WHO's health-emergency architecture similarly treats preparedness, detection, response, and recovery as interconnected capabilities rather than isolated functions. citeturn0search14turn0search22
+
+WHO's 2025 infection-prevention and control framework also emphasizes facility-level preparedness, readiness, response, and practical implementation, reinforcing the need for AEGIS to connect surveillance with operational response rather than stop at detection. citeturn0search18
+
+---
+
+# 82. WHAT MAKES AEGIS DIFFERENT
+
+AEGIS should not compete by saying:
+
+> "We have more charts."
+
+It should compete conceptually on:
+
+### 1. Biological systems thinking
+
+The system is designed as a defensive ecosystem.
+
+### 2. Decision-centered surveillance
+
+Information exists because it supports decisions.
+
+### 3. Evidence-centered intelligence
+
+Assessments expose their evidence and uncertainty.
+
+### 4. Human-centered response
+
+Humans remain accountable for consequential decisions.
+
+### 5. Closed-loop resilience
+
+The outcome of one event informs future preparedness.
+
+### 6. System self-awareness
+
+AEGIS communicates when its own data or infrastructure is degraded.
+
+---
+
+# 83. ARCHITECTURAL NON-NEGOTIABLES
+
+These rules are now part of AEGIS.
+
+## Rule 01
+
+Never invent a screen because a screen seems useful.
+
+## Rule 02
+
+Never invent a data source and present it as real.
+
+## Rule 03
+
+Never present simulated data as live data.
+
+## Rule 04
+
+Never convert an anomaly directly into a confirmed threat.
+
+## Rule 05
+
+Never hide uncertainty.
+
+## Rule 06
+
+Never hide stale data.
+
+## Rule 07
+
+Never let different screens maintain contradictory event states.
+
+## Rule 08
+
+Never let visual design override operational clarity.
+
+## Rule 09
+
+Never allow autonomous intervention to be implied where human authorization is required.
+
+## Rule 10
+
+Never create an AI recommendation without an explanation path.
+
+## Rule 11
+
+Never call a response successful until its outcome is verified.
+
+## Rule 12
+
+Never close an important event without preserving its institutional memory.
+
+## Rule 13
+
+Never add a feature without identifying the decision it supports.
+
+## Rule 14
+
+Never allow implementation convenience to redefine the product architecture.
+
+## Rule 15
+
+Never use the biological analogy as decoration when it can instead improve system logic.
+
+---
+
+# 84. WHAT WE ARE CARRYING FORWARD FROM THE PREVIOUS AEGIS WORK
+
+The following previously established concepts are retained because they are consistent with the new architecture:
+
+### AEGIS as the project name
+
+The project is AEGIS.
+
+The earlier proposed expansion of the acronym is not treated as an established historical meaning.
+
+### Bio-Resilience
+
+The central design methodology remains Bio-Resilience.
+
+### Immune-response architecture
+
+The:
+
+```text
+Innate
+Adaptive
+Effector
+Memory
+```
+
+model remains the central conceptual framework.
+
+### Living Map
+
+The previously explored spatial "Living Map" concept remains a candidate visualization pattern where it improves operational spatial understanding.
+
+### Clinical Authority
+
+The visual direction remains:
+
+```text
+Minimalist
+HUD-inspired
+High-density telemetry
+Clinical Authority
+```
+
+### Visual language
+
+The established palette remains:
+
+```text
+Deep Obsidian
+Surgical White
+Antigen Amber
+```
+
+### Human-centered response
+
+The system remains decision-support rather than an autonomous clinical authority.
+
+### Detection-to-learning journey
+
+The previously established conceptual flow:
+
+```text
+Detection
+→ Threat Intelligence
+→ Response
+→ Containment / Monitoring
+→ Recovery
+→ Biological Feedback
+→ Institutional Memory
+```
+
+is preserved, but now formalized into the larger architecture.
+
+---
+
+# 85. WHAT WE ARE NOT CARRYING FORWARD
+
+The following must **not** be assumed from the previous implementation:
+
+- previous screen architecture
+- previous routing structure
+- previous component hierarchy
+- previous mock data model
+- previous pathname logic
+- previous frontend state implementation
+- previous API assumptions
+- previous repository structure
+- previous unfinished Phase 2 behavior
+- previous UI shortcuts
+- undocumented features
+- invented integrations
+
+These belong to the old implementation and must be re-evaluated against this architecture.
+
+---
+
+# 86. AUTHORITATIVE SOURCE-OF-TRUTH HIERARCHY
+
+From this point forward, AEGIS should use this hierarchy:
+
+```text
+LEVEL 1
+MASTER ARCHITECTURE
+        ↓
+LEVEL 2
+PRODUCT REQUIREMENTS
+        ↓
+LEVEL 3
+DOMAIN / DATA MODEL
+        ↓
+LEVEL 4
+USER FLOWS
+        ↓
+LEVEL 5
+SCREEN REGISTRY
+        ↓
+LEVEL 6
+SCREEN SPECIFICATIONS
+        ↓
+LEVEL 7
+DESIGN SYSTEM
+        ↓
+LEVEL 8
+ENGINEERING IMPLEMENTATION
+        ↓
+LEVEL 9
+QA / ACCEPTANCE TESTS
+```
+
+If two documents conflict, the higher-level authoritative document wins.
+
+---
+
+# 87. FUTURE SCREEN ARCHITECTURE RULE
+
+Once the authoritative screen registry is attached to this architecture, every screen must map to one or more capabilities:
+
+```text
+SENSE
+UNDERSTAND
+ASSESS
+RESPOND
+VERIFY
+REMEMBER
+```
+
+If a screen cannot explain its architectural purpose, it should not exist.
+
+---
+
+# 88. ACCEPTANCE MODEL
+
+AEGIS is not complete because:
+
+> "All pages render."
+
+That is an insufficient acceptance test.
+
+AEGIS is successful when an authorized user can move through a complete operational scenario without the system breaking state, losing provenance, hiding uncertainty, or contradicting itself.
+
+The minimum conceptual acceptance journey is:
+
+```text
+Signal appears
+       ↓
+Signal is represented correctly
+       ↓
+An event can be created
+       ↓
+Evidence can be associated
+       ↓
+Assessment can change
+       ↓
+Uncertainty remains visible
+       ↓
+Response can be proposed
+       ↓
+Authorization can occur
+       ↓
+Response state changes
+       ↓
+Outcome can be observed
+       ↓
+Event can resolve
+       ↓
+Institutional memory can be created
+```
+
+---
+
+# 89. MASTER AEGIS ACCEPTANCE TEST
+
+The ultimate test is:
+
+> **Can a user follow a meaningful health-security event from detection through evidence, assessment, authorized response, verification, and institutional learning without the system losing context or contradicting its own state?**
+
+If the answer is no:
+
+**AEGIS is not finished.**
+
+---
+
+# 90. THE AEGIS NORTH STAR
+
+The entire architecture can be reduced to one sentence:
+
+> **AEGIS transforms fragmented biological and operational signals into an explainable, human-governed, closed-loop system for detection, assessment, response, verification, and institutional learning.**
+
+And the biological equivalent is:
+
+```text
+SENSE
+→ RECOGNIZE
+→ RESPOND
+→ RECOVER
+→ REMEMBER
+```
+
+The AEGIS equivalent is:
+
+```text
+DETECT
+→ UNDERSTAND
+→ ASSESS
+→ RESPOND
+→ VERIFY
+→ LEARN
+```
+
+---
+
+# 91. FINAL ARCHITECTURAL MODEL
+
+```text
+                         AEGIS
+                          │
+             BIO-RESILIENT DEFENSE SYSTEM
+                          │
+       ┌──────────────────┼──────────────────┐
+       │                  │                  │
+     SENSE             UNDERSTAND         ASSESS
+       │                  │                  │
+   Observations        Evidence          Risk / Context
+   Signals             Intelligence      Uncertainty
+       │                  │                  │
+       └──────────────────┼──────────────────┘
+                          ↓
+                    HUMAN DECISION
+                          │
+                          ↓
+                       RESPOND
+                          │
+                 ┌────────┴────────┐
+                 │                 │
+             Coordinate         Execute
+                 │                 │
+                 └────────┬────────┘
+                          ↓
+                       VERIFY
+                          │
+                          ↓
+                       RECOVER
+                          │
+                          ↓
+                       LEARN
+                          │
+                          ↓
+                 INSTITUTIONAL MEMORY
+                          │
+                          ↓
+                  FUTURE RESILIENCE
+                          │
+                          └───────────────┐
+                                          ↓
+                                       SENSE
+```
+
+This is the AEGIS architecture.
+
+It is intentionally **closed-loop**.
+
+The system does not end at the alert.
+
+It does not end at the response.
+
+It does not even end at recovery.
+
+It ends when the organization has converted the event into greater preparedness.
+
+---
+
+# 92. ARCHITECTURE COMPLETION CRITERIA
+
+This Master Architecture should be considered structurally complete when the following are all true:
+
+- [x] AEGIS purpose is defined.
+- [x] AEGIS boundaries are defined.
+- [x] Biological analogy is defined.
+- [x] Innate layer is defined.
+- [x] Adaptive layer is defined.
+- [x] Effector layer is defined.
+- [x] Memory layer is defined.
+- [x] Human oversight is defined.
+- [x] Evidence architecture is defined.
+- [x] Uncertainty model is defined.
+- [x] Response lifecycle is defined.
+- [x] Verification principle is defined.
+- [x] Institutional memory model is defined.
+- [x] Data architecture is defined conceptually.
+- [x] Event architecture is defined conceptually.
+- [x] System-state architecture is defined.
+- [x] Failure-state principles are defined.
+- [x] Security principles are defined.
+- [x] Interoperability principles are defined.
+- [x] Stakeholder model is defined.
+- [x] Visual architecture principles are defined.
+- [x] Product boundaries are defined.
+- [x] Acceptance philosophy is defined.
+- [x] Source-of-truth hierarchy is defined.
+
+The following are deliberately **not yet locked**:
+
+- exact screen registry
+- exact API contracts
+- exact database schema
+- exact technology implementation
+- exact sensor integrations
+- exact external data providers
+- exact threat classification taxonomy
+- exact response protocols
+- exact hospital workflow configuration
+
+Those belong in subsequent specifications.
+
+---
+
+# 93. THE NEXT ARCHITECTURAL DOCUMENTS
+
+This Master Architecture should now become the parent document for the next AEGIS specifications.
+
+The correct sequence is:
+
+```text
+01
+MASTER ARCHITECTURE
+        ↓
+02
+DOMAIN MODEL + GLOBAL STATE MODEL
+        ↓
+03
+USER FLOW / OPERATIONAL JOURNEY
+        ↓
+04
+PRODUCT ARCHITECTURE
+        ↓
+05
+ENGINEERING ARCHITECTURE
+        ↓
+06
+AUTHORITATIVE SCREEN REGISTRY
+        ↓
+07
+SCREEN-BY-SCREEN SPECIFICATION
+        ↓
+08
+DESIGN SYSTEM / UI ARCHITECTURE
+        ↓
+09
+API + DATA CONTRACTS
+        ↓
+10
+IMPLEMENTATION PLAN
+        ↓
+11
+QA + ACCEPTANCE TESTS
+```
+
+This order is intentional.
+
+**We do not jump from this document directly into coding.**
+
+The architecture needs to constrain the product before the product constrains the code.
+
+---
+
+# 94. FINAL DESIGN PRINCIPLE
+
+AEGIS should feel like a system that has been designed by people who understand that biological threats are not single alerts.
+
+They are dynamic situations.
+
+They evolve.
+
+Evidence changes.
+
+Confidence changes.
+
+Humans disagree.
+
+Systems fail.
+
+Responses have consequences.
+
+Conditions recover.
+
+And organizations forget.
+
+AEGIS exists to prevent that last failure.
+
+Its deepest purpose is therefore not simply:
+
+> **detect the threat.**
+
+It is:
+
+> **help an organization sense disruption, understand uncertainty, coordinate an appropriate response, verify what happened, and become harder to disrupt the next time.**
+
+That is Bio-Resilience by design.
+
+**AEGIS is not a dashboard with an immune-system theme.**
+
+**AEGIS is an operational system whose architecture is informed by the logic of resilience found in living systems.**
+
+---
+
+## MASTER ARCHITECTURE STATUS
+
+**STATUS: BASELINE ESTABLISHED**
+
+This document is now the conceptual parent architecture for AEGIS.
+
+Future AEGIS specifications must derive from it.
+
+Future implementation must not redefine it casually.
+
+Future screens must map back to it.
+
+Future data structures must support it.
+
+Future interactions must preserve its state model.
+
+Future AI behavior must remain subordinate to its human-governance principles.
+
+Future visual design must communicate its operational logic rather than merely decorate it.
+
+**AEGIS architectural north star:**
+
+```text
+SENSE
+→ DETECT
+→ UNDERSTAND
+→ ASSESS
+→ DECIDE
+→ RESPOND
+→ VERIFY
+→ RECOVER
+→ REMEMBER
+→ RESILIENCE
+```
+
+**END OF MASTER ARCHITECTURE v1.0**
