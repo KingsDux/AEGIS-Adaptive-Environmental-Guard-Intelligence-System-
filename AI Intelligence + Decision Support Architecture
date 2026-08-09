@@ -1,0 +1,2164 @@
+# AEGIS
+# AI Intelligence + Decision Support Architecture
+
+**System:** AEGIS  
+**Document:** 11 — AI Intelligence + Decision Support Architecture  
+**Version:** 1.0  
+**Status:** Master Architecture  
+**Date:** August 2026
+
+---
+
+# 01. Purpose
+
+This document defines the intelligence architecture of AEGIS.
+
+It establishes how AEGIS transforms heterogeneous operational information into:
+
+```text
+signals
+→ observations
+→ anomalies
+→ investigations
+→ evidence
+→ assessments
+→ recommendations
+→ human decisions
+→ outcomes
+→ institutional learning
+```
+
+The objective is not to create an autonomous pathogen-response system.
+
+The objective is to create a **high-trust decision-support system for experts operating in complex biological and healthcare environments.**
+
+---
+
+# 02. Core Principle
+
+AEGIS intelligence must follow:
+
+```text
+DETECT
+↓
+INTERPRET
+↓
+CORRELATE
+↓
+ASSESS
+↓
+EXPLAIN
+↓
+RECOMMEND
+↓
+HUMAN REVIEW
+↓
+DECISION
+↓
+OUTCOME
+↓
+LEARN
+```
+
+Never:
+
+```text
+DETECT
+↓
+AI DECIDES
+↓
+AUTONOMOUS CONSEQUENTIAL ACTION
+```
+
+---
+
+# 03. Intelligence Architecture
+
+The AEGIS intelligence layer consists of:
+
+```text
+1. Signal Ingestion
+2. Normalization
+3. Signal Quality Assessment
+4. Anomaly Detection
+5. Event Correlation
+6. Investigation Engine
+7. Evidence Management
+8. Threat Assessment
+9. Confidence Estimation
+10. Recommendation Engine
+11. Human Review
+12. Decision Recording
+13. Outcome Evaluation
+14. Institutional Memory
+```
+
+---
+
+# 04. Intelligence System Boundary
+
+```text
+                    AEGIS
+                      │
+        ┌─────────────┴─────────────┐
+        │                           │
+   Operational Data            External Data
+        │                           │
+        └─────────────┬─────────────┘
+                      ▼
+               INGESTION LAYER
+                      │
+                      ▼
+              NORMALIZATION
+                      │
+                      ▼
+             SIGNAL QUALITY
+                      │
+                      ▼
+             DETECTION ENGINE
+                      │
+                      ▼
+             CORRELATION ENGINE
+                      │
+                      ▼
+            INVESTIGATION ENGINE
+                      │
+                      ▼
+              EVIDENCE MODEL
+                      │
+                      ▼
+             ASSESSMENT ENGINE
+                      │
+                      ▼
+           DECISION SUPPORT ENGINE
+                      │
+                      ▼
+               HUMAN REVIEW
+                      │
+                      ▼
+                 DECISION
+                      │
+                      ▼
+                  OUTCOME
+                      │
+                      ▼
+             LEARNING / MEMORY
+```
+
+---
+
+# 05. Intelligence Invariants
+
+The following rules are architectural invariants.
+
+### INV-01
+
+A signal is not automatically an anomaly.
+
+### INV-02
+
+An anomaly is not automatically a threat.
+
+### INV-03
+
+A threat assessment is not automatically a diagnosis.
+
+### INV-04
+
+A recommendation is not an authorization.
+
+### INV-05
+
+Confidence is not certainty.
+
+### INV-06
+
+AI output must remain traceable to evidence.
+
+### INV-07
+
+Human authorization remains authoritative for consequential actions.
+
+### INV-08
+
+Missing data must never be silently interpreted as normal data.
+
+### INV-09
+
+Conflicting evidence must be represented explicitly.
+
+### INV-10
+
+AI-generated conclusions must never become untraceable system state.
+
+---
+
+# 06. Intelligence Object Hierarchy
+
+AEGIS should distinguish:
+
+```text
+Signal
+  ↓
+Observation
+  ↓
+Anomaly
+  ↓
+Event
+  ↓
+Investigation
+  ↓
+Assessment
+  ↓
+Recommendation
+  ↓
+Decision
+  ↓
+Outcome
+  ↓
+Learning
+```
+
+These are different domain objects.
+
+They must not be collapsed into one generic "alert" object.
+
+---
+
+# 07. Signal
+
+A signal is an individual incoming observation from an approved source.
+
+Conceptually:
+
+```text
+Signal {
+    id
+    source
+    timestamp
+    signalType
+    value
+    unit
+    location
+    quality
+    provenance
+}
+```
+
+---
+
+# 08. Signal Quality
+
+Every signal should have a quality assessment.
+
+Possible states:
+
+```text
+VALID
+DEGRADED
+STALE
+MISSING
+INVALID
+UNKNOWN
+```
+
+Signal quality must be visible to downstream intelligence.
+
+---
+
+# 09. Missing Data
+
+AEGIS must distinguish:
+
+```text
+NO SIGNAL
+```
+
+from:
+
+```text
+NORMAL SIGNAL
+```
+
+This distinction is fundamental.
+
+Missing information is uncertainty.
+
+It is not evidence of safety.
+
+---
+
+# 10. Observation
+
+An observation represents an interpreted or normalized signal.
+
+Example conceptual structure:
+
+```text
+Observation {
+    id
+    sourceSignalIds
+    observationType
+    value
+    timestamp
+    location
+    quality
+    provenance
+}
+```
+
+---
+
+# 11. Anomaly
+
+An anomaly represents a meaningful deviation from an established baseline or expected pattern.
+
+Conceptually:
+
+```text
+Anomaly {
+    id
+    observationIds
+    baselineReference
+    deviation
+    severity
+    confidence
+    detectedAt
+}
+```
+
+---
+
+# 12. Baselines
+
+Detection requires context.
+
+Possible baseline dimensions include:
+
+```text
+time
+location
+facility
+population context
+historical pattern
+operational context
+```
+
+Baselines must be versioned.
+
+A changing baseline must not silently rewrite historical interpretation.
+
+---
+
+# 13. Baseline Governance
+
+The system must know:
+
+```text
+which baseline
+was used
+when it was generated
+what data created it
+which version produced the assessment
+```
+
+---
+
+# 14. Detection Engine
+
+The detection engine identifies signals that warrant attention.
+
+It may use:
+
+```text
+threshold detection
+trend detection
+pattern detection
+statistical anomaly detection
+rule-based detection
+approved machine-learning models
+```
+
+The architecture must support multiple detection methods.
+
+---
+
+# 15. Detection Output
+
+Detection should produce:
+
+```text
+DetectionResult {
+    anomaly
+    method
+    evidence
+    confidence
+    timestamp
+}
+```
+
+Detection should not directly produce an operational intervention.
+
+---
+
+# 16. Detection Confidence
+
+Confidence answers:
+
+> How strongly does the available evidence support this detection?
+
+It does not answer:
+
+> Is this definitely a threat?
+
+---
+
+# 17. Event Correlation
+
+Individual anomalies may be weak.
+
+Multiple related observations may become meaningful when correlated.
+
+Conceptually:
+
+```text
+Signal A
++
+Signal B
++
+Signal C
++
+Temporal relationship
++
+Spatial relationship
+        ↓
+Correlated Event
+```
+
+---
+
+# 18. Correlation Engine
+
+The correlation engine evaluates relationships between observations.
+
+Potential dimensions:
+
+```text
+temporal
+spatial
+population
+facility
+operational
+source
+event history
+```
+
+---
+
+# 19. Correlation Must Preserve Evidence
+
+When an event is correlated, AEGIS must preserve the underlying observations.
+
+Never create:
+
+```text
+"AI says outbreak"
+```
+
+without being able to answer:
+
+```text
+Why?
+Which evidence?
+Which sources?
+Which time period?
+Which model/rule?
+What uncertainty?
+```
+
+---
+
+# 20. Investigation Object
+
+An investigation represents structured examination of a potentially significant event.
+
+Conceptually:
+
+```text
+Investigation {
+    id
+    eventIds
+    status
+    priority
+    assignedUsers
+    evidenceIds
+    assessmentIds
+    timeline
+    createdAt
+    updatedAt
+}
+```
+
+---
+
+# 21. Investigation States
+
+```text
+NEW
+↓
+TRIAGED
+↓
+UNDER_REVIEW
+↓
+ASSESSMENT_READY
+↓
+RESOLVED
+```
+
+Additional states may be introduced only when required by the domain model.
+
+---
+
+# 22. Investigation Workspace
+
+The intelligence interface should allow authorized users to inspect:
+
+```text
+event timeline
+supporting evidence
+signal quality
+spatial context
+related observations
+historical context
+system assessments
+uncertainties
+recommendations
+human decisions
+```
+
+---
+
+# 23. Evidence Model
+
+AEGIS must distinguish evidence from interpretation.
+
+Evidence may include approved:
+
+```text
+sensor observations
+clinical operational indicators
+laboratory results
+surveillance information
+environmental measurements
+historical records
+expert observations
+external authoritative information
+```
+
+---
+
+# 24. Evidence Provenance
+
+Every evidence item should retain:
+
+```text
+source
+timestamp
+origin
+collection method
+quality
+version
+transformation history
+```
+
+where available and appropriate.
+
+---
+
+# 25. Evidence Status
+
+Evidence may be:
+
+```text
+UNREVIEWED
+VALIDATED
+CONTESTED
+REJECTED
+STALE
+UNKNOWN
+```
+
+---
+
+# 26. Conflicting Evidence
+
+AEGIS must never hide conflicting evidence.
+
+Example:
+
+```text
+Evidence A
+supports assessment
+
+Evidence B
+contradicts assessment
+```
+
+The UI should represent both.
+
+---
+
+# 27. Evidence Weight
+
+The intelligence layer may assign evidence relevance or weight.
+
+However:
+
+> A numerical score must never hide the underlying evidence.
+
+Users must be able to inspect why an item received its assessment.
+
+---
+
+# 28. Assessment
+
+An assessment is an expert-oriented synthesis of available evidence.
+
+Conceptually:
+
+```text
+Assessment {
+    id
+    investigationId
+    hypothesis
+    supportingEvidence
+    conflictingEvidence
+    confidence
+    uncertainty
+    generatedBy
+    reviewedBy
+    status
+}
+```
+
+---
+
+# 29. Assessment States
+
+```text
+DRAFT
+↓
+UNDER_REVIEW
+↓
+REVIEWED
+↓
+SUPERSEDED
+```
+
+---
+
+# 30. Assessment vs Diagnosis
+
+AEGIS must not blur these concepts.
+
+An AEGIS assessment is:
+
+```text
+decision-support interpretation
+```
+
+not automatically:
+
+```text
+clinical diagnosis
+laboratory confirmation
+public-health declaration
+```
+
+Those remain governed by the appropriate professional and institutional processes.
+
+---
+
+# 31. Threat Assessment
+
+Where appropriate, AEGIS can organize threat assessments around multiple dimensions.
+
+Conceptually:
+
+```text
+Threat Assessment
+├── Evidence Strength
+├── Signal Severity
+├── Spread Indicators
+├── Operational Impact
+├── Uncertainty
+└── Confidence
+```
+
+The exact scoring methodology must be approved and validated by subject-matter experts.
+
+---
+
+# 32. Threat Classification
+
+Classification should not rely on one number alone.
+
+A robust assessment should expose:
+
+```text
+classification
+confidence
+evidence
+uncertainty
+rationale
+```
+
+---
+
+# 33. Routine vs Concerning Signals
+
+AEGIS should not implement a simplistic:
+
+```text
+normal flora = safe
+unusual signal = dangerous
+```
+
+model.
+
+Instead, it should evaluate:
+
+```text
+context
+change from baseline
+evidence quality
+clinical/operational relevance
+temporal pattern
+spatial pattern
+supporting evidence
+contradicting evidence
+```
+
+This prevents biological complexity from being reduced to a single binary rule.
+
+---
+
+# 34. Recognition Architecture
+
+The recognition layer may incorporate validated identification systems where appropriate.
+
+Its role is:
+
+```text
+identify
+compare
+contextualize
+flag uncertainty
+```
+
+not:
+
+```text
+automatically authorize intervention
+```
+
+---
+
+# 35. Model Registry
+
+Every production AI/ML model must be identifiable.
+
+Conceptually:
+
+```text
+Model {
+    id
+    name
+    version
+    purpose
+    status
+    trainingReference
+    evaluationReference
+    deploymentDate
+    approvedBy
+}
+```
+
+---
+
+# 36. Model Lifecycle
+
+```text
+DEVELOPMENT
+↓
+EVALUATION
+↓
+VALIDATION
+↓
+APPROVAL
+↓
+DEPLOYMENT
+↓
+MONITORING
+↓
+REVIEW
+↓
+RETIREMENT
+```
+
+---
+
+# 37. Model Versioning
+
+AEGIS must know which model generated an output.
+
+Never store only:
+
+```text
+"AI recommendation"
+```
+
+Store:
+
+```text
+model
+version
+timestamp
+input reference
+output
+confidence
+```
+
+where appropriate.
+
+---
+
+# 38. Model Output Object
+
+Conceptually:
+
+```text
+ModelOutput {
+    id
+    modelId
+    modelVersion
+    inputReference
+    output
+    confidence
+    uncertainty
+    generatedAt
+}
+```
+
+---
+
+# 39. Explainability
+
+Every important intelligence output should answer:
+
+```text
+What did the system conclude?
+
+Why?
+
+What evidence supports it?
+
+What evidence conflicts with it?
+
+How confident is it?
+
+What information is missing?
+
+What model/rule produced it?
+```
+
+---
+
+# 40. Explainability Levels
+
+AEGIS should provide:
+
+### Level 1 — Summary
+
+Plain-language conclusion.
+
+### Level 2 — Evidence
+
+Supporting observations.
+
+### Level 3 — Reasoning Factors
+
+Important features or factors contributing to the result.
+
+### Level 4 — Provenance
+
+Source and model information.
+
+This creates progressive disclosure rather than overwhelming every user.
+
+---
+
+# 41. Uncertainty Architecture
+
+Uncertainty must be a first-class object.
+
+Conceptually:
+
+```text
+Uncertainty {
+    type
+    source
+    severity
+    description
+    affectedAssessment
+}
+```
+
+---
+
+# 42. Uncertainty Types
+
+Possible categories:
+
+```text
+DATA_MISSING
+DATA_STALE
+DATA_CONFLICT
+MODEL_LIMITATION
+INSUFFICIENT_EVIDENCE
+CONTEXT_UNKNOWN
+```
+
+---
+
+# 43. Confidence vs Uncertainty
+
+AEGIS must display both where appropriate.
+
+Example:
+
+```text
+Confidence: Moderate
+
+Uncertainty:
+Recent laboratory information unavailable.
+```
+
+A high confidence score should not erase important uncertainty.
+
+---
+
+# 44. Recommendation Engine
+
+The recommendation engine transforms an assessment into possible next steps.
+
+Its output is:
+
+```text
+recommendation
+rationale
+supporting evidence
+expected objective
+constraints
+uncertainties
+required authority
+```
+
+---
+
+# 45. Recommendation Object
+
+Conceptually:
+
+```text
+Recommendation {
+    id
+    investigationId
+    recommendationType
+    rationale
+    evidenceIds
+    confidence
+    uncertainty
+    prerequisites
+    requiredAuthority
+    generatedBy
+    status
+}
+```
+
+---
+
+# 46. Recommendation States
+
+```text
+GENERATED
+↓
+PENDING_REVIEW
+↓
+ACCEPTED
+   OR
+MODIFIED
+   OR
+REJECTED
+↓
+SUPERSEDED
+```
+
+---
+
+# 47. Recommendation Does Not Equal Action
+
+The system must distinguish:
+
+```text
+Recommendation
+```
+
+from:
+
+```text
+Authorized Action
+```
+
+This distinction must exist in:
+
+```text
+domain model
+database
+API
+frontend
+audit trail
+```
+
+---
+
+# 48. Human Review
+
+High-impact recommendations require human review according to organizational policy.
+
+The reviewer should see:
+
+```text
+recommendation
+evidence
+uncertainty
+confidence
+alternative considerations
+system rationale
+```
+
+---
+
+# 49. Human Decision
+
+The human decision should be explicit.
+
+Possible outcomes:
+
+```text
+ACCEPT
+MODIFY
+REJECT
+DEFER
+REQUEST_MORE_EVIDENCE
+```
+
+---
+
+# 50. Human Override
+
+Authorized users may override system recommendations where policy allows.
+
+The system must record:
+
+```text
+original recommendation
+human decision
+reason
+actor
+timestamp
+```
+
+---
+
+# 51. Override Is Learning Data
+
+A repeated pattern of expert overrides may indicate:
+
+```text
+model weakness
+rule weakness
+missing context
+bad baseline
+workflow mismatch
+```
+
+This becomes valuable institutional learning.
+
+---
+
+# 52. Decision Record
+
+Conceptually:
+
+```text
+Decision {
+    id
+    recommendationId
+    actor
+    decision
+    rationale
+    timestamp
+    authorizationContext
+}
+```
+
+---
+
+# 53. Decision Provenance
+
+AEGIS must preserve the relationship:
+
+```text
+Evidence
+ ↓
+Assessment
+ ↓
+Recommendation
+ ↓
+Human Decision
+ ↓
+Outcome
+```
+
+This is the backbone of explainability.
+
+---
+
+# 54. Counterfactual / Alternative View
+
+Where practical, AEGIS should support:
+
+```text
+Primary interpretation
+Alternative interpretation
+```
+
+This reduces premature closure.
+
+The system should not force a single narrative when evidence remains ambiguous.
+
+---
+
+# 55. Alert Prioritization
+
+AEGIS may prioritize alerts based on factors such as:
+
+```text
+severity
+confidence
+operational relevance
+novelty
+persistence
+data quality
+uncertainty
+```
+
+Prioritization must be explainable.
+
+---
+
+# 56. Alert Fatigue Protection
+
+The system should avoid overwhelming users with repeated low-value notifications.
+
+Mechanisms may include:
+
+```text
+deduplication
+aggregation
+suppression
+priority ranking
+acknowledgement
+escalation
+```
+
+These mechanisms must never hide genuinely important information without traceability.
+
+---
+
+# 57. Escalation Logic
+
+Conceptually:
+
+```text
+LOW
+ ↓
+MONITOR
+
+MEDIUM
+ ↓
+REVIEW
+
+HIGH
+ ↓
+PRIORITIZED INVESTIGATION
+
+CRITICAL
+ ↓
+ESCALATION ACCORDING TO POLICY
+```
+
+Exact thresholds require stakeholder validation.
+
+---
+
+# 58. AI Safety Boundary
+
+AI may assist with:
+
+```text
+pattern recognition
+classification support
+summarization
+correlation
+prioritization
+forecasting
+recommendation
+information retrieval
+```
+
+AI must not independently:
+
+```text
+diagnose a patient
+declare a public-health emergency
+authorize consequential intervention
+change organizational permissions
+rewrite audit history
+override human authority
+```
+
+---
+
+# 59. Generative AI Boundary
+
+Generative AI may assist users with:
+
+```text
+summarizing evidence
+explaining complex information
+drafting investigation summaries
+surfacing relevant historical context
+```
+
+but generated content must remain distinguishable from authoritative source data.
+
+---
+
+# 60. AI-Generated Content States
+
+Generated content should be marked conceptually as:
+
+```text
+GENERATED
+```
+
+until appropriately reviewed.
+
+After human validation:
+
+```text
+REVIEWED
+```
+
+It must not silently become:
+
+```text
+AUTHORITATIVE
+```
+
+without a defined workflow.
+
+---
+
+# 61. Retrieval Architecture
+
+If AEGIS uses retrieval-augmented generation or knowledge retrieval:
+
+```text
+User Question
+ ↓
+Authorization
+ ↓
+Retrieval Scope
+ ↓
+Approved Knowledge Sources
+ ↓
+Evidence Retrieval
+ ↓
+AI Synthesis
+ ↓
+Citations / Provenance
+ ↓
+Human Review where required
+```
+
+---
+
+# 62. Knowledge Source Governance
+
+Knowledge sources must have:
+
+```text
+source identity
+version
+date
+authority
+scope
+status
+```
+
+Unverified sources must not be presented as authoritative.
+
+---
+
+# 63. External Knowledge
+
+External information should be labeled according to source provenance.
+
+AEGIS must distinguish:
+
+```text
+internal operational data
+validated reference information
+external information
+AI-generated synthesis
+```
+
+---
+
+# 64. Hallucination Control
+
+AEGIS must minimize unsupported AI claims through:
+
+```text
+retrieval grounding
+structured outputs
+source attribution
+confidence representation
+validation
+human review
+restricted action boundaries
+```
+
+---
+
+# 65. Unsupported Claims
+
+If the intelligence layer cannot establish something from available evidence, it should explicitly state uncertainty.
+
+Preferred:
+
+```text
+Insufficient evidence to determine.
+```
+
+Not:
+
+```text
+Likely X.
+```
+
+when the evidence does not support that conclusion.
+
+---
+
+# 66. Feedback Architecture
+
+Every meaningful intelligence outcome should be capable of generating feedback.
+
+```text
+Recommendation
+ ↓
+Human Decision
+ ↓
+Outcome
+ ↓
+Compare Expected vs Observed
+ ↓
+Feedback
+```
+
+---
+
+# 67. Biological Memory Analogy
+
+The immune-system analogy becomes useful here.
+
+AEGIS's "memory" is not biological memory.
+
+It is a controlled institutional learning system.
+
+Conceptually:
+
+```text
+Incident
+ ↓
+Assessment
+ ↓
+Response
+ ↓
+Outcome
+ ↓
+Review
+ ↓
+Validated Lesson
+ ↓
+Institutional Memory
+ ↓
+Future Decision Support
+```
+
+---
+
+# 68. Institutional Memory
+
+Memory records should contain:
+
+```text
+event
+context
+assessment
+decision
+outcome
+lesson
+confidence
+validation status
+source
+date
+```
+
+---
+
+# 69. Memory Validation
+
+A lesson should not automatically become system truth.
+
+Memory should move through:
+
+```text
+CANDIDATE
+↓
+REVIEW
+↓
+VALIDATED
+↓
+AVAILABLE_FOR_DECISION_SUPPORT
+```
+
+---
+
+# 70. Memory Retirement
+
+Lessons may become obsolete.
+
+Therefore:
+
+```text
+ACTIVE
+↓
+REVIEW_REQUIRED
+↓
+SUPERSEDED
+↓
+RETIRED
+```
+
+Historical memory should remain traceable where required.
+
+---
+
+# 71. Learning Loop
+
+The AEGIS learning loop:
+
+```text
+DETECT
+ ↓
+INVESTIGATE
+ ↓
+ASSESS
+ ↓
+RECOMMEND
+ ↓
+DECIDE
+ ↓
+ACT
+ ↓
+OBSERVE
+ ↓
+EVALUATE
+ ↓
+LEARN
+ ↓
+UPDATE KNOWLEDGE
+ ↓
+FUTURE DETECTION
+```
+
+This is the core Bio-Resilience intelligence loop.
+
+---
+
+# 72. Learning Must Not Be Silent
+
+AEGIS must not silently modify critical decision logic based on operational events.
+
+Any change to:
+
+```text
+model
+rule
+baseline
+threshold
+knowledge
+recommendation policy
+```
+
+must pass through an explicit governance process.
+
+---
+
+# 73. Continuous Learning Boundary
+
+AEGIS should initially favor:
+
+```text
+controlled learning
+```
+
+over:
+
+```text
+uncontrolled online learning
+```
+
+Production intelligence should not silently rewrite itself from every new event.
+
+---
+
+# 74. Model Evaluation
+
+Models should be evaluated against appropriate metrics.
+
+Depending on the task:
+
+```text
+precision
+recall
+sensitivity
+specificity
+false-positive rate
+false-negative rate
+calibration
+latency
+robustness
+```
+
+The appropriate metrics must be defined per model.
+
+---
+
+# 75. Operational Metrics
+
+AEGIS should also measure:
+
+```text
+time to detection
+time to review
+time to decision
+alert volume
+alert fatigue
+recommendation acceptance
+recommendation rejection
+override rate
+false alarm rate
+missed-event rate
+```
+
+---
+
+# 76. Human Factors Metrics
+
+The intelligence system should evaluate:
+
+```text
+user comprehension
+decision confidence
+time saved
+cognitive load
+workflow interruptions
+explainability satisfaction
+```
+
+---
+
+# 77. Bias and Fairness
+
+Where models influence decisions involving people or populations, evaluation must examine potential bias.
+
+This includes:
+
+```text
+data imbalance
+measurement bias
+geographic bias
+population differences
+systematic false positives
+systematic false negatives
+```
+
+---
+
+# 78. Model Drift
+
+AEGIS must monitor whether model performance changes over time.
+
+Conceptually:
+
+```text
+Model deployed
+ ↓
+Performance monitoring
+ ↓
+Drift detected?
+ ├── NO → continue
+ └── YES
+       ↓
+      review
+       ↓
+      validate
+       ↓
+      update / retire
+```
+
+---
+
+# 79. Data Drift
+
+The system must distinguish:
+
+```text
+model drift
+```
+
+from:
+
+```text
+data/environment drift
+```
+
+because they require different responses.
+
+---
+
+# 80. Model Failure
+
+When the intelligence engine fails:
+
+```text
+AI unavailable
+```
+
+must not mean:
+
+```text
+AEGIS unavailable
+```
+
+Core operational functionality should degrade gracefully.
+
+---
+
+# 81. Intelligence Degraded Mode
+
+Possible state:
+
+```text
+INTELLIGENCE_DEGRADED
+```
+
+In this state:
+
+```text
+raw observations remain available
+manual investigation remains available
+human assessment remains available
+automated recommendations may be unavailable
+```
+
+---
+
+# 82. AI Output Failure
+
+If an AI output is malformed, unsupported, or unavailable:
+
+```text
+reject output
+log failure
+preserve underlying evidence
+notify appropriate monitoring
+continue safe workflow
+```
+
+---
+
+# 83. Confidence Calibration
+
+Confidence values must not be treated as decorative UI elements.
+
+They should correspond to validated model behavior where numerical confidence is presented.
+
+---
+
+# 84. Confidence Presentation
+
+Prefer:
+
+```text
+High
+Moderate
+Low
+Unknown
+```
+
+when numerical precision would create false confidence.
+
+Numerical scores should be shown only when they have meaningful interpretation.
+
+---
+
+# 85. Decision Support UI
+
+The intelligence interface should prioritize:
+
+```text
+WHAT HAPPENED
+WHY IT MATTERS
+WHAT EVIDENCE SUPPORTS IT
+WHAT IS UNCERTAIN
+WHAT THE SYSTEM RECOMMENDS
+WHAT THE HUMAN CAN DO
+```
+
+---
+
+# 86. Evidence-First Interface
+
+A user should never need to trust an AI statement blindly.
+
+The interface should provide a path:
+
+```text
+Recommendation
+ ↓
+Why?
+ ↓
+Evidence
+ ↓
+Source
+ ↓
+Timeline
+```
+
+---
+
+# 87. Recommendation Comparison
+
+Where multiple valid approaches exist, AEGIS may present:
+
+```text
+Option A
+Option B
+Option C
+```
+
+with:
+
+```text
+expected objective
+supporting evidence
+uncertainties
+constraints
+```
+
+The system should avoid presenting one recommendation as inevitable when meaningful alternatives exist.
+
+---
+
+# 88. Human Decision Interface
+
+The user should have explicit controls such as:
+
+```text
+Accept
+Modify
+Reject
+Defer
+Request More Evidence
+```
+
+Exact UI labels must align with Document 09.
+
+---
+
+# 89. AI Provenance
+
+Every AI-generated intelligence artifact must be traceable to:
+
+```text
+model
+version
+input reference
+timestamp
+retrieval context where applicable
+human review status
+```
+
+---
+
+# 90. Intelligence Audit
+
+Important intelligence events must generate audit records:
+
+```text
+detection.generated
+assessment.generated
+recommendation.generated
+recommendation.reviewed
+recommendation.accepted
+recommendation.modified
+recommendation.rejected
+decision.recorded
+model.output.failed
+memory.created
+memory.validated
+```
+
+The final event registry must align with Document 10.
+
+---
+
+# 91. Intelligence Security
+
+The intelligence layer must obey the same authorization architecture as every other AEGIS service.
+
+For example:
+
+```text
+Can user view assessment?
+Can user view underlying evidence?
+Can user modify assessment?
+Can user approve recommendation?
+Can user create memory?
+Can user validate memory?
+```
+
+These are separate permissions.
+
+---
+
+# 92. Intelligence Data Flow
+
+```text
+DATA SOURCES
+     ↓
+INGESTION
+     ↓
+NORMALIZATION
+     ↓
+QUALITY CONTROL
+     ↓
+DETECTION
+     ↓
+CORRELATION
+     ↓
+INVESTIGATION
+     ↓
+EVIDENCE
+     ↓
+ASSESSMENT
+     ↓
+RECOMMENDATION
+     ↓
+HUMAN REVIEW
+     ↓
+DECISION
+     ↓
+OUTCOME
+     ↓
+LEARNING
+```
+
+---
+
+# 93. End-to-End Example
+
+A simplified AEGIS journey:
+
+```text
+Multiple operational signals change from baseline
+        ↓
+Detection engine identifies anomaly
+        ↓
+AEGIS creates investigation candidate
+        ↓
+Related evidence is correlated
+        ↓
+Authorized analyst reviews evidence
+        ↓
+System produces structured assessment support
+        ↓
+Uncertainty is displayed
+        ↓
+System produces decision-support recommendations
+        ↓
+Authorized decision maker reviews
+        ↓
+Human decision recorded
+        ↓
+Outcome observed
+        ↓
+Outcome evaluated
+        ↓
+Validated lesson enters institutional memory
+```
+
+Notice what is deliberately absent:
+
+```text
+AI independently declares an outbreak
+AI independently authorizes intervention
+AI independently executes consequential response
+```
+
+---
+
+# 94. Intelligence Architecture and the Immune Analogy
+
+The biological analogy maps as follows:
+
+| Biological Concept | AEGIS Concept |
+|---|---|
+| Skin / mucosa | Environmental sensing |
+| Innate detection | Anomaly detection |
+| Antigen recognition | Structured identification |
+| Adaptive response | Investigation + assessment |
+| Antibodies | Response recommendations |
+| Immune regulation | Human authorization + policy |
+| Immune memory | Institutional memory |
+| Homeostasis | Operational resilience |
+
+The analogy guides architecture.
+
+It does not replace scientific, clinical, or security governance.
+
+---
+
+# 95. Why the Analogy Matters
+
+Traditional monitoring often looks like:
+
+```text
+DATA
+ ↓
+DASHBOARD
+ ↓
+HUMAN
+```
+
+AEGIS is designed as:
+
+```text
+DATA
+ ↓
+DETECTION
+ ↓
+CONTEXT
+ ↓
+CORRELATION
+ ↓
+EVIDENCE
+ ↓
+ASSESSMENT
+ ↓
+DECISION SUPPORT
+ ↓
+HUMAN DECISION
+ ↓
+OUTCOME
+ ↓
+LEARNING
+```
+
+The difference is that AEGIS treats the organization as a **learning system**, not merely a monitoring system.
+
+---
+
+# 96. Intelligence Governance
+
+AI and intelligence changes require governance.
+
+Changes to:
+
+```text
+models
+rules
+baselines
+thresholds
+knowledge sources
+recommendation policies
+```
+
+must have:
+
+```text
+owner
+reason
+version
+testing
+approval
+deployment record
+rollback strategy
+```
+
+---
+
+# 97. Rollback
+
+Every production intelligence change must be reversible where technically feasible.
+
+```text
+New Version
+ ↓
+Monitoring
+ ↓
+Failure?
+ ├── NO → continue
+ └── YES
+       ↓
+     rollback
+```
+
+---
+
+# 98. Intelligence Change Record
+
+Conceptually:
+
+```text
+IntelligenceChange {
+    id
+    component
+    oldVersion
+    newVersion
+    reason
+    evidence
+    testedBy
+    approvedBy
+    deployedAt
+    rollbackReference
+}
+```
+
+---
+
+# 99. Intelligence Definition of Done
+
+The intelligence architecture is complete when AEGIS can demonstrate:
+
+```text
+✓ Signals have provenance
+✓ Signal quality is represented
+✓ Missing data is distinguishable
+✓ Anomalies are separated from threats
+✓ Evidence is separated from interpretation
+✓ Assessments preserve uncertainty
+✓ Recommendations are separate from decisions
+✓ Human authority is explicit
+✓ AI outputs are versioned
+✓ AI outputs are traceable
+✓ Important outputs are auditable
+✓ Model changes are governed
+✓ Learning is controlled
+✓ Institutional memory is validated
+✓ AI failure has a safe degraded mode
+✓ Users can inspect evidence
+✓ Unsupported conclusions are not presented as facts
+✓ Security boundaries are enforced
+```
+
+---
+
+# 100. Master Intelligence Contract
+
+AEGIS intelligence must always preserve the following chain:
+
+```text
+SOURCE
+ ↓
+SIGNAL
+ ↓
+OBSERVATION
+ ↓
+ANOMALY
+ ↓
+EVENT
+ ↓
+EVIDENCE
+ ↓
+ASSESSMENT
+ ↓
+RECOMMENDATION
+ ↓
+HUMAN DECISION
+ ↓
+OUTCOME
+ ↓
+VALIDATED LEARNING
+```
+
+If a future implementation skips a layer without an explicitly approved architectural reason, it must be treated as an architecture deviation.
+
+---
+
+# 101. Final Principle
+
+The most important rule in the entire AEGIS intelligence architecture is:
+
+> **AEGIS must make expert judgment stronger, faster, more contextual, and more traceable without pretending that uncertainty has disappeared.**
+
+The system should behave less like an oracle and more like an exceptionally disciplined intelligence partner.
+
+It should tell the expert:
+
+```text
+Here is what changed.
+
+Here is why it matters.
+
+Here is the evidence.
+
+Here is what we do not know.
+
+Here is what the system believes.
+
+Here is why it believes it.
+
+Here are the possible next steps.
+
+You have the authority to decide.
+```
+
+That is the intelligence architecture AEGIS should be built around.
