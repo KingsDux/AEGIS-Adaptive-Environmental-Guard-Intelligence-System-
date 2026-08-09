@@ -1,0 +1,1107 @@
+# AEGIS
+
+# Architecture Reconciliation & Decision Record
+
+**Document Type:** Architecture Decision / Reconciliation Record  
+**Project:** AEGIS — Adaptive Environmental Guard Intelligence System  
+**Status:** APPROVED BASELINE  
+**Purpose:** Resolve identified architectural inconsistencies before Repository Phase 0 Audit and implementation.
+
+---
+
+# 01. PURPOSE
+
+Claude's review of the complete AEGIS architecture identified several inconsistencies.
+
+Most are minor documentation issues.
+
+Two require an explicit architectural decision before implementation:
+
+1. **Domain Entity Naming Divergence**
+2. **Competing Implementation Roadmaps**
+
+This document formally resolves those issues.
+
+It exists to prevent:
+
+> AI agents, engineers, designers, or future documentation from making different interpretations of the AEGIS architecture.
+
+This document does **not** redesign AEGIS.
+
+It establishes how the existing approved architecture must be interpreted.
+
+---
+
+# 02. AUTHORITY
+
+The AEGIS architecture hierarchy remains:
+
+```text
+Safety / Security Constraints
+        ↓
+Stakeholder Requirements
+        ↓
+01 Master Architecture
+        ↓
+02 Domain Model + Global State
+        ↓
+03 User Flow
+        ↓
+04 Functional Requirements
+        ↓
+05 Interaction + State Transition
+        ↓
+06 Data Architecture
+        ↓
+07 API Architecture
+        ↓
+08 Frontend Architecture
+        ↓
+09 Design System
+        ↓
+10 Security
+        ↓
+11 AI Intelligence
+        ↓
+12 Observability
+        ↓
+13 Threat Modeling
+        ↓
+14 Testing
+        ↓
+15 Infrastructure
+        ↓
+16 Development Architecture
+        ↓
+17 AI Development Workflow
+        ↓
+18 Repository Constitution
+        ↓
+19 Master Build Plan
+        ↓
+20 Verification
+        ↓
+21 Phase 0 Audit
+```
+
+When two documents describe the same concept at different abstraction levels, the higher-level authoritative concept remains intact.
+
+Lower-level documents must map to it rather than silently redefine it.
+
+---
+
+# 03. DECISION 01 — DOMAIN ENTITY RECONCILIATION
+
+## Problem
+
+Document 02 defines the canonical AEGIS domain model.
+
+Document 06 defines a more granular data architecture.
+
+The vocabularies are not identical.
+
+### Document 02 includes:
+
+```text
+Organization
+Facility
+Location
+Source
+Device
+Observation
+Signal
+Event
+Evidence
+Assessment
+Decision
+Response
+Action
+Verification
+Recovery
+Timeline Entry
+Institutional Memory
+User
+Role
+Permission
+Audit Record
+System Status
+Data Freshness
+```
+
+### Document 06 includes:
+
+```text
+Observation
+Signal
+Anomaly
+Event
+Threat
+Risk Assessment
+Investigation
+Case
+Finding
+Transmission Assessment
+Containment Action
+Response Action
+Recovery Assessment
+Preparedness Lesson
+Resilience Gap
+Improvement Item
+Research Finding
+Location
+Organization
+Actor
+Evidence
+Notification
+Audit Record
+Domain Event
+```
+
+---
+
+# 04. DECISION
+
+**Document 02 remains the canonical domain vocabulary.**
+
+**Document 06 remains the concrete data architecture.**
+
+Document 06 must therefore be interpreted as a **data-layer specialization and decomposition of the canonical domain model**, not as a replacement for it.
+
+This means:
+
+```text
+DOMAIN MODEL
+     ↓
+Canonical business concepts
+     ↓
+DATA MODEL
+     ↓
+Concrete persisted/queryable representations
+```
+
+The data layer may contain more granular entities than the domain layer when those entities provide necessary implementation detail.
+
+---
+
+# 05. DOMAIN VS DATA DISTINCTION
+
+AEGIS must distinguish between:
+
+### Domain Concept
+
+What the system means.
+
+### Data Entity
+
+How the system stores, transports, indexes, or queries information.
+
+### UI Representation
+
+How the concept is presented to the user.
+
+### API Resource
+
+How the concept is exposed through a service boundary.
+
+These are related but are not required to have identical names.
+
+---
+
+# 06. CANONICAL MAPPING RULE
+
+The following principle is mandatory:
+
+> **A more granular data entity must map to a canonical domain concept.**
+
+No data entity may become an independent domain concept merely because it has its own database table or API endpoint.
+
+---
+
+# 07. INITIAL DOMAIN-TO-DATA MAPPING
+
+The following mappings establish the interpretation required for implementation.
+
+## Observation
+
+```text
+Domain:
+Observation
+
+Data:
+Observation
+```
+
+Direct mapping.
+
+---
+
+## Signal
+
+```text
+Domain:
+Signal
+
+Data:
+Signal
+```
+
+Direct mapping.
+
+---
+
+## Event
+
+```text
+Domain:
+Event
+
+Data:
+Event
+```
+
+Direct mapping.
+
+---
+
+## Evidence
+
+```text
+Domain:
+Evidence
+
+Data:
+Evidence
+```
+
+Direct mapping.
+
+---
+
+## Organization
+
+```text
+Domain:
+Organization
+
+Data:
+Organization
+```
+
+Direct mapping.
+
+---
+
+## Location
+
+```text
+Domain:
+Location
+
+Data:
+Location
+```
+
+Direct mapping.
+
+---
+
+## Audit Record
+
+```text
+Domain:
+AuditRecord
+
+Data:
+AuditRecord
+```
+
+Direct mapping.
+
+---
+
+## Assessment
+
+The canonical domain concept is:
+
+```text
+Assessment
+```
+
+The data architecture may contain specialized assessments such as:
+
+```text
+RiskAssessment
+TransmissionAssessment
+RecoveryAssessment
+```
+
+Therefore:
+
+```text
+Assessment
+├── RiskAssessment
+├── TransmissionAssessment
+└── RecoveryAssessment
+```
+
+These are interpreted as **specialized assessment representations**, not replacements for the canonical domain concept.
+
+---
+
+# 08. Response
+
+The canonical domain concept is:
+
+```text
+Response
+```
+
+The data architecture contains:
+
+```text
+ResponseAction
+ContainmentAction
+```
+
+These are interpreted as response-related data representations.
+
+Conceptually:
+
+```text
+Response
+└── Actions
+    ├── ContainmentAction
+    └── ResponseAction
+```
+
+Exact inheritance/composition must be determined during implementation from the approved contracts.
+
+OpenCode must **not invent additional relationships**.
+
+---
+
+# 09. Action
+
+The canonical domain concept is:
+
+```text
+Action
+```
+
+The data architecture contains:
+
+```text
+ContainmentAction
+ResponseAction
+```
+
+These are specialized action representations.
+
+```text
+Action
+├── ContainmentAction
+└── ResponseAction
+```
+
+---
+
+# 10. Recovery
+
+The canonical domain concept is:
+
+```text
+Recovery
+```
+
+The data architecture contains:
+
+```text
+RecoveryAssessment
+```
+
+Therefore:
+
+```text
+Recovery
+└── RecoveryAssessment
+```
+
+The data entity must not be interpreted as replacing the domain concept.
+
+---
+
+# 11. Institutional Memory
+
+Document 02 defines:
+
+```text
+InstitutionalMemory
+```
+
+Document 06 contains several learning-oriented entities:
+
+```text
+PreparednessLesson
+ResilienceGap
+ImprovementItem
+ResearchFinding
+```
+
+These are interpreted as **data representations supporting institutional learning and memory**.
+
+Conceptually:
+
+```text
+InstitutionalMemory
+├── PreparednessLesson
+├── ResilienceGap
+├── ImprovementItem
+└── ResearchFinding
+```
+
+The exact relationships remain governed by Document 06's contracts.
+
+---
+
+# 12. INVESTIGATION / CASE / FINDING
+
+Document 06 contains:
+
+```text
+Investigation
+Case
+Finding
+```
+
+These are valid data-layer concepts.
+
+They do not automatically require new canonical domain entities.
+
+They must map to the appropriate canonical concepts already established in Document 02.
+
+Before implementation, their exact domain mapping must be explicitly documented.
+
+**OpenCode must not invent this mapping.**
+
+If the existing documents do not provide enough information, it must be recorded as:
+
+```text
+UNKNOWN
+```
+
+and returned for architectural decision.
+
+---
+
+# 13. THREAT / ANOMALY
+
+Document 06 contains:
+
+```text
+Anomaly
+Threat
+```
+
+These terms may represent more specialized operational interpretations of:
+
+```text
+Signal
+Event
+Assessment
+```
+
+However:
+
+> **The architecture does not authorize OpenCode to arbitrarily decide which one they belong to.**
+
+Therefore the exact mapping must be verified against the existing contracts and repository during Phase 0.
+
+If unresolved:
+
+```text
+UNKNOWN
+```
+
+No implementation assumption is permitted.
+
+---
+
+# 14. ACTOR VS USER
+
+Document 02 defines:
+
+```text
+User
+```
+
+Document 06 defines:
+
+```text
+Actor
+```
+
+These must not automatically be treated as identical.
+
+For Phase 0:
+
+```text
+User = canonical application identity concept
+Actor = data/audit/event representation
+```
+
+The exact relationship must be verified against Document 10 and Document 06.
+
+---
+
+# 15. DOMAIN MODEL GOLDEN RULE
+
+For implementation:
+
+> **Document 02 defines what AEGIS means.**
+
+> **Document 06 defines how AEGIS data is structured and exchanged.**
+
+> **Document 07 defines how services expose that data.**
+
+> **Document 08 defines how the frontend consumes it.**
+
+> **Document 09 defines how users see it.**
+
+This distinction must remain intact.
+
+---
+
+# 16. DECISION 02 — IMPLEMENTATION ROADMAP
+
+## Problem
+
+Two roadmap descriptions exist:
+
+### Document 16
+
+Contains a 22-phase implementation sequence.
+
+### Document 19
+
+Contains a 20-phase implementation sequence and is specifically titled:
+
+> Master Build Plan + Progressive Implementation Roadmap
+
+The two sequences overlap but are not identical.
+
+Allowing both to remain authoritative would create implementation ambiguity.
+
+---
+
+# 17. DECISION
+
+**Document 19 is the authoritative implementation roadmap.**
+
+Document 16's roadmap is not authoritative for implementation sequencing.
+
+The roadmap in Document 19 governs:
+
+```text
+Phase 0
+Phase 1
+Phase 2
+...
+Phase 19
+```
+
+OpenCode and future AI agents must follow Document 19 when determining implementation order.
+
+---
+
+# 18. ROLE OF DOCUMENT 16
+
+Document 16 remains authoritative for:
+
+```text
+development architecture
+implementation principles
+engineering practices
+build principles
+AI task patterns
+implementation constraints
+development standards
+```
+
+Its alternate roadmap must be treated as:
+
+```text
+REFERENCE / HISTORICAL
+```
+
+not as the active implementation sequence.
+
+---
+
+# 19. DOCUMENT 19 ROADMAP AUTHORITY
+
+When any conflict occurs between:
+
+```text
+Document 16 roadmap
+vs.
+Document 19 roadmap
+```
+
+the answer is:
+
+```text
+Document 19 wins.
+```
+
+No AI agent may choose a different sequence based on personal judgment.
+
+---
+
+# 20. DECISION 03 — DOCUMENT CURRENCY
+
+Several documents contain historical references to earlier document counts.
+
+Examples include references to:
+
+```text
+01–16
+17 documents
+19 documents
+```
+
+These are understood as historical document-state references.
+
+The current architecture baseline is:
+
+```text
+Documents 01–20 = Approved Architecture Baseline
+Document 21 = Phase 0 Execution Protocol
+```
+
+Therefore:
+
+> **The current architecture baseline is Documents 01–20.**
+
+Document 21 is the executable audit instruction derived from that architecture.
+
+---
+
+# 21. DOCUMENT 21 STATUS
+
+Document 21 is:
+
+```text
+IMPLEMENTATION GATE
+```
+
+It is not a competing architecture document.
+
+Its purpose is to inspect the repository against the approved architecture.
+
+Therefore:
+
+```text
+Documents 01–20
+       ↓
+Architecture
+       ↓
+Document 21
+       ↓
+Repository Audit
+```
+
+---
+
+# 22. DECISION 04 — 13-SCREEN AUTHORITY
+
+The 13-screen registry remains unchanged.
+
+Documents 03 and 04 are confirmed to agree.
+
+No other document may introduce alternative screen names as authoritative.
+
+Where roadmap documents contain illustrative screen names:
+
+```text
+Approved 13-screen registry wins.
+```
+
+AI agents must not create screens from illustrative roadmap language.
+
+---
+
+# 23. DECISION 05 — STATE MACHINE AUTHORITY
+
+The canonical operational state machine remains governed by:
+
+**Document 02 — Domain Model + Global State Architecture**
+
+Narrative sequences in other documents are explanatory unless explicitly mapped to the canonical state machine.
+
+Therefore:
+
+```text
+Doc02 state semantics
+        ↓
+Canonical
+```
+
+Other documents:
+
+```text
+Narrative / explanatory
+```
+
+OpenCode must not create a new state machine based on narrative descriptions.
+
+---
+
+# 24. DECISION 06 — AI AUTHORITY BOUNDARY
+
+All AI behavior remains subject to the existing AEGIS safety boundary.
+
+AI may:
+
+```text
+analyze
+classify
+surface patterns
+summarize
+prioritize
+recommend
+explain
+support investigation
+```
+
+AI must not independently authorize consequential operational actions.
+
+The system must maintain:
+
+```text
+Observation
+    ↓
+Inference
+    ↓
+Recommendation
+    ↓
+Human Authorization
+    ↓
+Execution
+    ↓
+Verification
+```
+
+AI must not silently collapse these stages.
+
+---
+
+# 25. DECISION 07 — NO IMPLEMENTATION ASSUMPTIONS
+
+The reconciliation decisions do not authorize OpenCode to fill remaining gaps.
+
+If an architectural relationship is not explicitly established:
+
+```text
+UNKNOWN
+```
+
+must be recorded.
+
+Examples:
+
+```text
+Unknown domain mapping
+Unknown RBAC policy
+Unknown identity provider
+Unknown regulatory requirements
+Unknown threat scoring methodology
+Unknown performance target
+Unknown AI deployment decision
+```
+
+Unknown information must remain visible until resolved.
+
+---
+
+# 26. DECISION 08 — PHASE 0 REMAINS READ-ONLY
+
+The reconciliation does not change the purpose of Document 21.
+
+Phase 0 remains:
+
+```text
+READ
+INSPECT
+COMPARE
+DOCUMENT
+STOP
+```
+
+No implementation begins during Phase 0.
+
+---
+
+# 27. PHASE 0 AUTHORITY AFTER THIS DOCUMENT
+
+OpenCode must now use:
+
+```text
+Documents 01–20
+        +
+This Reconciliation Record
+        +
+Document 21
+```
+
+as the Phase 0 audit baseline.
+
+---
+
+# 28. PHASE 0 MUST VERIFY THE RECONCILIATION
+
+During Phase 0, OpenCode must specifically inspect the repository for:
+
+```text
+domain entity naming
+data entity naming
+state naming
+screen naming
+roadmap references
+legacy architecture
+duplicate domain models
+duplicate schemas
+conflicting terminology
+```
+
+If the repository contains a different interpretation:
+
+```text
+Do not automatically change it.
+```
+
+Report it as:
+
+```text
+CONFLICT
+```
+
+or:
+
+```text
+MISMATCH
+```
+
+with evidence.
+
+---
+
+# 29. NEW TRACEABILITY REQUIREMENT
+
+Every implementation-level domain entity should eventually be traceable through:
+
+```text
+Domain Concept
+      ↓
+Data Entity
+      ↓
+API Contract
+      ↓
+Frontend State
+      ↓
+UI Representation
+      ↓
+Test
+```
+
+Example:
+
+```text
+Assessment
+      ↓
+RiskAssessment
+      ↓
+Risk Assessment API Contract
+      ↓
+Assessment State
+      ↓
+Assessment UI
+      ↓
+Assessment Tests
+```
+
+This prevents disconnected implementations.
+
+---
+
+# 30. RECONCILIATION STATUS
+
+| Decision | Status |
+|---|---|
+| Domain vs Data vocabulary | RESOLVED |
+| Implementation roadmap | RESOLVED |
+| Document count/currency | RESOLVED |
+| 13-screen authority | CONFIRMED |
+| Global state authority | CONFIRMED |
+| AI safety boundary | CONFIRMED |
+| Phase 0 read-only requirement | CONFIRMED |
+
+---
+
+# 31. REMAINING OPEN QUESTIONS
+
+These remain intentionally unresolved and are **not blockers for Phase 0**:
+
+```text
+1. Final RBAC matrix
+2. Data sensitivity classification
+3. Applicable regulatory framework
+4. Identity provider
+5. Audit retention
+6. Break-glass policy
+7. Audit pipeline failure policy
+8. Threat/risk scoring methodology
+9. Escalation thresholds
+10. Generative AI/RAG inclusion in v1
+11. Performance/SLO targets
+12. RPO/RTO
+13. Cloud provider
+14. Infrastructure sizing
+15. Telemetry trust model
+16. Fail-open/fail-closed policy per subsystem
+```
+
+These must be resolved before their corresponding implementation stages.
+
+---
+
+# 32. IMPLEMENTATION SAFETY RULE
+
+No AI agent may interpret an unresolved question as permission to choose a solution.
+
+Instead:
+
+```text
+UNKNOWN
+    ↓
+DOCUMENT
+    ↓
+ESCALATE
+    ↓
+DECIDE
+    ↓
+UPDATE TRACEABILITY
+    ↓
+IMPLEMENT
+```
+
+---
+
+# 33. FINAL ARCHITECTURAL INTERPRETATION
+
+AEGIS should now be understood as:
+
+```text
+Canonical Domain
+       ↓
+Domain State
+       ↓
+User Journey
+       ↓
+Functional Requirements
+       ↓
+Interaction Contracts
+       ↓
+Data Contracts
+       ↓
+API Contracts
+       ↓
+Frontend Architecture
+       ↓
+Design System
+       ↓
+Security / AI / Observability
+       ↓
+Testing
+       ↓
+Infrastructure
+       ↓
+Implementation
+       ↓
+Verification
+```
+
+The repository must implement this chain without bypassing its intermediate contracts.
+
+---
+
+# 34. FINAL DECISIONS
+
+## Decision A
+
+**Document 02 remains the canonical domain model.**
+
+Document 06 is the concrete data architecture and may use more granular entities.
+
+---
+
+## Decision B
+
+**Document 19 is the authoritative implementation roadmap.**
+
+Document 16's alternate roadmap is reference material only.
+
+---
+
+## Decision C
+
+**Documents 01–20 constitute the approved architecture baseline.**
+
+Document 21 is the Phase 0 execution protocol.
+
+---
+
+## Decision D
+
+**The 13-screen registry in Documents 03–04 is authoritative.**
+
+No alternative screen naming may override it.
+
+---
+
+## Decision E
+
+**Document 02 owns canonical global state semantics.**
+
+Narrative state sequences elsewhere are explanatory.
+
+---
+
+## Decision F
+
+**Phase 0 must remain read-only.**
+
+No implementation begins until Phase 0 has been reviewed and approved.
+
+---
+
+# 35. FINAL GATE
+
+The architecture is now considered:
+
+**RECONCILED FOR PHASE 0.**
+
+The project may proceed to:
+
+> **AEGIS Implementation Phase 0 — Repository Audit & Architecture Alignment**
+
+The next objective is not to build AEGIS.
+
+The next objective is to determine, with evidence:
+
+> **How close is the existing repository to the approved AEGIS architecture?**
+
+Only after that question is answered and reviewed may implementation begin.
+
+---
+
+# END OF AEGIS ARCHITECTURE RECONCILIATION & DECISION RECORD
