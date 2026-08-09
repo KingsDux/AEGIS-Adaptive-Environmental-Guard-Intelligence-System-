@@ -1,0 +1,2564 @@
+# AEGIS
+# Testing + Quality Assurance Architecture
+
+**System:** AEGIS  
+**Document:** 14 — Testing + Quality Assurance Architecture  
+**Version:** 1.0  
+**Status:** Master Architecture  
+**Date:** August 2026
+
+---
+
+# 01. Purpose
+
+This document defines how AEGIS will be verified, validated, tested, and accepted throughout its lifecycle.
+
+AEGIS is not an ordinary dashboard.
+
+It is a high-stakes decision-support system operating across:
+
+```text
+data
+telemetry
+intelligence
+human decisions
+security
+operational workflows
+```
+
+Therefore, testing must answer more than:
+
+> "Does the application work?"
+
+It must answer:
+
+```text
+Does the system behave correctly?
+
+Does the system preserve state correctly?
+
+Does data remain trustworthy?
+
+Does uncertainty remain visible?
+
+Does the AI behave within its boundaries?
+
+Do permissions work correctly?
+
+Does the UI communicate the correct operational state?
+
+Does the system fail safely?
+
+Does the system recover correctly?
+
+Can the complete operational journey be completed?
+
+Can stakeholders trust what the system shows?
+```
+
+---
+
+# 02. QA Philosophy
+
+AEGIS follows:
+
+> **Test the system as a system, not merely as code.**
+
+Testing must cover five dimensions:
+
+```text
+FUNCTION
+DATA
+INTELLIGENCE
+HUMAN INTERACTION
+RESILIENCE
+```
+
+---
+
+# 03. Quality Model
+
+AEGIS quality is defined as:
+
+```text
+QUALITY
+=
+Correctness
++
+Reliability
++
+Security
++
+Usability
++
+Traceability
++
+Resilience
++
+Explainability
+```
+
+A visually impressive interface that produces incorrect state is not a quality product.
+
+---
+
+# 04. Testing Pyramid
+
+AEGIS should use a layered testing strategy.
+
+```text
+                    E2E
+                 /       \
+          Operational Journey
+             /           \
+       Integration      Security
+          /                 \
+      Component          Intelligence
+        /                     \
+      Unit                  Contract
+```
+
+The largest number of tests should be lower in the pyramid.
+
+High-level tests should validate critical journeys rather than replace lower-level tests.
+
+---
+
+# 05. Test Layers
+
+AEGIS testing includes:
+
+```text
+01 Unit Testing
+02 Component Testing
+03 Contract Testing
+04 API Testing
+05 Integration Testing
+06 Data Testing
+07 State Testing
+08 Frontend Testing
+09 Accessibility Testing
+10 Intelligence Testing
+11 Security Testing
+12 Performance Testing
+13 Reliability Testing
+14 Failure Testing
+15 Recovery Testing
+16 End-to-End Testing
+17 Operational Journey Testing
+18 User Acceptance Testing
+19 Regression Testing
+20 Release Validation
+```
+
+---
+
+# 06. Test Traceability
+
+Every important requirement should be traceable.
+
+```text
+Requirement
+ ↓
+Implementation
+ ↓
+Test
+ ↓
+Result
+ ↓
+Evidence
+```
+
+This creates a requirement-to-verification chain.
+
+---
+
+# 07. Requirement IDs
+
+AEGIS requirements should eventually have stable identifiers.
+
+Example:
+
+```text
+FR-001
+FR-002
+FR-003
+```
+
+Tests can then reference them:
+
+```text
+TEST-FR-001
+TEST-FR-002
+```
+
+This should align with Document 04.
+
+---
+
+# 08. Test Case Structure
+
+A test case should contain:
+
+```text
+Test ID
+Requirement ID
+Purpose
+Preconditions
+Input
+Action
+Expected Result
+Actual Result
+Status
+Evidence
+Environment
+Tester
+Timestamp
+```
+
+---
+
+# 09. Test Status
+
+Use controlled statuses:
+
+```text
+NOT_RUN
+PASS
+FAIL
+BLOCKED
+SKIPPED
+```
+
+Do not use vague statuses such as:
+
+```text
+looks good
+probably works
+seems fine
+```
+
+---
+
+# 10. Unit Testing
+
+Unit tests validate isolated logic.
+
+Examples:
+
+```text
+state reducers
+validation functions
+data transformations
+utility functions
+permission calculations
+formatters
+threshold logic
+```
+
+---
+
+# 11. Unit Test Principle
+
+A unit test should answer:
+
+> Does this isolated piece of logic produce the expected result for a defined input?
+
+---
+
+# 12. Unit Test Examples
+
+Conceptually:
+
+```text
+Input:
+stale telemetry
+
+Expected:
+freshness = STALE
+```
+
+Another:
+
+```text
+Input:
+unauthorized role
+
+Expected:
+operation denied
+```
+
+Another:
+
+```text
+Input:
+invalid telemetry schema
+
+Expected:
+validation failure
+```
+
+---
+
+# 13. Component Testing
+
+Component tests validate UI behavior independently.
+
+Examples:
+
+```text
+alert card
+telemetry card
+status indicator
+investigation panel
+timeline
+navigation
+filter
+modal
+table
+map layer
+```
+
+---
+
+# 14. Component Test Requirements
+
+A component test should verify:
+
+```text
+rendering
+interaction
+state
+accessibility
+error behavior
+empty behavior
+loading behavior
+permission behavior
+```
+
+---
+
+# 15. State Testing
+
+State is one of the most important parts of AEGIS.
+
+Tests must verify:
+
+```text
+initial state
+state transition
+derived state
+persistent state
+reset behavior
+error state
+degraded state
+```
+
+---
+
+# 16. State Transition Testing
+
+For every important transition:
+
+```text
+Initial State
+ ↓
+User/System Event
+ ↓
+Expected State
+```
+
+Example:
+
+```text
+ALERT_OPEN
+ ↓
+ACKNOWLEDGE
+ ↓
+ALERT_ACKNOWLEDGED
+```
+
+The system must not accidentally enter an invalid state.
+
+---
+
+# 17. Invalid Transition Testing
+
+AEGIS must explicitly test invalid operations.
+
+Example:
+
+```text
+RESOLVED
+ ↓
+ACKNOWLEDGE
+```
+
+If the transition is invalid, the system should reject it safely.
+
+---
+
+# 18. State Machine Integrity
+
+Tests should verify:
+
+```text
+allowed transitions
+blocked transitions
+transition conditions
+side effects
+audit events
+notifications
+UI updates
+```
+
+This directly derives from Document 05.
+
+---
+
+# 19. API Testing
+
+Every API endpoint must be tested for:
+
+```text
+valid input
+invalid input
+missing input
+authentication
+authorization
+successful response
+error response
+malformed request
+rate behavior
+```
+
+---
+
+# 20. API Contract Testing
+
+API consumers and providers must agree on:
+
+```text
+request schema
+response schema
+status codes
+error format
+required fields
+optional fields
+data types
+```
+
+A frontend should not silently adapt to an unexpected backend schema.
+
+---
+
+# 21. Contract Failure
+
+If a contract changes unexpectedly:
+
+```text
+API
+ ↓
+Contract Test
+ ↓
+FAIL
+ ↓
+Build blocked
+```
+
+This prevents silent breakage.
+
+---
+
+# 22. Integration Testing
+
+Integration tests verify multiple components working together.
+
+Example:
+
+```text
+Frontend
+ ↓
+API
+ ↓
+Service
+ ↓
+Database
+```
+
+Another:
+
+```text
+Telemetry
+ ↓
+Ingestion
+ ↓
+Validation
+ ↓
+Storage
+ ↓
+Intelligence
+```
+
+---
+
+# 23. Data Testing
+
+AEGIS must test:
+
+```text
+schema
+validation
+normalization
+quality
+freshness
+provenance
+duplicates
+missing values
+invalid values
+```
+
+---
+
+# 24. Data Contract Testing
+
+Every important data contract should have tests.
+
+Examples:
+
+```text
+TelemetryRecord
+Alert
+Investigation
+Assessment
+Recommendation
+Decision
+AuditEvent
+User
+Permission
+```
+
+---
+
+# 25. Data Integrity Testing
+
+Tests must verify that important records are not silently altered.
+
+Example:
+
+```text
+Original event
+ ↓
+Processing
+ ↓
+Stored event
+```
+
+Expected:
+
+```text
+integrity preserved
+```
+
+---
+
+# 26. Data Freshness Testing
+
+Given a stale input:
+
+```text
+Expected:
+status = STALE
+```
+
+The UI must not display:
+
+```text
+status = CURRENT
+```
+
+---
+
+# 27. Missing Data Testing
+
+Given missing telemetry:
+
+```text
+Expected:
+UNKNOWN / MISSING / DEGRADED
+```
+
+Not:
+
+```text
+NORMAL
+```
+
+unless explicitly justified by the domain logic.
+
+---
+
+# 28. Provenance Testing
+
+For important data:
+
+```text
+source
+timestamp
+processing path
+```
+
+must remain traceable.
+
+---
+
+# 29. Frontend Testing
+
+Frontend tests should cover:
+
+```text
+navigation
+routing
+rendering
+interaction
+state
+permissions
+loading
+errors
+empty states
+degraded states
+responsive behavior
+```
+
+---
+
+# 30. 13-Screen Testing
+
+Every AEGIS screen must have a test suite derived from Document 04.
+
+For every screen verify:
+
+```text
+purpose
+entry point
+required data
+layout
+components
+interactions
+states
+navigation
+permissions
+error handling
+completion criteria
+```
+
+---
+
+# 31. Screen State Matrix
+
+Each screen should eventually have:
+
+```text
+LOADING
+READY
+EMPTY
+ERROR
+DEGRADED
+STALE
+NO_PERMISSION
+```
+
+where applicable.
+
+---
+
+# 32. Navigation Testing
+
+Test:
+
+```text
+screen A
+ ↓
+screen B
+ ↓
+back
+ ↓
+screen A
+```
+
+Verify:
+
+```text
+URL/state
+context
+filters
+selected entity
+navigation history
+```
+
+are preserved correctly where required.
+
+---
+
+# 33. Deep-Link Testing
+
+If AEGIS supports deep links:
+
+```text
+URL
+ ↓
+application
+ ↓
+correct screen
+ ↓
+correct entity
+ ↓
+correct state
+```
+
+must work.
+
+---
+
+# 34. Browser Refresh Testing
+
+Refreshing a page must produce an intentional result.
+
+Test:
+
+```text
+refresh
+reload
+new session
+expired session
+```
+
+and verify the expected behavior.
+
+---
+
+# 35. Accessibility Testing
+
+AEGIS must be usable by people with relevant accessibility needs.
+
+Test:
+
+```text
+keyboard navigation
+focus order
+focus visibility
+screen reader semantics
+ARIA usage where appropriate
+contrast
+text scaling
+reduced motion
+non-color status indicators
+```
+
+---
+
+# 36. Accessibility Principle
+
+Critical meaning must never depend exclusively on:
+
+```text
+color
+animation
+position
+sound
+```
+
+---
+
+# 37. Responsive Testing
+
+AEGIS may primarily target large operational displays.
+
+Nevertheless, define supported:
+
+```text
+desktop
+large monitor
+tablet
+```
+
+breakpoints where applicable.
+
+Do not assume mobile support unless it is an explicit product requirement.
+
+---
+
+# 38. Visual Regression Testing
+
+Important interfaces should be compared against approved visual references.
+
+Test:
+
+```text
+spacing
+typography
+layout
+component states
+icons
+responsive behavior
+```
+
+This protects the design system from accidental drift.
+
+---
+
+# 39. Design System Testing
+
+Document 09 defines the component architecture.
+
+Tests should verify that components:
+
+```text
+use approved tokens
+support required states
+maintain accessibility
+behave consistently
+```
+
+---
+
+# 40. Interaction Testing
+
+Interactions must be tested as workflows.
+
+Example:
+
+```text
+Open alert
+ ↓
+Inspect evidence
+ ↓
+Open investigation
+ ↓
+Review assessment
+ ↓
+Review recommendation
+ ↓
+Record decision
+```
+
+Every step must preserve correct state.
+
+---
+
+# 41. AI Intelligence Testing
+
+AI testing must be separated from ordinary software testing.
+
+AI output is probabilistic.
+
+Therefore evaluate:
+
+```text
+accuracy
+consistency
+grounding
+uncertainty
+failure behavior
+safety boundaries
+```
+
+---
+
+# 42. AI Test Categories
+
+AEGIS should test:
+
+```text
+classification
+summarization
+evidence extraction
+recommendation generation
+uncertainty expression
+source attribution
+```
+
+only where these capabilities are actually part of the approved AEGIS intelligence architecture.
+
+---
+
+# 43. AI Evaluation Dataset
+
+AI evaluation should use a controlled dataset containing representative scenarios.
+
+Conceptually:
+
+```text
+Scenario
+ ↓
+Expected properties
+ ↓
+Model output
+ ↓
+Evaluation
+```
+
+The goal is not necessarily exact textual matching.
+
+---
+
+# 44. AI Grounding Test
+
+Given known evidence:
+
+```text
+Evidence
+ ↓
+AI
+```
+
+the output should remain supported by that evidence.
+
+Unsupported claims should fail evaluation.
+
+---
+
+# 45. AI Hallucination Test
+
+Create controlled cases designed to expose unsupported generation.
+
+Expected behavior:
+
+```text
+insufficient evidence
+```
+
+rather than fabricated certainty.
+
+---
+
+# 46. AI Uncertainty Test
+
+When evidence is incomplete:
+
+```text
+Expected:
+uncertainty communicated
+```
+
+not:
+
+```text
+false confidence
+```
+
+---
+
+# 47. AI Boundary Test
+
+Verify that AI cannot:
+
+```text
+modify protected data
+change permissions
+execute consequential operations
+override authorization
+```
+
+unless explicitly designed, authorized, and governed.
+
+For AEGIS, the default architecture should keep consequential actions behind controlled human authorization.
+
+---
+
+# 48. AI Regression Testing
+
+When changing:
+
+```text
+model
+prompt
+retrieval logic
+knowledge source
+system instructions
+output schema
+```
+
+rerun the approved AI evaluation suite.
+
+---
+
+# 49. AI Version Testing
+
+Every production intelligence version should be identifiable.
+
+Conceptually:
+
+```text
+model version
+prompt version
+retrieval version
+configuration version
+```
+
+This enables reproducibility.
+
+---
+
+# 50. Security Testing
+
+Security testing should cover:
+
+```text
+authentication
+authorization
+session management
+input validation
+API security
+data access
+secrets
+logging
+privilege boundaries
+```
+
+---
+
+# 51. Authentication Tests
+
+Verify:
+
+```text
+valid credentials
+invalid credentials
+expired credentials
+session expiration
+MFA where required
+account lockout / protection
+logout
+token invalidation
+```
+
+---
+
+# 52. Authorization Tests
+
+For every protected operation:
+
+```text
+authorized role → allowed
+unauthorized role → denied
+```
+
+Test both frontend and backend.
+
+---
+
+# 53. Privilege Escalation Testing
+
+Attempt to access:
+
+```text
+higher privilege
+different organization
+different scope
+restricted resource
+```
+
+without authorization.
+
+Expected:
+
+```text
+DENIED
+```
+
+---
+
+# 54. Tenant / Organizational Isolation
+
+If AEGIS eventually supports multiple organizations or facilities, test that one organization cannot access another organization's data.
+
+This requirement must be explicitly implemented before such a multi-tenant model is assumed.
+
+---
+
+# 55. Input Security Testing
+
+Test malicious or malformed inputs against:
+
+```text
+forms
+API
+query parameters
+filters
+imports
+external data
+AI inputs
+```
+
+---
+
+# 56. Injection Testing
+
+Relevant systems should be tested for:
+
+```text
+SQL injection
+command injection
+script injection
+prompt injection
+```
+
+according to the technologies actually used.
+
+---
+
+# 57. Dependency Security
+
+The build pipeline should identify:
+
+```text
+vulnerable dependencies
+outdated packages
+known security issues
+```
+
+before release.
+
+---
+
+# 58. Secrets Testing
+
+Automated checks should detect accidentally committed:
+
+```text
+API keys
+tokens
+credentials
+private keys
+```
+
+---
+
+# 59. Audit Testing
+
+Verify that sensitive actions generate appropriate audit records.
+
+Example:
+
+```text
+User
+ ↓
+Sensitive Action
+ ↓
+Audit Event
+```
+
+The audit architecture remains governed by Document 10.
+
+---
+
+# 60. Observability Testing
+
+Document 12 requires system visibility.
+
+Test:
+
+```text
+errors generate logs
+important operations generate metrics
+distributed workflows can be traced where appropriate
+service failures become visible
+telemetry failures become visible
+```
+
+---
+
+# 61. Failure Injection
+
+AEGIS must eventually test controlled failures.
+
+Examples:
+
+```text
+database unavailable
+API unavailable
+AI unavailable
+telemetry unavailable
+network interruption
+notification failure
+expired session
+invalid data
+```
+
+---
+
+# 62. Graceful Degradation Testing
+
+When a non-critical service fails:
+
+```text
+Expected:
+AEGIS enters appropriate degraded state
+```
+
+not:
+
+```text
+entire application becomes unusable
+```
+
+where graceful degradation is architecturally possible.
+
+---
+
+# 63. Recovery Testing
+
+Test:
+
+```text
+failure
+ ↓
+recovery
+ ↓
+normal operation
+```
+
+Verify:
+
+```text
+state consistency
+data integrity
+notifications
+audit
+user experience
+```
+
+---
+
+# 64. Disaster Recovery Testing
+
+Eventually test:
+
+```text
+service restoration
+database restoration
+backup restoration
+configuration restoration
+```
+
+Recovery targets must be defined by infrastructure requirements.
+
+---
+
+# 65. Performance Testing
+
+Performance testing should cover:
+
+```text
+page load
+API latency
+database operations
+telemetry ingestion
+event processing
+search
+filtering
+intelligence generation
+```
+
+---
+
+# 66. Load Testing
+
+Simulate realistic concurrent workloads.
+
+Test:
+
+```text
+normal load
+peak load
+sustained load
+burst load
+```
+
+Do not invent production numbers before stakeholder requirements exist.
+
+---
+
+# 67. Stress Testing
+
+Push selected components beyond expected operating conditions to identify:
+
+```text
+failure point
+degradation behavior
+recovery behavior
+```
+
+---
+
+# 68. Capacity Testing
+
+Determine how performance changes as:
+
+```text
+users increase
+events increase
+telemetry increases
+historical data increases
+```
+
+---
+
+# 69. Performance Regression
+
+A new release must not silently create significant performance degradation.
+
+Compare against established baselines.
+
+---
+
+# 70. Reliability Testing
+
+Measure:
+
+```text
+availability
+failure rate
+recovery time
+data loss
+processing reliability
+```
+
+---
+
+# 71. Concurrency Testing
+
+Test simultaneous operations.
+
+Examples:
+
+```text
+two users editing same object
+multiple alerts arriving simultaneously
+multiple investigations updating
+```
+
+Expected conflict behavior must be explicit.
+
+---
+
+# 72. Race Condition Testing
+
+Where state changes can occur concurrently:
+
+```text
+Event A
+Event B
+```
+
+test all meaningful ordering combinations.
+
+---
+
+# 73. Event Ordering Testing
+
+For event-driven workflows:
+
+```text
+Event 1
+Event 2
+Event 3
+```
+
+must produce correct state even when events arrive late or out of order where the architecture supports such conditions.
+
+---
+
+# 74. Idempotency Testing
+
+Repeated requests should not unintentionally create duplicate operations.
+
+Example:
+
+```text
+same request
+ ↓
+retry
+ ↓
+expected:
+one logical operation
+```
+
+where the endpoint is designed to be idempotent.
+
+---
+
+# 75. Operational Journey Testing
+
+This is one of the most important AEGIS test categories.
+
+The system must be tested as a complete operational journey.
+
+Conceptually:
+
+```text
+Signal
+ ↓
+Detection
+ ↓
+Assessment
+ ↓
+Investigation
+ ↓
+Decision Support
+ ↓
+Human Decision
+ ↓
+Response Workflow
+ ↓
+Outcome
+ ↓
+Feedback
+ ↓
+Institutional Learning
+```
+
+---
+
+# 76. Journey Integrity
+
+The test should verify that:
+
+```text
+context
+state
+data
+permissions
+evidence
+decision
+audit
+```
+
+remain connected throughout the journey.
+
+---
+
+# 77. End-to-End Scenario
+
+A complete test scenario should eventually resemble:
+
+```text
+Operational anomaly detected
+ ↓
+Global Monitoring
+ ↓
+Threat Intelligence
+ ↓
+Evidence reviewed
+ ↓
+Assessment generated
+ ↓
+Recommendation generated
+ ↓
+Authorized response workflow
+ ↓
+Outcome recorded
+ ↓
+Feedback captured
+ ↓
+Learning available
+```
+
+This is not merely a UI test.
+
+It is a system test.
+
+---
+
+# 78. Cross-Screen State Testing
+
+When an entity changes on Screen A:
+
+```text
+Screen A
+ ↓
+state change
+ ↓
+Screen B
+```
+
+Screen B must receive the correct state.
+
+---
+
+# 79. Cross-Screen Data Consistency
+
+If an investigation changes:
+
+```text
+Investigation status = CLOSED
+```
+
+all relevant views must eventually reflect the same authoritative state.
+
+---
+
+# 80. Browser Session Testing
+
+Test:
+
+```text
+new session
+existing session
+expired session
+multiple tabs
+refresh
+logout
+re-login
+```
+
+---
+
+# 81. Notification Testing
+
+Test:
+
+```text
+alert created
+ ↓
+notification generated
+ ↓
+delivery success/failure
+ ↓
+user acknowledgement
+```
+
+These states must remain distinguishable.
+
+---
+
+# 82. Empty-State Testing
+
+Every screen should have intentional behavior when there is no data.
+
+Avoid:
+
+```text
+blank screen
+broken layout
+undefined values
+```
+
+---
+
+# 83. Error-State Testing
+
+Errors should communicate:
+
+```text
+what happened
+impact
+whether retry is possible
+what the user can do next
+```
+
+Avoid exposing internal technical details unnecessarily.
+
+---
+
+# 84. Degraded-State Testing
+
+Examples:
+
+```text
+AI unavailable
+telemetry stale
+integration unavailable
+partial data
+service degraded
+```
+
+The interface should remain understandable.
+
+---
+
+# 85. Loading-State Testing
+
+Verify that loading states:
+
+```text
+appear when necessary
+do not flash unnecessarily
+do not block unrelated functionality
+resolve correctly
+handle timeout
+```
+
+---
+
+# 86. Permission-State Testing
+
+When a user lacks permission:
+
+```text
+Expected:
+clear permission boundary
+```
+
+not:
+
+```text
+broken component
+```
+
+---
+
+# 87. Regression Testing
+
+Every major change should trigger the appropriate regression suite.
+
+Regression testing should cover:
+
+```text
+core functionality
+state
+navigation
+contracts
+security
+critical journeys
+```
+
+---
+
+# 88. Smoke Testing
+
+After deployment, perform a minimal smoke suite:
+
+```text
+application loads
+authentication works
+primary API works
+database accessible
+critical screen loads
+critical workflow works
+```
+
+---
+
+# 89. Release Testing
+
+A release should not be considered production-ready until:
+
+```text
+critical tests pass
+security gates pass
+contract tests pass
+critical journey passes
+deployment checks pass
+```
+
+---
+
+# 90. Test Environments
+
+AEGIS should separate:
+
+```text
+LOCAL
+DEVELOPMENT
+TEST
+STAGING
+PRODUCTION
+```
+
+Each environment must have clearly defined purpose.
+
+---
+
+# 91. Test Data
+
+Testing should primarily use:
+
+```text
+synthetic scenarios
+controlled fixtures
+approved anonymized datasets
+```
+
+Production sensitive data should not casually become test data.
+
+---
+
+# 92. Synthetic Operational Scenarios
+
+AEGIS should build a reusable scenario library.
+
+Examples:
+
+```text
+normal conditions
+single anomaly
+multiple anomalies
+missing telemetry
+stale telemetry
+conflicting sources
+service failure
+AI unavailable
+high alert volume
+authorization failure
+recovery
+```
+
+---
+
+# 93. Golden Scenarios
+
+Critical scenarios should have stable expected outcomes.
+
+Example:
+
+```text
+Scenario:
+known test anomaly
+
+Expected:
+specific state transition
+specific evidence presentation
+specific recommendation behavior
+specific audit event
+```
+
+---
+
+# 94. Test Fixtures
+
+Fixtures should be version-controlled where appropriate.
+
+Examples:
+
+```text
+users
+roles
+telemetry
+alerts
+investigations
+assessments
+recommendations
+```
+
+---
+
+# 95. Test Isolation
+
+Tests should not unexpectedly depend on:
+
+```text
+another test
+local machine state
+production services
+external APIs
+uncontrolled AI outputs
+```
+
+---
+
+# 96. External Integration Testing
+
+Third-party integrations should have:
+
+```text
+mock tests
+contract tests
+integration tests
+failure tests
+timeout tests
+authentication tests
+```
+
+---
+
+# 97. AI Provider Dependency Testing
+
+If AEGIS depends on an external model provider:
+
+```text
+provider available
+provider slow
+provider unavailable
+provider returns invalid output
+```
+
+must be tested.
+
+---
+
+# 98. Model Output Validation
+
+AI output should pass schema validation before entering downstream workflows.
+
+Example:
+
+```text
+AI output
+ ↓
+schema validation
+ ↓
+semantic validation
+ ↓
+approved internal representation
+```
+
+---
+
+# 99. AI Non-Determinism
+
+Tests should not always demand exact textual output.
+
+Instead evaluate:
+
+```text
+required fields
+grounding
+constraints
+safety properties
+semantic correctness
+```
+
+---
+
+# 100. Human Review Testing
+
+Where human review is required:
+
+```text
+AI output
+ ↓
+human review
+ ↓
+approve / reject / modify
+```
+
+the system must preserve the distinction between generated and human-approved content.
+
+---
+
+# 101. Decision Audit Testing
+
+Test that the system can reconstruct:
+
+```text
+what evidence existed
+what assessment existed
+what recommendation existed
+who made the decision
+when
+```
+
+subject to appropriate privacy and governance requirements.
+
+---
+
+# 102. Security Boundary Testing
+
+Explicitly test:
+
+```text
+User
+ ↓
+Frontend
+ ↓
+API
+ ↓
+Service
+ ↓
+Database
+```
+
+at every boundary.
+
+---
+
+# 103. Threat-to-Test Mapping
+
+Document 13 risks must map to tests.
+
+Example:
+
+```text
+Threat:
+Unauthorized access
+
+Test:
+Unauthorized role attempts protected operation
+
+Expected:
+DENIED
++
+audit event
+```
+
+Another:
+
+```text
+Threat:
+Stale telemetry
+
+Test:
+Source stops sending data
+
+Expected:
+telemetry becomes STALE
++
+UI communicates degraded freshness
+```
+
+---
+
+# 104. Risk-Based Testing
+
+Not every feature receives equal testing effort.
+
+Highest priority:
+
+```text
+security-critical
+safety-critical
+data-integrity-critical
+state-critical
+decision-support-critical
+```
+
+---
+
+# 105. Severity Classification
+
+Test failures should be classified:
+
+```text
+BLOCKER
+CRITICAL
+HIGH
+MEDIUM
+LOW
+```
+
+---
+
+# 106. Blocker
+
+A blocker prevents meaningful operation or release.
+
+Examples:
+
+```text
+application cannot start
+authentication bypass
+critical data corruption
+core workflow unusable
+```
+
+---
+
+# 107. Critical
+
+Examples:
+
+```text
+incorrect authorization
+incorrect operational state
+critical workflow failure
+serious data integrity failure
+```
+
+---
+
+# 108. High
+
+Examples:
+
+```text
+important feature broken
+significant UI state inconsistency
+major integration failure
+```
+
+---
+
+# 109. Medium / Low
+
+These generally involve:
+
+```text
+non-critical usability issue
+minor visual defect
+low-impact edge case
+```
+
+Final severity definitions should be standardized in the project's QA policy.
+
+---
+
+# 110. Bug Lifecycle
+
+```text
+DISCOVERED
+ ↓
+TRIAGED
+ ↓
+ASSIGNED
+ ↓
+IN PROGRESS
+ ↓
+FIXED
+ ↓
+RETEST
+ ↓
+VERIFIED
+ ↓
+CLOSED
+```
+
+---
+
+# 111. Failed Test Lifecycle
+
+A failed test must produce:
+
+```text
+failure evidence
+environment
+steps
+expected result
+actual result
+severity
+related requirement
+```
+
+---
+
+# 112. No Silent Test Failures
+
+A test suite must not report:
+
+```text
+PASS
+```
+
+when a test was skipped because the environment was broken.
+
+Use:
+
+```text
+BLOCKED
+```
+
+or:
+
+```text
+SKIPPED
+```
+
+with reason.
+
+---
+
+# 113. CI Testing
+
+The engineering pipeline should eventually automate:
+
+```text
+lint
+type checking
+unit tests
+component tests
+contract tests
+security checks
+build
+```
+
+before merging.
+
+---
+
+# 114. Pull Request Quality Gate
+
+A pull request should not be considered complete if:
+
+```text
+tests fail
+type checks fail
+build fails
+security checks fail
+critical contracts fail
+```
+
+---
+
+# 115. Pre-Production Gate
+
+Before staging/production:
+
+```text
+critical tests pass
+security checks pass
+E2E passes
+critical operational journey passes
+```
+
+---
+
+# 116. Production Validation
+
+After deployment:
+
+```text
+smoke tests
+health checks
+critical workflow
+observability verification
+```
+
+must be performed.
+
+---
+
+# 117. Rollback Testing
+
+AEGIS must eventually test:
+
+```text
+deployment
+ ↓
+failure
+ ↓
+rollback
+ ↓
+validation
+```
+
+Rollback should not be merely theoretical.
+
+---
+
+# 118. Quality Evidence
+
+For major releases, preserve evidence such as:
+
+```text
+test report
+screenshots
+logs
+test results
+security results
+performance results
+AI evaluation results
+approval records
+```
+
+---
+
+# 119. QA Documentation
+
+The project should maintain:
+
+```text
+test strategy
+test cases
+test fixtures
+test scenarios
+test results
+bug reports
+release reports
+regression suite
+AI evaluation suite
+```
+
+---
+
+# 120. Test Automation Principle
+
+Automate tests that are:
+
+```text
+frequent
+repeatable
+deterministic
+high-value
+regression-prone
+```
+
+Do not automate everything blindly.
+
+---
+
+# 121. Manual Testing
+
+Human testing remains important for:
+
+```text
+workflow comprehension
+visual hierarchy
+operational usability
+ambiguous scenarios
+stakeholder acceptance
+AI usefulness
+```
+
+---
+
+# 122. Expert Review
+
+Because AEGIS targets:
+
+```text
+healthcare stakeholders
+biosecurity experts
+pandemic preparedness teams
+health workers
+global health organizations
+```
+
+expert review must eventually be incorporated.
+
+Technical correctness alone is insufficient.
+
+---
+
+# 123. Stakeholder Acceptance
+
+Stakeholders should validate:
+
+```text
+information hierarchy
+terminology
+workflow
+decision-support usefulness
+uncertainty communication
+alert behavior
+operational relevance
+```
+
+---
+
+# 124. User Acceptance Testing
+
+UAT should answer:
+
+> Can the intended user accomplish the intended task correctly, efficiently, and safely?
+
+---
+
+# 125. Operational Acceptance
+
+Operational stakeholders should validate:
+
+```text
+monitoring
+investigation
+assessment
+decision support
+response workflow
+feedback
+```
+
+---
+
+# 126. Safety Acceptance
+
+Safety review should verify:
+
+```text
+failure behavior
+uncertainty
+human control
+automation boundaries
+misleading states
+```
+
+---
+
+# 127. Final Acceptance Principle
+
+AEGIS is not accepted merely because:
+
+```text
+all automated tests pass
+```
+
+Acceptance requires:
+
+```text
+technical verification
++
+security validation
++
+intelligence evaluation
++
+UX validation
++
+stakeholder acceptance
+```
+
+---
+
+# 128. Master Acceptance Matrix
+
+The final release should eventually map:
+
+```text
+Requirement
+ ↓
+Risk
+ ↓
+Implementation
+ ↓
+Test
+ ↓
+Result
+ ↓
+Evidence
+ ↓
+Stakeholder approval
+```
+
+---
+
+# 129. Definition of Done
+
+A feature is complete only when:
+
+```text
+✓ Requirement exists
+✓ Design exists
+✓ Implementation exists
+✓ Unit tests pass
+✓ Component tests pass where applicable
+✓ Contract tests pass where applicable
+✓ Integration tests pass where applicable
+✓ Security requirements pass
+✓ Accessibility requirements pass
+✓ Error states work
+✓ Loading states work
+✓ Empty states work
+✓ Degraded states work
+✓ State transitions work
+✓ Observability exists
+✓ Documentation is updated
+✓ Acceptance criteria pass
+```
+
+---
+
+# 130. Definition of Production Ready
+
+AEGIS is production-ready only when:
+
+```text
+✓ Critical requirements implemented
+✓ Critical tests passing
+✓ Security validated
+✓ Data integrity validated
+✓ AI intelligence evaluated
+✓ Critical journeys pass
+✓ Failure modes tested
+✓ Recovery validated
+✓ Observability operational
+✓ Audit operational
+✓ Backup/recovery validated
+✓ Performance acceptable
+✓ Accessibility acceptable
+✓ Stakeholder acceptance achieved
+✓ Known risks documented
+✓ Residual risks accepted
+```
+
+---
+
+# 131. Master Testing Flow
+
+The complete QA lifecycle becomes:
+
+```text
+REQUIREMENT
+     ↓
+RISK
+     ↓
+TEST DESIGN
+     ↓
+IMPLEMENTATION
+     ↓
+AUTOMATED TESTS
+     ↓
+INTEGRATION TESTS
+     ↓
+SYSTEM TESTS
+     ↓
+SECURITY TESTS
+     ↓
+AI EVALUATION
+     ↓
+OPERATIONAL JOURNEY
+     ↓
+STAKEHOLDER VALIDATION
+     ↓
+RELEASE
+     ↓
+PRODUCTION MONITORING
+     ↓
+FEEDBACK
+     ↓
+REGRESSION
+```
+
+---
+
+# 132. Continuous Quality Loop
+
+AEGIS quality does not end at deployment.
+
+```text
+Production
+ ↓
+Observability
+ ↓
+Incident
+ ↓
+Investigation
+ ↓
+Learning
+ ↓
+Requirement
+ ↓
+Test
+ ↓
+Improvement
+```
+
+This creates an engineering equivalent of the Bio-Resilience feedback loop.
+
+---
+
+# 133. Testing and Bio-Resilience
+
+The immune-system analogy becomes useful here without being treated as literal biology.
+
+```text
+Detection
+ ↓
+Diagnosis
+ ↓
+Response
+ ↓
+Outcome
+ ↓
+Memory
+```
+
+For engineering:
+
+```text
+Test
+ ↓
+Failure Detection
+ ↓
+Root Cause
+ ↓
+Correction
+ ↓
+Regression Test
+ ↓
+Institutional Memory
+```
+
+The architecture therefore becomes progressively harder to break.
+
+---
+
+# 134. Testing Definition of Done
+
+This document is complete when AEGIS has:
+
+```text
+✓ Test strategy
+✓ Test hierarchy
+✓ Requirement traceability
+✓ Unit strategy
+✓ Component strategy
+✓ API strategy
+✓ Contract strategy
+✓ Data strategy
+✓ State strategy
+✓ AI evaluation strategy
+✓ Security strategy
+✓ Accessibility strategy
+✓ Performance strategy
+✓ Reliability strategy
+✓ Failure strategy
+✓ Recovery strategy
+✓ E2E strategy
+✓ Operational journey strategy
+✓ UAT strategy
+✓ Regression strategy
+✓ Release gates
+✓ Risk-to-test mapping
+✓ Evidence requirements
+```
+
+---
+
+# 135. Cross-Document Dependencies
+
+Document 14 depends on:
+
+```text
+01 — AEGIS Master Architecture
+02 — AEGIS Domain Model + Global State Architecture
+03 — AEGIS User Flow + Operational Journey Architecture
+04 — AEGIS Functional Requirements + 13 Screen Master Specification
+05 — AEGIS Interaction + State Transition Specification
+06 — AEGIS Data Architecture + Data Contracts
+07 — AEGIS API Architecture + Service Contracts
+08 — AEGIS Frontend + Application Architecture
+09 — AEGIS Design System + Component Architecture
+10 — AEGIS Security + Authentication + Authorization + Audit
+11 — AEGIS AI Intelligence + Decision Support
+12 — AEGIS Observability + Telemetry
+13 — AEGIS Threat Modeling + Risk Architecture
+```
+
+---
+
+# 136. Final Principle
+
+The most important QA rule for AEGIS is:
+
+> **Never test only whether the interface displays the correct thing. Test whether the entire system earned the right to display it.**
+
+A number on a dashboard may have passed rendering tests while:
+
+```text
+the source was stale
+the data was corrupted
+the state was wrong
+the model misunderstood it
+the user lacked permission
+the recommendation was unsupported
+```
+
+Therefore AEGIS quality must always be evaluated from:
+
+```text
+SOURCE
+ ↓
+DATA
+ ↓
+PROCESSING
+ ↓
+INTELLIGENCE
+ ↓
+STATE
+ ↓
+UI
+ ↓
+HUMAN DECISION
+ ↓
+OUTCOME
+```
+
+That is the complete chain that must be trustworthy.
