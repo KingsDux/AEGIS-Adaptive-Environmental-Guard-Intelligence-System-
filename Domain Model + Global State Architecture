@@ -1,0 +1,4873 @@
+# AEGIS
+
+## Domain Model + Global State Architecture
+
+### Bio-Resilient Pathogen Defense & Health Security Decision-Support System
+
+**Project:** AEGIS  
+**Document:** Domain Model + Global State Architecture  
+**Version:** 1.0  
+**Status:** Foundational / Source of Truth  
+**Parent Document:** AEGIS Master System Architecture v1.0  
+**Architecture Principle:** Sense → Detect → Understand → Assess → Decide → Respond → Verify → Recover → Remember → Resilience
+
+---
+
+# 00. DOCUMENT PURPOSE
+
+This document defines the **internal conceptual model of AEGIS**.
+
+The Master Architecture defined the system's purpose, biological model, product boundaries, stakeholder model, operational philosophy, and high-level architecture.
+
+This document defines the next layer:
+
+> **What entities exist inside AEGIS, how they relate, what state they own, how state changes, and how those changes propagate through the system.**
+
+This document is the authoritative foundation for:
+
+- User Flow Architecture
+- Product Architecture
+- Engineering Architecture
+- Screen Registry
+- Screen Specifications
+- API Contracts
+- Data Contracts
+- Frontend State Management
+- Backend Domain Services
+- Event Architecture
+- Simulation Architecture
+- QA and Acceptance Testing
+
+---
+
+# 01. SOURCE-OF-TRUTH RULE
+
+AEGIS follows one fundamental rule:
+
+> **The domain model owns truth. The interface displays truth.**
+
+A screen must never become the source of truth for an operational entity.
+
+A component must never independently invent the state of an event.
+
+A route must never determine whether an event is resolved.
+
+A mock dataset must never define the actual domain model.
+
+A visual state must never silently become a business state.
+
+The conceptual hierarchy is:
+
+```text
+MASTER ARCHITECTURE
+        ↓
+DOMAIN MODEL
+        ↓
+GLOBAL STATE MODEL
+        ↓
+DOMAIN EVENTS
+        ↓
+USER FLOWS
+        ↓
+SCREEN SPECIFICATIONS
+        ↓
+UI COMPONENTS
+```
+
+Lower layers may implement higher layers.
+
+Lower layers may not redefine higher layers without an explicit architecture change.
+
+---
+
+# 02. AEGIS DOMAIN PHILOSOPHY
+
+AEGIS is a closed-loop operational system.
+
+Its core domain lifecycle is:
+
+```text
+OBSERVE
+   ↓
+SIGNAL
+   ↓
+EVENT
+   ↓
+EVIDENCE
+   ↓
+ASSESSMENT
+   ↓
+DECISION
+   ↓
+RESPONSE
+   ↓
+VERIFICATION
+   ↓
+RECOVERY
+   ↓
+MEMORY
+```
+
+This is not merely a workflow.
+
+These are distinct **domain concepts**.
+
+They must not be collapsed into one generic object called "alert" or "incident."
+
+---
+
+# 03. CRITICAL DOMAIN DISTINCTIONS
+
+The following distinctions are mandatory.
+
+## 3.1 Observation ≠ Signal
+
+An observation is information received from a source.
+
+A signal is an interpretation that an observation or collection of observations may warrant attention.
+
+---
+
+## 3.2 Signal ≠ Event
+
+A signal indicates something potentially meaningful.
+
+An event is a managed operational situation.
+
+Not every signal becomes an event.
+
+---
+
+## 3.3 Event ≠ Threat
+
+An event is something being investigated or managed.
+
+A threat assessment is an interpretation of the potential significance of the event.
+
+---
+
+## 3.4 Threat ≠ Diagnosis
+
+AEGIS is not inherently a clinical diagnostic system.
+
+A threat assessment represents operational significance and uncertainty.
+
+It must not automatically be represented as a medical diagnosis.
+
+---
+
+## 3.5 Evidence ≠ Assessment
+
+Evidence supports an assessment.
+
+Evidence itself should remain distinguishable from the conclusion derived from it.
+
+---
+
+## 3.6 Assessment ≠ Decision
+
+An assessment describes the current interpretation.
+
+A decision determines what the responsible human or organization chooses to do.
+
+---
+
+## 3.7 Recommendation ≠ Authorization
+
+AEGIS may recommend an operational response.
+
+That does not mean the response has been approved.
+
+---
+
+## 3.8 Authorization ≠ Execution
+
+An approved response has not necessarily happened.
+
+---
+
+## 3.9 Execution ≠ Verification
+
+An action being reported as executed does not prove that its intended outcome occurred.
+
+---
+
+## 3.10 Resolution ≠ Learning
+
+Closing an event does not automatically create institutional memory.
+
+The learning process must be explicit.
+
+---
+
+# 04. CORE DOMAIN MAP
+
+The AEGIS domain consists of the following primary entities:
+
+```text
+ORGANIZATION
+    │
+    └── FACILITY
+          │
+          └── LOCATION
+                │
+                └── SOURCE / DEVICE
+                       │
+                       └── OBSERVATION
+                              │
+                              ↓
+                            SIGNAL
+                              │
+                              ↓
+                            EVENT
+                       ┌──────┼───────┐
+                       ↓      ↓       ↓
+                    EVIDENCE CONTEXT TIMELINE
+                       │
+                       ↓
+                   ASSESSMENT
+                       │
+                       ↓
+                    DECISION
+                       │
+                       ↓
+                    RESPONSE
+                       │
+                       ↓
+                     ACTION
+                       │
+                       ↓
+                  VERIFICATION
+                       │
+                       ↓
+                    RECOVERY
+                       │
+                       ↓
+              INSTITUTIONAL MEMORY
+```
+
+Cross-cutting entities:
+
+```text
+USER
+ROLE
+PERMISSION
+PROVENANCE
+AUDIT RECORD
+SYSTEM STATUS
+CONNECTIVITY STATUS
+DATA FRESHNESS
+```
+
+---
+
+# 05. DOMAIN ENTITY CATALOG
+
+The canonical entities are:
+
+| Entity | Purpose | Primary Owner |
+|---|---|---|
+| Organization | Administrative boundary | Organization domain |
+| Facility | Physical/operational institution | Facility domain |
+| Location | Spatial operational context | Facility domain |
+| Source | Origin of information | Source domain |
+| Device | Optional physical/system source | Source domain |
+| Observation | Raw or source-level observation | Observation domain |
+| Signal | Detected deviation requiring attention | Detection domain |
+| Event | Managed operational situation | Event domain |
+| Evidence | Information supporting or challenging interpretation | Evidence domain |
+| Assessment | Current interpretation of event significance | Assessment domain |
+| Decision | Human/organizational determination | Decision domain |
+| Response | Coordinated operational response | Response domain |
+| Action | Individual response activity | Response domain |
+| Verification | Assessment of response outcome | Verification domain |
+| Recovery | Return toward stable operational state | Recovery domain |
+| Timeline Entry | Chronological event history | Event domain |
+| Institutional Memory | Structured lessons from completed events | Memory domain |
+| User | System actor | Identity domain |
+| Role | Permission grouping | Identity domain |
+| Permission | Authorized capability | Identity domain |
+| Audit Record | Immutable activity history | Audit domain |
+| System Status | Health of AEGIS itself | System domain |
+| Data Freshness | Currency of information | Data-quality domain |
+
+---
+
+# 06. ORGANIZATION DOMAIN
+
+## 6.1 Organization
+
+Represents the institution or administrative body using AEGIS.
+
+Conceptual fields:
+
+```text
+organization_id
+name
+status
+metadata
+created_at
+updated_at
+```
+
+AEGIS should not assume that an organization is a hospital.
+
+It may represent an appropriate:
+
+- healthcare organization
+- public-health organization
+- preparedness organization
+- health-security organization
+- other authorized institutional boundary
+
+The implementation must remain configurable.
+
+---
+
+# 07. FACILITY
+
+A Facility represents an operational physical or logical site belonging to an organization.
+
+Conceptual fields:
+
+```text
+facility_id
+organization_id
+name
+facility_type
+status
+location_reference
+metadata
+created_at
+updated_at
+```
+
+The architecture should not hard-code a specific facility hierarchy.
+
+---
+
+# 08. LOCATION
+
+Location provides spatial context.
+
+Conceptually:
+
+```text
+location_id
+facility_id
+parent_location_id
+name
+location_type
+status
+metadata
+```
+
+A location may represent different levels of organizational geography.
+
+The architecture must support hierarchical relationships:
+
+```text
+Facility
+   ↓
+Zone
+   ↓
+Area
+   ↓
+Operational Location
+```
+
+The exact terminology remains configurable.
+
+---
+
+# 09. SOURCE
+
+A Source represents where an observation or piece of information originated.
+
+A source could conceptually be:
+
+- device
+- clinical system
+- laboratory system
+- environmental system
+- human report
+- surveillance feed
+- external intelligence source
+- imported dataset
+- simulation generator
+
+The domain must not assume that every source is a sensor.
+
+---
+
+# 10. SOURCE MODEL
+
+```text
+Source
+├── source_id
+├── source_type
+├── name
+├── status
+├── owner
+├── provenance
+├── trust_metadata
+├── last_seen_at
+└── metadata
+```
+
+The source itself is not the observation.
+
+It produces or supplies observations.
+
+---
+
+# 11. DEVICE
+
+Device is an optional specialized source entity.
+
+Conceptually:
+
+```text
+Device
+├── device_id
+├── source_id
+├── device_type
+├── location_id
+├── operational_status
+├── calibration_metadata
+├── last_seen_at
+└── metadata
+```
+
+No specific real-world device types are assumed by this architecture.
+
+---
+
+# 12. OBSERVATION
+
+Observation is one of the most important AEGIS entities.
+
+It represents information received from a source.
+
+Conceptually:
+
+```text
+Observation
+├── observation_id
+├── source_id
+├── subject_reference
+├── location_id
+├── observed_at
+├── received_at
+├── observation_type
+├── value
+├── unit
+├── status
+├── quality
+├── confidence
+├── provenance
+└── metadata
+```
+
+The exact observation schema must be domain-configurable.
+
+---
+
+# 13. OBSERVATION PRINCIPLE
+
+An observation should preserve the difference between:
+
+```text
+WHEN IT WAS OBSERVED
+```
+
+and:
+
+```text
+WHEN AEGIS RECEIVED IT
+```
+
+These timestamps are not necessarily identical.
+
+This distinction becomes important for:
+
+- delayed feeds
+- offline systems
+- synchronization
+- historical reconstruction
+- data freshness
+- event ordering
+
+---
+
+# 14. OBSERVATION STATUS
+
+Conceptual observation states:
+
+```text
+RECEIVED
+VALIDATED
+FLAGGED
+INVALID
+SUPERSEDED
+RETRACTED
+```
+
+Not every implementation must expose all states initially.
+
+But the domain must support the possibility that an observation can later be challenged or corrected.
+
+---
+
+# 15. DATA QUALITY
+
+Data quality is separate from threat assessment.
+
+Conceptually:
+
+```text
+Data Quality
+├── completeness
+├── timeliness
+├── source reliability
+├── consistency
+└── validation status
+```
+
+Do not create:
+
+```text
+"high quality = high threat"
+```
+
+Those are independent dimensions.
+
+---
+
+# 16. SIGNAL DOMAIN
+
+A Signal represents an identified deviation, pattern, or condition that warrants attention.
+
+It is produced from:
+
+```text
+one or more observations
+```
+
+and/or:
+
+```text
+other authorized information sources
+```
+
+A signal may exist without becoming an operational event.
+
+---
+
+# 17. SIGNAL MODEL
+
+```text
+Signal
+├── signal_id
+├── signal_type
+├── detected_at
+├── source_references
+├── observation_references
+├── location_references
+├── detection_basis
+├── severity_indicator
+├── confidence
+├── status
+├── freshness
+└── metadata
+```
+
+The exact detection algorithms are intentionally outside this document.
+
+---
+
+# 18. SIGNAL STATES
+
+```text
+NEW
+↓
+ACKNOWLEDGED
+↓
+UNDER_REVIEW
+↓
+CORRELATED
+↓
+ESCALATED
+↓
+RESOLVED
+```
+
+Possible alternate states:
+
+```text
+DISMISSED
+DUPLICATE
+INVALID
+EXPIRED
+SUPERSEDED
+```
+
+A dismissed signal is not necessarily a failed system detection.
+
+It may represent a legitimate signal that was investigated and determined not to require escalation.
+
+---
+
+# 19. EVENT DOMAIN
+
+An Event is the central operational object.
+
+It represents a situation that authorized users are actively investigating, coordinating, monitoring, or resolving.
+
+---
+
+# 20. EVENT CREATION
+
+An Event may originate from:
+
+```text
+Signal
+Manual report
+Imported event
+External intelligence
+Authorized system process
+Simulation
+```
+
+Therefore:
+
+> **Signal → Event is common, but not mandatory.**
+
+---
+
+# 21. EVENT MODEL
+
+```text
+Event
+├── event_id
+├── event_type
+├── title
+├── description
+├── status
+├── priority
+├── created_at
+├── detected_at
+├── updated_at
+├── resolved_at
+├── organization_id
+├── facility_references
+├── location_references
+├── source_references
+├── signal_references
+├── evidence_references
+├── assessment_references
+├── response_references
+├── timeline_reference
+├── ownership
+├── provenance
+├── data_mode
+└── metadata
+```
+
+---
+
+# 22. EVENT LIFECYCLE
+
+The canonical lifecycle is:
+
+```text
+DETECTED
+   ↓
+OPEN
+   ↓
+INVESTIGATING
+   ↓
+CHARACTERIZING
+   ↓
+ASSESSED
+   ↓
+RESPONDING
+   ↓
+MONITORING
+   ↓
+RESOLVING
+   ↓
+CLOSED
+   ↓
+MEMORIALIZED
+```
+
+This is a conceptual lifecycle.
+
+Not every event must pass through every state.
+
+---
+
+# 23. EVENT STATE RULES
+
+### DETECTED
+
+An event has been created from a recognized trigger.
+
+### OPEN
+
+The event is formally active.
+
+### INVESTIGATING
+
+Users are actively gathering or reviewing information.
+
+### CHARACTERIZING
+
+The team is building an understanding of the event.
+
+### ASSESSED
+
+A current assessment exists.
+
+This does **not** mean certainty.
+
+### RESPONDING
+
+A response is actively being coordinated or executed.
+
+### MONITORING
+
+Response or event conditions are being observed.
+
+### RESOLVING
+
+Evidence indicates the event may be moving toward closure.
+
+### CLOSED
+
+The operational event is closed.
+
+### MEMORIALIZED
+
+The event has been incorporated into institutional memory.
+
+---
+
+# 24. EVENT INVARIANT
+
+An Event must never silently transition from:
+
+```text
+DETECTED
+```
+
+to:
+
+```text
+THREAT CONFIRMED
+```
+
+without an explicit domain operation and supporting state.
+
+The event lifecycle and threat assessment lifecycle remain separate.
+
+---
+
+# 25. EVIDENCE DOMAIN
+
+Evidence represents information relevant to understanding an event.
+
+Evidence can:
+
+- support an assessment
+- challenge an assessment
+- provide context
+- identify uncertainty
+- establish provenance
+- document human observations
+
+---
+
+# 26. EVIDENCE MODEL
+
+```text
+Evidence
+├── evidence_id
+├── event_id
+├── evidence_type
+├── source_reference
+├── observation_reference
+├── content_reference
+├── collected_at
+├── received_at
+├── provenance
+├── quality
+├── relevance
+├── status
+├── reviewer
+└── metadata
+```
+
+Evidence should be linkable back to its source.
+
+---
+
+# 27. EVIDENCE STATES
+
+```text
+AVAILABLE
+UNDER_REVIEW
+VERIFIED
+CHALLENGED
+REJECTED
+SUPERSEDED
+```
+
+A piece of evidence should not disappear simply because it is challenged.
+
+Its status should record the challenge.
+
+---
+
+# 28. EVIDENCE RELATIONSHIPS
+
+AEGIS should eventually support relationships such as:
+
+```text
+SUPPORTS
+CONTRADICTS
+CONTEXTUALIZES
+DERIVED_FROM
+SUPERSEDES
+RELATED_TO
+```
+
+This creates an evidence graph.
+
+Conceptually:
+
+```text
+Observation
+     ↓
+Evidence
+ ↙       ↘
+supports  contradicts
+   ↓         ↓
+     Assessment
+```
+
+---
+
+# 29. ASSESSMENT DOMAIN
+
+An Assessment represents the current authorized interpretation of an event.
+
+It should answer:
+
+> What do we currently believe this event means?
+
+---
+
+# 30. ASSESSMENT MODEL
+
+```text
+Assessment
+├── assessment_id
+├── event_id
+├── assessment_type
+├── classification
+├── confidence
+├── risk_indicator
+├── rationale
+├── supporting_evidence
+├── contradicting_evidence
+├── missing_information
+├── assessor
+├── status
+├── created_at
+├── supersedes
+└── metadata
+```
+
+---
+
+# 31. CONFIDENCE MODEL
+
+Confidence answers:
+
+> How strongly does the available evidence support this interpretation?
+
+Conceptually:
+
+```text
+LOW
+MODERATE
+HIGH
+```
+
+The exact scale may later be formalized.
+
+But the architecture must preserve confidence as a separate field.
+
+---
+
+# 32. RISK MODEL
+
+Risk answers:
+
+> What is the potential operational significance?
+
+Risk must remain separate from confidence.
+
+Therefore the domain permits:
+
+```text
+Low Confidence + High Potential Significance
+```
+
+and:
+
+```text
+High Confidence + Low Potential Significance
+```
+
+This is intentional.
+
+---
+
+# 33. ASSESSMENT VERSIONING
+
+Assessments must be versioned.
+
+Example:
+
+```text
+Assessment v1
+    ↓
+Assessment v2
+    ↓
+Assessment v3
+```
+
+The previous assessment should not be silently overwritten.
+
+Each revision must preserve:
+
+```text
+who changed it
+when
+why
+what evidence changed
+what the new interpretation became
+```
+
+---
+
+# 34. ASSESSMENT STATE
+
+```text
+DRAFT
+↓
+UNDER_REVIEW
+↓
+PUBLISHED
+↓
+SUPERSEDED
+```
+
+Possible:
+
+```text
+WITHDRAWN
+```
+
+A published assessment can later be superseded.
+
+---
+
+# 35. DECISION DOMAIN
+
+Decision represents a human or organizational determination following assessment.
+
+This is where AEGIS crosses from:
+
+```text
+"What do we think?"
+```
+
+to:
+
+```text
+"What are we going to do?"
+```
+
+---
+
+# 36. DECISION MODEL
+
+```text
+Decision
+├── decision_id
+├── event_id
+├── assessment_reference
+├── decision_type
+├── decision
+├── rationale
+├── decision_maker
+├── authorization_scope
+├── created_at
+├── status
+└── metadata
+```
+
+---
+
+# 37. DECISION STATES
+
+```text
+PROPOSED
+↓
+UNDER_REVIEW
+↓
+APPROVED
+```
+
+Alternative outcomes:
+
+```text
+REJECTED
+DEFERRED
+EXPIRED
+SUPERSEDED
+```
+
+---
+
+# 38. RESPONSE DOMAIN
+
+Response represents a coordinated operational response to an event.
+
+It is not simply a button click.
+
+---
+
+# 39. RESPONSE MODEL
+
+```text
+Response
+├── response_id
+├── event_id
+├── decision_id
+├── objective
+├── status
+├── owner
+├── actions
+├── authorization
+├── execution_metadata
+├── verification_reference
+├── created_at
+├── started_at
+├── completed_at
+└── metadata
+```
+
+---
+
+# 40. RESPONSE STATES
+
+```text
+PROPOSED
+↓
+REVIEWING
+↓
+APPROVED
+↓
+IN_PROGRESS
+↓
+PARTIALLY_COMPLETED
+↓
+COMPLETED
+↓
+VERIFIED
+```
+
+Alternative:
+
+```text
+REJECTED
+CANCELLED
+BLOCKED
+FAILED
+EXPIRED
+SUPERSEDED
+```
+
+---
+
+# 41. RESPONSE INVARIANT
+
+AEGIS must never treat:
+
+```text
+APPROVED
+```
+
+as:
+
+```text
+EXECUTED
+```
+
+or:
+
+```text
+EXECUTED
+```
+
+as:
+
+```text
+SUCCESSFUL
+```
+
+These are separate states.
+
+---
+
+# 42. ACTION DOMAIN
+
+A Response contains one or more Actions.
+
+Conceptually:
+
+```text
+Action
+├── action_id
+├── response_id
+├── action_type
+├── objective
+├── owner
+├── authorization_status
+├── execution_status
+├── started_at
+├── completed_at
+├── result
+├── exception
+└── metadata
+```
+
+AEGIS should represent authorized operational workflows without assuming that every action is automatically executable by software.
+
+---
+
+# 43. ACTION STATES
+
+```text
+PROPOSED
+AUTHORIZED
+READY
+IN_PROGRESS
+COMPLETED
+VERIFIED
+```
+
+Exceptions:
+
+```text
+REJECTED
+BLOCKED
+FAILED
+CANCELLED
+EXPIRED
+```
+
+---
+
+# 44. VERIFICATION DOMAIN
+
+Verification answers:
+
+> Did the response produce the intended operational outcome?
+
+Verification is separate from execution.
+
+---
+
+# 45. VERIFICATION MODEL
+
+```text
+Verification
+├── verification_id
+├── response_id
+├── action_references
+├── observed_outcome
+├── expected_outcome
+├── evidence_references
+├── status
+├── verifier
+├── verified_at
+├── exceptions
+└── metadata
+```
+
+---
+
+# 46. VERIFICATION STATES
+
+```text
+PENDING
+↓
+UNDER_REVIEW
+↓
+VERIFIED
+```
+
+Alternative:
+
+```text
+FAILED
+INCONCLUSIVE
+PARTIAL
+```
+
+This is important.
+
+The system must be able to say:
+
+> "We do not yet know whether the response worked."
+
+That is a valid operational state.
+
+---
+
+# 47. RECOVERY DOMAIN
+
+Recovery represents the transition from active response toward stable operation.
+
+Recovery is not simply:
+
+```text
+event = closed
+```
+
+It may involve:
+
+- continued monitoring
+- restoration of normal operations
+- confirmation of expected conditions
+- review of residual risk
+- transition to normal surveillance
+
+Exact clinical or operational recovery criteria remain configurable.
+
+---
+
+# 48. RECOVERY STATES
+
+```text
+NOT_STARTED
+↓
+IN_PROGRESS
+↓
+STABILIZING
+↓
+RECOVERED
+```
+
+Alternative:
+
+```text
+BLOCKED
+PARTIAL
+FAILED
+```
+
+---
+
+# 49. INSTITUTIONAL MEMORY DOMAIN
+
+Institutional Memory captures what the organization learned from an event.
+
+---
+
+# 50. MEMORY MODEL
+
+```text
+InstitutionalMemory
+├── memory_id
+├── source_event_id
+├── event_summary
+├── confirmed_facts
+├── assessment_history
+├── response_summary
+├── verified_outcomes
+├── lessons
+├── unresolved_questions
+├── recommendations
+├── reviewers
+├── review_status
+├── created_at
+└── updated_at
+```
+
+---
+
+# 51. MEMORY STATES
+
+```text
+DRAFT
+↓
+UNDER_REVIEW
+↓
+APPROVED
+↓
+ACTIVE
+```
+
+Possible:
+
+```text
+ARCHIVED
+SUPERSEDED
+```
+
+---
+
+# 52. MEMORY INVARIANT
+
+Institutional memory must not silently modify operational truth.
+
+For example:
+
+```text
+Memory
+```
+
+cannot automatically rewrite:
+
+```text
+historical event
+```
+
+unless an explicit correction process exists.
+
+Memory is derived organizational knowledge.
+
+It is not a hidden database mutation mechanism.
+
+---
+
+# 53. USER DOMAIN
+
+A User represents an authenticated human actor.
+
+Conceptually:
+
+```text
+User
+├── user_id
+├── organization_id
+├── name
+├── role_references
+├── status
+├── authentication_metadata
+└── preferences
+```
+
+Sensitive identity information should be minimized according to the actual product requirements.
+
+---
+
+# 54. ROLE DOMAIN
+
+A Role represents a set of permissions.
+
+Examples may eventually include roles for:
+
+- health workers
+- infection prevention teams
+- analysts
+- preparedness teams
+- leadership
+- administrators
+
+These are role concepts, not a final authorization taxonomy.
+
+---
+
+# 55. PERMISSION DOMAIN
+
+Permissions describe what an actor may do.
+
+Conceptually:
+
+```text
+VIEW
+INVESTIGATE
+ANNOTATE
+ASSESS
+RECOMMEND
+AUTHORIZE
+EXECUTE
+VERIFY
+ADMINISTER
+```
+
+The final permission matrix belongs in the security specification.
+
+---
+
+# 56. PROVENANCE DOMAIN
+
+Every important AEGIS object should be able to answer:
+
+```text
+WHERE DID THIS COME FROM?
+```
+
+Provenance should conceptually include:
+
+```text
+source
+origin
+created_at
+received_at
+author
+transformation_history
+verification_status
+```
+
+---
+
+# 57. AUDIT DOMAIN
+
+Audit records are separate from normal domain state.
+
+Audit records answer:
+
+```text
+WHO DID WHAT?
+WHEN?
+TO WHICH OBJECT?
+FROM WHAT STATE?
+TO WHAT STATE?
+```
+
+Conceptual model:
+
+```text
+AuditRecord
+├── audit_id
+├── actor_id
+├── action
+├── entity_type
+├── entity_id
+├── previous_state
+├── resulting_state
+├── timestamp
+├── reason
+└── metadata
+```
+
+---
+
+# 58. SYSTEM HEALTH DOMAIN
+
+AEGIS must represent its own operational health.
+
+Conceptual entity:
+
+```text
+SystemStatus
+├── service_health
+├── ingestion_health
+├── integration_health
+├── storage_health
+├── event_processing_health
+├── notification_health
+└── updated_at
+```
+
+The exact technical implementation belongs in Engineering Architecture.
+
+---
+
+# 59. CONNECTIVITY DOMAIN
+
+Connectivity is a global operational state.
+
+Canonical states:
+
+```text
+ONLINE
+DEGRADED
+PARTIAL
+OFFLINE
+RECOVERING
+```
+
+---
+
+# 60. DATA FRESHNESS DOMAIN
+
+Freshness should be represented separately from connectivity.
+
+A system can be:
+
+```text
+ONLINE
+```
+
+while data is:
+
+```text
+STALE
+```
+
+Therefore:
+
+```text
+Connectivity ≠ Freshness
+```
+
+This is a mandatory invariant.
+
+---
+
+# 61. DATA MODE
+
+AEGIS must distinguish:
+
+```text
+LIVE
+SIMULATED
+HISTORICAL
+TEST
+```
+
+This is a system-wide property.
+
+It must be visible wherever confusion between modes could create an incorrect interpretation.
+
+---
+
+# 62. GLOBAL STATE ARCHITECTURE
+
+AEGIS global state is divided into explicit domains.
+
+```text
+AEGIS GLOBAL STATE
+│
+├── session
+├── user
+├── permissions
+├── system
+├── connectivity
+├── dataFreshness
+├── organizations
+├── facilities
+├── locations
+├── sources
+├── observations
+├── signals
+├── events
+├── evidence
+├── assessments
+├── decisions
+├── responses
+├── actions
+├── verifications
+├── recovery
+├── memory
+├── timeline
+└── audit
+```
+
+Not every domain needs to be loaded globally at all times.
+
+"Global state" means:
+
+> **shared authoritative application state**
+
+not:
+
+> **everything stored in one giant frontend object.**
+
+---
+
+# 63. STATE OWNERSHIP
+
+Each state slice must have one conceptual owner.
+
+| State | Owner |
+|---|---|
+| Session | Identity |
+| Permissions | Identity / Authorization |
+| System health | System |
+| Connectivity | System |
+| Freshness | Data Quality |
+| Observations | Observation |
+| Signals | Detection |
+| Events | Event |
+| Evidence | Evidence |
+| Assessments | Assessment |
+| Decisions | Decision |
+| Responses | Response |
+| Actions | Response |
+| Verification | Verification |
+| Recovery | Recovery |
+| Memory | Memory |
+| Audit | Audit |
+
+This prevents state duplication.
+
+---
+
+# 64. FRONTEND STATE RULE
+
+The frontend may maintain:
+
+### Server/domain state
+
+Data representing authoritative system entities.
+
+### UI state
+
+Temporary interaction state.
+
+### Derived state
+
+Computed views of authoritative state.
+
+These must not be confused.
+
+---
+
+# 65. UI STATE
+
+Examples:
+
+```text
+selectedEventId
+selectedFacilityId
+activePanel
+activeFilter
+mapViewport
+expandedEvidenceId
+modalState
+searchQuery
+```
+
+These are interface concerns.
+
+They are not domain truth.
+
+---
+
+# 66. DOMAIN STATE
+
+Examples:
+
+```text
+event.status
+assessment.confidence
+response.status
+verification.status
+observation.quality
+system.connectivity
+```
+
+These represent operational truth.
+
+---
+
+# 67. DERIVED STATE
+
+Derived state is computed from authoritative state.
+
+Examples:
+
+```text
+activeEventCount
+unresolvedSignalCount
+responseProgress
+eventDuration
+dataStaleness
+isOperationallyDegraded
+```
+
+Derived state should not be independently stored unless there is a clear performance or persistence reason.
+
+---
+
+# 68. GLOBAL STATE SHAPE
+
+Conceptually:
+
+```text
+AEGISState
+│
+├── identity
+│   ├── session
+│   ├── user
+│   └── permissions
+│
+├── system
+│   ├── health
+│   ├── connectivity
+│   ├── dataMode
+│   └── freshness
+│
+├── context
+│   ├── organization
+│   ├── facility
+│   └── location
+│
+├── surveillance
+│   ├── observations
+│   └── signals
+│
+├── operations
+│   ├── events
+│   ├── evidence
+│   ├── assessments
+│   ├── decisions
+│   ├── responses
+│   ├── actions
+│   ├── verification
+│   └── recovery
+│
+├── memory
+│   └── institutionalMemory
+│
+└── ui
+    ├── selection
+    ├── filters
+    ├── panels
+    ├── navigation
+    └── transientInteraction
+```
+
+---
+
+# 69. STATE OWNERSHIP RULE
+
+The state owner is responsible for validating transitions.
+
+For example:
+
+```text
+Event
+```
+
+owns:
+
+```text
+event.status
+```
+
+The UI cannot simply execute:
+
+```text
+event.status = "RESOLVED"
+```
+
+Instead, it must invoke a domain operation such as:
+
+```text
+resolveEvent(eventId)
+```
+
+The domain validates whether the transition is allowed.
+
+---
+
+# 70. DOMAIN COMMANDS
+
+AEGIS interactions should conceptually become commands.
+
+Examples:
+
+```text
+acknowledgeSignal
+createEvent
+assignEvent
+addEvidence
+updateAssessment
+submitAssessment
+proposeResponse
+approveResponse
+rejectResponse
+startAction
+completeAction
+verifyResponse
+beginRecovery
+resolveEvent
+createMemory
+reviewMemory
+approveMemory
+```
+
+These are domain concepts.
+
+They are not final API names.
+
+---
+
+# 71. COMMAND RULE
+
+A command represents an intention to change domain state.
+
+It is not merely a UI event.
+
+For example:
+
+```text
+Button Click
+    ↓
+approveResponse()
+    ↓
+Domain validation
+    ↓
+State transition
+    ↓
+Domain event
+    ↓
+Updated state
+    ↓
+UI synchronization
+```
+
+---
+
+# 72. DOMAIN EVENTS
+
+A domain event describes something that has already happened.
+
+Examples:
+
+```text
+ObservationReceived
+SignalDetected
+SignalAcknowledged
+EventCreated
+EventAssigned
+EvidenceAdded
+EvidenceVerified
+AssessmentCreated
+AssessmentPublished
+DecisionCreated
+ResponseProposed
+ResponseApproved
+ResponseRejected
+ActionStarted
+ActionCompleted
+VerificationStarted
+ResponseVerified
+RecoveryStarted
+RecoveryCompleted
+EventResolved
+MemoryCreated
+MemoryApproved
+```
+
+---
+
+# 73. COMMAND VS EVENT
+
+The distinction is mandatory.
+
+### Command
+
+> "I want this to happen."
+
+### Event
+
+> "This has happened."
+
+Example:
+
+```text
+COMMAND
+approveResponse
+```
+
+becomes:
+
+```text
+EVENT
+ResponseApproved
+```
+
+only after the state transition succeeds.
+
+---
+
+# 74. EVENT ORDERING
+
+Some domain events have causal dependencies.
+
+For example:
+
+```text
+ResponseApproved
+```
+
+cannot legitimately occur before:
+
+```text
+ResponseProposed
+```
+
+Similarly:
+
+```text
+ResponseVerified
+```
+
+cannot occur before:
+
+```text
+ResponseStarted
+```
+
+where the product rules require that sequence.
+
+The system must preserve causal ordering.
+
+---
+
+# 75. IDEMPOTENCY
+
+Repeated commands should not accidentally create duplicate state.
+
+For example, if the same approval request is submitted twice because of a network retry:
+
+```text
+approveResponse
+approveResponse
+```
+
+AEGIS must not produce two independent approvals.
+
+The engineering layer should implement idempotency for consequential commands.
+
+---
+
+# 76. STATE TRANSITION MODEL
+
+Every domain state transition should follow:
+
+```text
+CURRENT STATE
+      ↓
+COMMAND
+      ↓
+AUTHORIZATION
+      ↓
+VALIDATION
+      ↓
+STATE TRANSITION
+      ↓
+DOMAIN EVENT
+      ↓
+AUDIT
+      ↓
+DOWNSTREAM UPDATE
+```
+
+This is the canonical AEGIS mutation model.
+
+---
+
+# 77. EVENT PROPAGATION
+
+When a domain state changes, dependent state must update predictably.
+
+Example:
+
+```text
+ResponseApproved
+       ↓
+Response.status = APPROVED
+       ↓
+Event may reflect response readiness
+       ↓
+Timeline receives entry
+       ↓
+Audit record created
+       ↓
+Relevant UI projections update
+```
+
+The exact dependent states must be explicitly defined.
+
+No hidden mutations.
+
+---
+
+# 78. CANONICAL CROSS-DOMAIN FLOW
+
+A complete scenario:
+
+```text
+ObservationReceived
+        ↓
+SignalDetected
+        ↓
+EventCreated
+        ↓
+EvidenceAdded
+        ↓
+AssessmentCreated
+        ↓
+DecisionCreated
+        ↓
+ResponseProposed
+        ↓
+ResponseApproved
+        ↓
+ActionStarted
+        ↓
+ActionCompleted
+        ↓
+VerificationStarted
+        ↓
+ResponseVerified
+        ↓
+RecoveryStarted
+        ↓
+RecoveryCompleted
+        ↓
+EventResolved
+        ↓
+MemoryCreated
+```
+
+This is the core state propagation chain.
+
+---
+
+# 79. IMPORTANT: NOT EVERY EVENT MUST FOLLOW THIS EXACT PATH
+
+AEGIS must support branching.
+
+For example:
+
+```text
+SignalDetected
+      ↓
+SignalDismissed
+```
+
+No Event is required.
+
+Or:
+
+```text
+EventCreated
+      ↓
+Investigation
+      ↓
+EventClosed
+```
+
+without a response.
+
+Or:
+
+```text
+ResponseStarted
+      ↓
+ResponseFailed
+      ↓
+NewDecision
+      ↓
+NewResponse
+```
+
+The architecture must support operational reality rather than forcing every situation into a single happy path.
+
+---
+
+# 80. GLOBAL CONTEXT
+
+AEGIS has contextual selectors such as:
+
+```text
+Organization
+Facility
+Location
+Time Range
+Event
+Data Mode
+```
+
+These affect what the user sees.
+
+They should not mutate underlying domain entities merely because the user changes a filter.
+
+---
+
+# 81. CONTEXT VS DOMAIN STATE
+
+Example:
+
+Selecting:
+
+```text
+Facility A
+```
+
+changes:
+
+```text
+currentFacilityContext
+```
+
+It does not change:
+
+```text
+Facility.status
+```
+
+Similarly:
+
+Selecting:
+
+```text
+Event 104
+```
+
+changes:
+
+```text
+selectedEventId
+```
+
+It does not change:
+
+```text
+Event 104.status
+```
+
+---
+
+# 82. FILTERING RULE
+
+Filters create projections.
+
+They do not alter source data.
+
+```text
+AUTHORITATIVE EVENTS
+       ↓
+FILTER
+       ↓
+VISIBLE EVENTS
+```
+
+Not:
+
+```text
+FILTER
+ ↓
+MODIFIED EVENTS
+```
+
+---
+
+# 83. SELECTION RULE
+
+Selection is UI state.
+
+```text
+selectedEventId
+```
+
+may reference:
+
+```text
+event_001
+```
+
+But the event itself remains domain-owned.
+
+---
+
+# 84. DATA FRESHNESS PROPAGATION
+
+Every domain object sourced from potentially changing external data should be capable of communicating freshness.
+
+Conceptually:
+
+```text
+freshness:
+    lastUpdatedAt
+    age
+    status
+```
+
+Freshness states:
+
+```text
+CURRENT
+AGING
+STALE
+UNKNOWN
+```
+
+Exact thresholds must be domain-configurable.
+
+Do not invent universal time thresholds in this architecture.
+
+---
+
+# 85. UNKNOWN STATE
+
+AEGIS must explicitly support:
+
+```text
+UNKNOWN
+```
+
+This is a first-class state.
+
+Examples:
+
+```text
+unknown source status
+unknown response outcome
+unknown data freshness
+unknown assessment
+unknown verification
+```
+
+Unknown must not silently become:
+
+```text
+NORMAL
+```
+
+---
+
+# 86. NULL VS UNKNOWN
+
+A missing database value and an operationally unknown state are not necessarily identical.
+
+Conceptually:
+
+```text
+NULL
+```
+
+means:
+
+> no value stored.
+
+While:
+
+```text
+UNKNOWN
+```
+
+means:
+
+> the system currently cannot establish the relevant truth.
+
+The implementation should preserve this distinction where operationally meaningful.
+
+---
+
+# 87. CONFLICTING STATE
+
+AEGIS must support conflicting evidence.
+
+Example:
+
+```text
+Evidence A → supports assessment
+Evidence B → contradicts assessment
+```
+
+The correct response is not to silently delete one.
+
+The assessment should represent the conflict.
+
+---
+
+# 88. CONFLICT MODEL
+
+Conceptually:
+
+```text
+Assessment
+├── supportingEvidence[]
+├── contradictingEvidence[]
+└── unresolvedQuestions[]
+```
+
+This enables transparent uncertainty.
+
+---
+
+# 89. STALE STATE
+
+A stale state means:
+
+> The system has data, but the data may no longer represent the current situation.
+
+It does not mean:
+
+> The situation is safe.
+
+This distinction must appear in:
+
+- domain state
+- UI state
+- alerting
+- analytics
+- acceptance tests
+
+---
+
+# 90. DEGRADED MODE
+
+AEGIS should have an explicit degraded operational state.
+
+Examples:
+
+```text
+PARTIAL DATA
+DELAYED DATA
+SOURCE FAILURE
+INTEGRATION FAILURE
+CONNECTIVITY LOSS
+SYSTEM RECOVERY
+```
+
+The system should continue to provide whatever information remains trustworthy while clearly communicating limitations.
+
+---
+
+# 91. DEGRADED STATE INVARIANT
+
+If a critical dependency becomes unavailable:
+
+AEGIS must not silently represent its absence as:
+
+```text
+NORMAL
+```
+
+Instead:
+
+```text
+UNAVAILABLE
+```
+
+or:
+
+```text
+UNKNOWN
+```
+
+or:
+
+```text
+STALE
+```
+
+as appropriate.
+
+---
+
+# 92. SIMULATION STATE
+
+Simulation must be explicit.
+
+Global:
+
+```text
+dataMode = LIVE | SIMULATED | HISTORICAL | TEST
+```
+
+Simulation state must not leak into live state.
+
+---
+
+# 93. SIMULATION ISOLATION
+
+A simulated event must never accidentally modify live operational state.
+
+Conceptually:
+
+```text
+SIMULATION DOMAIN
+       │
+       X
+       │
+LIVE DOMAIN
+```
+
+The engineering implementation should enforce isolation.
+
+---
+
+# 94. USER PERMISSION EFFECT ON STATE
+
+The global state visible to a user is permission-filtered.
+
+Conceptually:
+
+```text
+AUTHORITATIVE STATE
+       ↓
+AUTHORIZATION
+       ↓
+USER-VISIBLE STATE
+```
+
+Two users may therefore see different permitted representations of the same underlying event.
+
+This is expected.
+
+---
+
+# 95. PERMISSION DOES NOT ALTER TRUTH
+
+A user lacking access to an entity does not mean the entity does not exist.
+
+It means:
+
+```text
+NOT AUTHORIZED
+```
+
+rather than:
+
+```text
+NORMAL
+```
+
+where the distinction matters.
+
+---
+
+# 96. AUDITABILITY OF STATE CHANGE
+
+Every consequential mutation should generate an auditable record.
+
+Minimum conceptual chain:
+
+```text
+Actor
+ ↓
+Command
+ ↓
+Validation
+ ↓
+State Change
+ ↓
+Domain Event
+ ↓
+Audit Record
+```
+
+This allows later reconstruction of what happened.
+
+---
+
+# 97. TIMELINE AS DERIVED DOMAIN HISTORY
+
+The Event Timeline should primarily be constructed from authoritative domain events and important recorded actions.
+
+It should not be manually fabricated by individual screens.
+
+Conceptually:
+
+```text
+Domain Events
+     ↓
+Timeline Projection
+     ↓
+Event History UI
+```
+
+---
+
+# 98. TIMELINE INVARIANT
+
+If a significant state transition occurs, the system should be able to reconstruct:
+
+```text
+WHAT
+WHEN
+WHO
+FROM
+TO
+WHY
+```
+
+where appropriate.
+
+---
+
+# 99. STATE SNAPSHOT VS EVENT HISTORY
+
+AEGIS needs both:
+
+### Current state
+
+"What is true now?"
+
+and:
+
+### History
+
+"How did we get here?"
+
+Current state is optimized for operational use.
+
+History is optimized for:
+
+- audit
+- investigation
+- learning
+- accountability
+- reconstruction
+
+Neither should replace the other.
+
+---
+
+# 100. DOMAIN RELATIONSHIP MAP
+
+The canonical relationships are:
+
+```text
+Organization
+   └── Facility
+         └── Location
+
+Source
+   └── Observation
+
+Observation
+   └── Signal
+
+Signal
+   └── Event
+
+Event
+   ├── Evidence
+   ├── Assessment
+   ├── Decision
+   ├── Response
+   │     └── Action
+   ├── Verification
+   ├── Recovery
+   ├── Timeline
+   └── Institutional Memory
+```
+
+Cross-cutting:
+
+```text
+User → Decision
+User → Assessment
+User → Response Authorization
+User → Verification
+User → Memory Review
+
+Everything consequential → Audit
+Everything externally sourced → Provenance
+```
+
+---
+
+# 101. AGGREGATE BOUNDARIES
+
+For engineering purposes, AEGIS should eventually treat some entities as aggregate roots.
+
+Candidate aggregate roots:
+
+```text
+Event
+Response
+Assessment
+InstitutionalMemory
+Organization
+```
+
+The exact aggregate boundaries must be validated during Engineering Architecture.
+
+The important principle is:
+
+> Related state should have a clear authority boundary.
+
+---
+
+# 102. EVENT AS CENTRAL OPERATIONAL AGGREGATE
+
+The Event is the central operational object connecting:
+
+```text
+Signals
+Evidence
+Assessments
+Decisions
+Responses
+Verification
+Recovery
+Memory
+```
+
+This does not mean all those objects must be physically stored inside one database record.
+
+It means they are operationally related through the Event.
+
+---
+
+# 103. NO GIANT EVENT OBJECT
+
+The frontend must not create a single massive object containing everything:
+
+```text
+event {
+  observations,
+  evidence,
+  assessment,
+  responses,
+  users,
+  memory,
+  system,
+  ...
+}
+```
+
+as the only source of truth.
+
+Domain boundaries must remain explicit.
+
+---
+
+# 104. NORMALIZED RELATIONSHIPS
+
+Conceptually:
+
+```text
+Event
+  → evidence IDs
+  → assessment IDs
+  → decision IDs
+  → response IDs
+```
+
+The actual engineering storage strategy may differ.
+
+The conceptual ownership must remain clear.
+
+---
+
+# 105. DERIVED OPERATIONAL METRICS
+
+AEGIS may calculate:
+
+```text
+activeEventCount
+unresolvedSignalCount
+responseProgress
+eventAge
+timeSinceLastObservation
+assessmentConfidence
+verificationStatus
+dataFreshness
+```
+
+These are derived values.
+
+They must not contradict their source entities.
+
+---
+
+# 106. STATE CONSISTENCY RULE
+
+If:
+
+```text
+Response.status = VERIFIED
+```
+
+then the UI should never display:
+
+```text
+Response = IN PROGRESS
+```
+
+because a separate component has stale local state.
+
+The application must have a synchronization strategy that prevents contradictory representations.
+
+---
+
+# 107. OPTIMISTIC UI RULE
+
+Optimistic updates may be used for low-consequence UI interactions.
+
+They should be used cautiously for consequential domain mutations.
+
+For example:
+
+```text
+filter changed
+```
+
+is safe to update immediately.
+
+But:
+
+```text
+response approved
+```
+
+should not permanently appear approved until authoritative confirmation exists.
+
+---
+
+# 108. FAILED COMMAND MODEL
+
+If a command fails:
+
+```text
+Command
+ ↓
+Failure
+```
+
+the domain state must remain authoritative.
+
+The UI should represent:
+
+```text
+FAILED
+```
+
+or:
+
+```text
+NOT COMPLETED
+```
+
+rather than assuming success.
+
+---
+
+# 109. CONCURRENCY
+
+AEGIS should assume multiple authorized users may interact with the same event.
+
+Example:
+
+```text
+Analyst A
++
+Clinical Lead B
++
+Preparedness Team C
+```
+
+may all interact with the same operational situation.
+
+The architecture therefore requires:
+
+- authoritative state
+- versioning or concurrency control
+- conflict handling
+- audit history
+
+---
+
+# 110. STALE CLIENT STATE
+
+A user's browser may hold an older representation.
+
+Example:
+
+```text
+Client sees:
+RESPONSE = PROPOSED
+
+Another user approves it.
+
+Server:
+RESPONSE = APPROVED
+```
+
+When Client A attempts an incompatible mutation, the system must detect the stale state rather than silently overwrite the newer state.
+
+---
+
+# 111. VERSIONING
+
+Important domain objects should conceptually support version information.
+
+Example:
+
+```text
+event_version
+assessment_version
+response_version
+```
+
+This supports concurrency and auditability.
+
+Exact implementation remains an engineering decision.
+
+---
+
+# 112. DOMAIN INVARIANTS
+
+The following invariants are mandatory.
+
+### Invariant 01
+
+Observation does not equal threat.
+
+### Invariant 02
+
+Signal does not equal outbreak.
+
+### Invariant 03
+
+Event does not equal diagnosis.
+
+### Invariant 04
+
+Confidence does not equal risk.
+
+### Invariant 05
+
+Recommendation does not equal authorization.
+
+### Invariant 06
+
+Authorization does not equal execution.
+
+### Invariant 07
+
+Execution does not equal verification.
+
+### Invariant 08
+
+Resolution does not equal institutional learning.
+
+### Invariant 09
+
+Unknown does not equal normal.
+
+### Invariant 10
+
+Stale does not equal safe.
+
+### Invariant 11
+
+Simulation does not equal live data.
+
+### Invariant 12
+
+UI state does not equal domain truth.
+
+### Invariant 13
+
+User selection does not mutate domain state.
+
+### Invariant 14
+
+Historical state must remain reconstructable.
+
+### Invariant 15
+
+Every consequential state mutation must be attributable.
+
+### Invariant 16
+
+Permission filtering must not rewrite underlying truth.
+
+### Invariant 17
+
+Failed commands must not produce successful state.
+
+### Invariant 18
+
+Conflicting evidence must remain representable.
+
+### Invariant 19
+
+An assessment must preserve its evidence context.
+
+### Invariant 20
+
+A verified response must have a traceable verification record.
+
+---
+
+# 113. GLOBAL STATE TRANSITION MODEL
+
+The entire system can be represented as:
+
+```text
+OBSERVATION STATE
+      ↓
+DETECTION STATE
+      ↓
+EVENT STATE
+      ↓
+EVIDENCE STATE
+      ↓
+ASSESSMENT STATE
+      ↓
+DECISION STATE
+      ↓
+RESPONSE STATE
+      ↓
+ACTION STATE
+      ↓
+VERIFICATION STATE
+      ↓
+RECOVERY STATE
+      ↓
+MEMORY STATE
+```
+
+But this is not one giant state machine.
+
+Each domain owns its own lifecycle.
+
+The arrows represent relationships and causal flow.
+
+---
+
+# 114. WHY THIS MATTERS
+
+A common architectural mistake would be:
+
+```text
+system.status = "threat"
+```
+
+AEGIS must instead model:
+
+```text
+Observation
+    ↓
+Signal
+    ↓
+Event
+    ↓
+Evidence
+    ↓
+Assessment
+    ↓
+Decision
+```
+
+This preserves the reasoning chain.
+
+---
+
+# 115. BIOLOGICAL ANALOG MAPPING
+
+The domain model maps to the immune analogy as follows:
+
+| Biological concept | AEGIS domain |
+|---|---|
+| Environmental sensing | Observation |
+| Innate recognition | Signal |
+| Immune activation | Event |
+| Antigen information | Evidence |
+| Adaptive recognition | Assessment |
+| Immune decision | Decision |
+| Effector mechanism | Response |
+| Effector action | Action |
+| Outcome checking | Verification |
+| Recovery | Recovery |
+| Memory cells | Institutional Memory |
+
+The analogy ends at the architectural level.
+
+AEGIS does not claim biological equivalence.
+
+---
+
+# 116. GLOBAL STATE CHANGE EXAMPLE
+
+Consider a new observation.
+
+Initial:
+
+```text
+Observation received
+Signal count = 0
+Event count = 0
+```
+
+Then:
+
+```text
+ObservationReceived
+```
+
+The observation domain changes.
+
+If detection criteria produce a signal:
+
+```text
+SignalDetected
+```
+
+Then:
+
+```text
+Signal count +1
+```
+
+If a user creates an event:
+
+```text
+EventCreated
+```
+
+Then:
+
+```text
+Event count +1
+Signal becomes linked to Event
+```
+
+If evidence is added:
+
+```text
+EvidenceAdded
+```
+
+Then:
+
+```text
+Event evidence count changes
+Timeline changes
+Assessment context changes
+```
+
+If an assessment is published:
+
+```text
+AssessmentPublished
+```
+
+Then:
+
+```text
+Event assessment state changes
+Timeline changes
+Operational views update
+```
+
+If a response is approved:
+
+```text
+ResponseApproved
+```
+
+Then:
+
+```text
+Response status changes
+Event response state changes
+Timeline changes
+Audit changes
+```
+
+The UI does not manually update all these values.
+
+The domain event propagation model does.
+
+---
+
+# 117. GLOBAL STATE CHANGE CONTRACT
+
+Every consequential user interaction should be expressible as:
+
+```text
+USER INTENT
+    ↓
+COMMAND
+    ↓
+DOMAIN VALIDATION
+    ↓
+AUTHORIZED?
+    ↓
+VALID TRANSITION?
+    ↓
+STATE MUTATION
+    ↓
+DOMAIN EVENT
+    ↓
+AUDIT
+    ↓
+PROJECTIONS / SYNCHRONIZATION
+    ↓
+UI UPDATE
+```
+
+This is the AEGIS interaction contract.
+
+---
+
+# 118. READ MODEL VS WRITE MODEL
+
+The architecture should distinguish:
+
+### Write path
+
+```text
+User Intent
+→ Command
+→ Domain Logic
+→ State Change
+```
+
+### Read path
+
+```text
+Authoritative State
+→ Projection
+→ Query
+→ UI
+```
+
+This separation helps prevent interface logic from becoming business logic.
+
+---
+
+# 119. PROJECTION MODEL
+
+The dashboard may require aggregated views.
+
+For example:
+
+```text
+Current Situation
+```
+
+may combine:
+
+```text
+Event state
++
+Signal state
++
+Assessment state
++
+Response state
++
+Freshness
++
+System health
+```
+
+This should be a derived projection.
+
+It should not become a new competing source of truth.
+
+---
+
+# 120. SITUATIONAL AWARENESS PROJECTION
+
+Conceptually:
+
+```text
+SituationView
+├── activeEvents
+├── activeSignals
+├── currentAssessments
+├── responseStates
+├── dataFreshness
+├── systemHealth
+└── contextualFilters
+```
+
+This is a read model.
+
+It does not own those underlying states.
+
+---
+
+# 121. EVENT DETAIL PROJECTION
+
+Conceptually:
+
+```text
+EventDetailView
+├── event
+├── signals
+├── evidence
+├── assessments
+├── decisions
+├── responses
+├── verification
+├── recovery
+├── timeline
+└── memory
+```
+
+Again:
+
+> Projection, not source of truth.
+
+---
+
+# 122. STATE SYNCHRONIZATION
+
+The UI must synchronize with authoritative state through one predictable mechanism.
+
+Possible implementation mechanisms include:
+
+- server fetch
+- polling
+- server-sent events
+- WebSocket
+- event subscriptions
+
+The choice belongs to Engineering Architecture.
+
+The invariant is:
+
+> **There must be one authoritative synchronization model.**
+
+---
+
+# 123. REAL-TIME PRINCIPLE
+
+"Real-time" should not be a visual claim.
+
+It must correspond to a defined freshness contract.
+
+If the system updates every minute:
+
+it should not imply millisecond-level live telemetry.
+
+The architecture therefore separates:
+
+```text
+UPDATE FREQUENCY
+```
+
+from:
+
+```text
+DATA FRESHNESS
+```
+
+and:
+
+```text
+USER PERCEPTION
+```
+
+---
+
+# 124. STATE PERSISTENCE
+
+Not all state requires persistence.
+
+### Persist:
+
+- events
+- assessments
+- decisions
+- responses
+- actions
+- verification
+- recovery
+- institutional memory
+- audit records
+- observations where required
+
+### Usually transient:
+
+- panel open state
+- hover state
+- temporary selection
+- animation state
+
+### Context-dependent:
+
+- filters
+- map viewport
+- search state
+- user preferences
+
+---
+
+# 125. STATE RESET RULE
+
+When a user changes operational context:
+
+```text
+Facility A → Facility B
+```
+
+context-dependent UI state may reset.
+
+But domain state must not.
+
+Similarly:
+
+```text
+Event A → Event B
+```
+
+must not modify Event A.
+
+---
+
+# 126. CASCADING STATE CHANGES
+
+AEGIS should avoid hidden cascades.
+
+A mutation may cause downstream projections to update.
+
+But those changes should be traceable.
+
+Example:
+
+```text
+ResponseVerified
+```
+
+may result in:
+
+```text
+response.status = VERIFIED
+verification.status = VERIFIED
+timeline += entry
+```
+
+It should not silently modify unrelated observations or historical evidence.
+
+---
+
+# 127. DELETE POLICY
+
+High-consequence operational history should generally not be hard-deleted through ordinary UI interactions.
+
+Where information must be removed, corrected, or retracted, the domain should support explicit states such as:
+
+```text
+RETRACTED
+INVALIDATED
+SUPERSEDED
+ARCHIVED
+```
+
+The exact retention policy belongs to the security/governance architecture.
+
+---
+
+# 128. CORRECTION MODEL
+
+When information is found to be wrong:
+
+```text
+Original record
+      ↓
+Correction
+      ↓
+New authoritative interpretation
+```
+
+Do not simply erase history.
+
+The correction itself should be auditable.
+
+---
+
+# 129. TIME MODEL
+
+AEGIS should distinguish:
+
+```text
+observed_at
+received_at
+created_at
+updated_at
+effective_at
+resolved_at
+verified_at
+```
+
+Not every entity requires every timestamp.
+
+But timestamps should represent distinct concepts rather than one generic:
+
+```text timestamp
+```
+
+---
+
+# 130. IDENTITY MODEL
+
+Every persistent domain entity should have a stable identifier.
+
+Examples:
+
+```text
+ORG-...
+FAC-...
+LOC-...
+SRC-...
+OBS-...
+SIG-...
+EVT-...
+EVD-...
+ASM-...
+DEC-...
+RSP-...
+ACT-...
+VRF-...
+MEM-...
+AUD-...
+```
+
+The exact identifier format is an engineering decision.
+
+The important requirement is:
+
+> IDs must remain stable and unique within their domain.
+
+---
+
+# 131. RELATIONSHIP INTEGRITY
+
+References between entities must be validated.
+
+For example:
+
+```text
+Evidence.event_id
+```
+
+must reference an existing authorized Event.
+
+A Response must reference a valid Event.
+
+A Verification must reference a valid Response.
+
+A Memory record must reference a valid completed or appropriately reviewable event.
+
+---
+
+# 132. ORPHAN STATE
+
+AEGIS should prevent unexplained orphaned records.
+
+Examples:
+
+```text
+Evidence with no Event
+Verification with no Response
+Action with no Response
+Memory with no source Event
+```
+
+Where orphan states are technically possible, they must be explicitly classified rather than silently ignored.
+
+---
+
+# 133. DOMAIN VALIDATION
+
+Validation occurs at multiple layers:
+
+```text
+UI validation
+      ↓
+API validation
+      ↓
+Domain validation
+      ↓
+Persistence validation
+```
+
+Domain validation remains authoritative.
+
+---
+
+# 134. UI CANNOT BYPASS DOMAIN RULES
+
+A malicious or buggy client must not be able to submit:
+
+```text
+response.status = VERIFIED
+```
+
+directly and bypass the response/verification lifecycle.
+
+The backend/domain layer must enforce the invariant.
+
+---
+
+# 135. SECURITY AND DOMAIN STATE
+
+Authorization must be evaluated before consequential commands.
+
+Conceptually:
+
+```text
+Command
+ ↓
+Identity
+ ↓
+Permission
+ ↓
+Scope
+ ↓
+Domain validation
+ ↓
+Mutation
+```
+
+A valid command from an unauthorized user is still rejected.
+
+---
+
+# 136. GLOBAL STATE BOOTSTRAP
+
+When AEGIS initializes:
+
+```text
+1. Establish session
+2. Resolve user identity
+3. Resolve permissions
+4. Establish operational context
+5. Determine data mode
+6. Determine connectivity
+7. Determine system health
+8. Load required domain projections
+9. Establish synchronization
+10. Render operational interface
+```
+
+The UI should not display a fully "healthy" operational state before these checks establish enough truth.
+
+---
+
+# 137. GLOBAL STATE SHUTDOWN / RECOVERY
+
+If connectivity is lost:
+
+```text
+ONLINE
+ ↓
+DEGRADED
+ ↓
+OFFLINE
+```
+
+When connectivity returns:
+
+```text
+OFFLINE
+ ↓
+RECOVERING
+ ↓
+SYNCHRONIZING
+ ↓
+ONLINE
+```
+
+The exact implementation is engineering-specific.
+
+The conceptual state must exist.
+
+---
+
+# 138. RECOVERY AFTER DISCONNECTION
+
+When reconnecting, AEGIS must not simply overwrite local state blindly.
+
+It should:
+
+```text
+Detect divergence
+ ↓
+Synchronize authoritative state
+ ↓
+Resolve conflicts
+ ↓
+Update projections
+ ↓
+Record relevant audit information
+```
+
+This is particularly important for consequential actions.
+
+---
+
+# 139. NOTIFICATION STATE
+
+Notifications should be derived from domain conditions.
+
+A notification should not become the primary source of event truth.
+
+Example:
+
+```text
+Event escalated
+```
+
+may produce:
+
+```text
+Notification
+```
+
+But deleting the notification must not delete the event escalation.
+
+---
+
+# 140. ALERT STATE
+
+An alert is a presentation or communication mechanism.
+
+It should be derived from:
+
+```text
+Signal
+Event
+Assessment
+System condition
+```
+
+Therefore:
+
+> Alert ≠ domain event.
+
+---
+
+# 141. GLOBAL ALERT MODEL
+
+Conceptually:
+
+```text
+Alert
+├── alert_id
+├── source_entity
+├── alert_type
+├── severity
+├── created_at
+├── acknowledged_at
+├── dismissed_at
+└── status
+```
+
+Alerts can be acknowledged without changing the underlying event.
+
+---
+
+# 142. ACKNOWLEDGEMENT RULE
+
+Acknowledging:
+
+```text
+Signal
+```
+
+means:
+
+> A responsible user has seen or accepted responsibility for reviewing it.
+
+It does not mean:
+
+> The signal is resolved.
+
+---
+
+# 143. DISMISSAL RULE
+
+Dismissing a UI notification does not automatically dismiss:
+
+```text
+Signal
+Event
+Assessment
+Response
+```
+
+The underlying domain state must be changed through its own command.
+
+---
+
+# 144. GLOBAL STATE DEPENDENCY GRAPH
+
+```text
+IDENTITY
+   ↓
+PERMISSIONS
+   ↓
+VISIBLE DATA
+   ↓
+USER ACTIONS
+   ↓
+DOMAIN COMMANDS
+   ↓
+DOMAIN STATE
+   ↓
+DOMAIN EVENTS
+   ↓
+PROJECTIONS
+   ↓
+UI
+```
+
+Cross-cutting:
+
+```text
+SYSTEM HEALTH
+CONNECTIVITY
+FRESHNESS
+PROVENANCE
+AUDIT
+```
+
+---
+
+# 145. AEGIS STATE MACHINE SUMMARY
+
+## Signal
+
+```text
+NEW
+→ ACKNOWLEDGED
+→ UNDER_REVIEW
+→ CORRELATED
+→ ESCALATED
+→ RESOLVED
+```
+
+## Event
+
+```text
+DETECTED
+→ OPEN
+→ INVESTIGATING
+→ CHARACTERIZING
+→ ASSESSED
+→ RESPONDING
+→ MONITORING
+→ RESOLVING
+→ CLOSED
+→ MEMORIALIZED
+```
+
+## Assessment
+
+```text
+DRAFT
+→ UNDER_REVIEW
+→ PUBLISHED
+→ SUPERSEDED
+```
+
+## Decision
+
+```text
+PROPOSED
+→ UNDER_REVIEW
+→ APPROVED
+```
+
+## Response
+
+```text
+PROPOSED
+→ REVIEWING
+→ APPROVED
+→ IN_PROGRESS
+→ PARTIALLY_COMPLETED
+→ COMPLETED
+→ VERIFIED
+```
+
+## Verification
+
+```text
+PENDING
+→ UNDER_REVIEW
+→ VERIFIED
+```
+
+or:
+
+```text
+FAILED
+INCONCLUSIVE
+PARTIAL
+```
+
+## Recovery
+
+```text
+NOT_STARTED
+→ IN_PROGRESS
+→ STABILIZING
+→ RECOVERED
+```
+
+## Memory
+
+```text
+DRAFT
+→ UNDER_REVIEW
+→ APPROVED
+→ ACTIVE
+```
+
+---
+
+# 146. CANONICAL STATE TRANSITION EXAMPLE
+
+A signal appears.
+
+### Step 1
+
+```text
+ObservationReceived
+```
+
+State:
+
+```text
+Observation = RECEIVED
+```
+
+### Step 2
+
+Detection identifies a meaningful deviation.
+
+```text
+SignalDetected
+```
+
+State:
+
+```text
+Signal = NEW
+```
+
+### Step 3
+
+User acknowledges it.
+
+```text
+SignalAcknowledged
+```
+
+State:
+
+```text
+Signal = ACKNOWLEDGED
+```
+
+### Step 4
+
+User creates an event.
+
+```text
+EventCreated
+```
+
+State:
+
+```text
+Event = OPEN
+```
+
+### Step 5
+
+Evidence is added.
+
+```text
+EvidenceAdded
+```
+
+### Step 6
+
+Assessment is produced.
+
+```text
+AssessmentCreated
+```
+
+### Step 7
+
+Assessment is reviewed.
+
+```text
+AssessmentPublished
+```
+
+### Step 8
+
+A response is proposed.
+
+```text
+ResponseProposed
+```
+
+### Step 9
+
+Responsible authority approves it.
+
+```text
+ResponseApproved
+```
+
+### Step 10
+
+Action begins.
+
+```text
+ActionStarted
+```
+
+### Step 11
+
+Action finishes.
+
+```text
+ActionCompleted
+```
+
+### Step 12
+
+Outcome is assessed.
+
+```text
+VerificationStarted
+```
+
+### Step 13
+
+Outcome is verified.
+
+```text
+ResponseVerified
+```
+
+### Step 14
+
+Recovery begins.
+
+```text
+RecoveryStarted
+```
+
+### Step 15
+
+Recovery completes.
+
+```text
+RecoveryCompleted
+```
+
+### Step 16
+
+Event closes.
+
+```text
+EventResolved
+```
+
+### Step 17
+
+Institutional memory is created.
+
+```text
+MemoryCreated
+```
+
+This is the canonical AEGIS closed loop.
+
+---
+
+# 147. WHAT HAPPENS WHEN THE ASSESSMENT CHANGES?
+
+Suppose:
+
+```text
+Assessment v1 = current interpretation
+```
+
+New evidence arrives.
+
+The system should:
+
+```text
+EvidenceAdded
+ ↓
+Assessment recalculated/reviewed
+ ↓
+Assessment v2
+ ↓
+Assessment v1 superseded
+ ↓
+Timeline updated
+ ↓
+Relevant response decision may require review
+```
+
+Importantly:
+
+> A new assessment does not automatically execute a new response.
+
+Human decision remains explicit.
+
+---
+
+# 148. WHAT HAPPENS WHEN A RESPONSE FAILS?
+
+```text
+ActionStarted
+ ↓
+ActionFailed
+ ↓
+Response = FAILED / BLOCKED / PARTIAL
+ ↓
+Timeline updated
+ ↓
+Assessment may require review
+ ↓
+New Decision
+ ↓
+New Response
+```
+
+The system must not hide the failed attempt.
+
+Failure is valuable operational information.
+
+---
+
+# 149. WHAT HAPPENS WHEN DATA BECOMES STALE?
+
+Example:
+
+```text
+Source stops reporting
+```
+
+The source state changes:
+
+```text
+SOURCE = DEGRADED
+```
+
+Data freshness changes:
+
+```text
+FRESHNESS = STALE
+```
+
+Relevant projections update:
+
+```text
+Situation = LIMITED DATA
+```
+
+The system does **not** infer:
+
+```text
+NO SIGNAL = NORMAL
+```
+
+---
+
+# 150. WHAT HAPPENS WHEN EVIDENCE CONFLICTS?
+
+```text
+Evidence A
+    ↓
+supports Assessment A
+
+Evidence B
+    ↓
+contradicts Assessment A
+```
+
+Assessment becomes:
+
+```text
+confidence adjusted
++
+contradicting evidence exposed
++
+uncertainty preserved
+```
+
+The system does not silently select the convenient answer.
+
+---
+
+# 151. WHAT HAPPENS WHEN TWO USERS ACT SIMULTANEOUSLY?
+
+Example:
+
+```text
+User A approves response
+User B rejects response
+```
+
+The system needs authoritative ordering and concurrency control.
+
+Possible result:
+
+```text
+First valid transition succeeds.
+Second command detects changed state.
+Second user receives current state and conflict outcome.
+```
+
+The exact conflict-resolution mechanism belongs to Engineering Architecture.
+
+The invariant does not.
+
+---
+
+# 152. WHAT HAPPENS WHEN A USER LACKS PERMISSION?
+
+The command fails before mutation.
+
+```text
+User
+ ↓
+Command
+ ↓
+Permission check
+ ↓
+DENIED
+ ↓
+No domain mutation
+ ↓
+Audit event
+```
+
+The UI should communicate the authorization boundary without revealing information the user is not permitted to access.
+
+---
+
+# 153. WHAT HAPPENS WHEN THE SERVER IS UNAVAILABLE?
+
+The application should move toward:
+
+```text
+DEGRADED / OFFLINE
+```
+
+rather than pretending mutations succeeded.
+
+Read-only access to cached information may be possible depending on implementation.
+
+Consequential writes must have explicit confirmation semantics.
+
+---
+
+# 154. DOMAIN MODEL AND SCREEN DESIGN
+
+Screens must consume domain models.
+
+Example:
+
+A future Event screen should not invent:
+
+```text
+Threat = High
+```
+
+because the designer wants a dramatic visual.
+
+It should obtain the authoritative assessment.
+
+Similarly, a dashboard card should not display:
+
+```text
+Response Active
+```
+
+unless the Response domain actually indicates an active response.
+
+---
+
+# 155. SCREEN DATA CONTRACT PRINCIPLE
+
+Every screen will eventually specify:
+
+```text
+Reads:
+    Event
+    Assessment
+    Response
+
+Writes:
+    Decision
+    Response
+
+Derived:
+    EventAge
+    ResponseProgress
+
+UI:
+    selectedTab
+    expandedPanel
+```
+
+This will be mandatory when the screen registry is created.
+
+---
+
+# 156. DOMAIN MODEL AND DESIGN SYSTEM
+
+The design system should be built around domain states.
+
+For example:
+
+```text
+SignalCard
+EventStatus
+AssessmentConfidence
+ResponseStatus
+VerificationStatus
+DataFreshness
+ConnectivityState
+```
+
+The design system should not have arbitrary semantic colors disconnected from domain meaning.
+
+---
+
+# 157. SEMANTIC STATE LANGUAGE
+
+AEGIS should standardize language around:
+
+```text
+DETECTED
+UNDER REVIEW
+ASSESSED
+RECOMMENDED
+AUTHORIZED
+IN PROGRESS
+VERIFIED
+RECOVERING
+RESOLVED
+UNKNOWN
+STALE
+DEGRADED
+```
+
+Exact user-facing labels may later be optimized through UX research.
+
+The underlying domain semantics should remain stable.
+
+---
+
+# 158. DOMAIN MODEL AND AI
+
+AI may eventually assist with:
+
+- summarization
+- evidence organization
+- pattern surfacing
+- contextual explanation
+- search
+- recommendation generation
+
+But AI output must remain represented as an identifiable source.
+
+Conceptually:
+
+```text
+AI-generated suggestion
+```
+
+is not automatically:
+
+```text
+Verified assessment
+```
+
+---
+
+# 159. AI OUTPUT MODEL
+
+If AI is introduced, its output should conceptually include:
+
+```text
+model/source
+generated_at
+input_context
+suggestion
+confidence
+supporting_references
+limitations
+review_status
+reviewer
+```
+
+Human review remains explicit where required.
+
+---
+
+# 160. AI MEMORY RULE
+
+AI-generated content must not automatically become institutional memory.
+
+The lifecycle should be:
+
+```text
+AI Suggestion
+ ↓
+Human Review
+ ↓
+Approved Knowledge
+ ↓
+Institutional Memory
+```
+
+This preserves organizational accountability.
+
+---
+
+# 161. BIO-RESILIENCE FEEDBACK MODEL
+
+The completed domain loop becomes:
+
+```text
+OBSERVATION
+    ↓
+SIGNAL
+    ↓
+EVENT
+    ↓
+EVIDENCE
+    ↓
+ASSESSMENT
+    ↓
+DECISION
+    ↓
+RESPONSE
+    ↓
+VERIFICATION
+    ↓
+RECOVERY
+    ↓
+MEMORY
+    ↓
+FUTURE PREPAREDNESS
+```
+
+This is the domain implementation of the biological "immune memory" concept.
+
+---
+
+# 162. THE MOST IMPORTANT GLOBAL STATE PRINCIPLE
+
+AEGIS should behave like this:
+
+> **Every important thing that happens has a state, an owner, a transition rule, an event, and an audit trail.**
+
+If something has none of those, it should be questioned.
+
+---
+
+# 163. ENGINEERING BOUNDARY
+
+This document defines:
+
+- domain entities
+- domain relationships
+- state semantics
+- ownership
+- invariants
+- commands
+- events
+- synchronization principles
+
+It does **not yet define**:
+
+- database technology
+- ORM
+- API framework
+- exact JSON schema
+- exact SQL schema
+- frontend state library
+- WebSocket implementation
+- caching strategy
+- deployment topology
+
+Those belong to the Engineering Architecture.
+
+---
+
+# 164. PRODUCT BOUNDARY
+
+This document does not determine:
+
+- exact screens
+- exact navigation labels
+- exact layouts
+- exact card designs
+- exact typography
+- exact animation
+- exact dashboard composition
+
+Those belong to Product Architecture, User Flow, Screen Architecture, and Design System specifications.
+
+---
+
+# 165. NO UNAUTHORIZED DOMAIN EXPANSION
+
+Future documents must not casually introduce new primary domain entities.
+
+If a new entity is proposed, it must answer:
+
+1. Why does it exist?
+2. What operational problem does it solve?
+3. Who owns it?
+4. What state does it own?
+5. What entities does it relate to?
+6. What commands modify it?
+7. What events does it produce?
+8. Why can't an existing entity represent it?
+
+If those questions cannot be answered, the entity should not be added.
+
+---
+
+# 166. DOMAIN COMPLETENESS TEST
+
+The domain model is structurally adequate when the following scenario can be represented without inventing an additional hidden entity:
+
+```text
+A new observation arrives.
+        ↓
+A signal is detected.
+        ↓
+A human reviews it.
+        ↓
+An event is created.
+        ↓
+Evidence is collected.
+        ↓
+The interpretation changes.
+        ↓
+An assessment is published.
+        ↓
+A decision is made.
+        ↓
+A response is authorized.
+        ↓
+Actions are executed.
+        ↓
+The outcome is verified.
+        ↓
+Recovery occurs.
+        ↓
+The event closes.
+        ↓
+Lessons are captured.
+```
+
+If the architecture cannot represent any step cleanly, the model is incomplete.
+
+---
+
+# 167. GLOBAL STATE COMPLETENESS TEST
+
+The global state architecture is adequate when:
+
+- every screen can read authoritative domain state
+- no screen needs to invent domain state
+- consequential interactions map to commands
+- commands have validation
+- successful mutations produce events
+- state changes are auditable
+- projections update predictably
+- stale data is distinguishable
+- unknown data is distinguishable
+- simulation is isolated
+- permission boundaries are enforced
+- concurrent changes can be detected
+- failed actions cannot masquerade as successful actions
+
+---
+
+# 168. IMPLEMENTATION READINESS TEST
+
+AEGIS is **not yet ready for full implementation** merely because this document exists.
+
+The following documents must still be derived:
+
+```text
+01 Master Architecture
+        ↓
+02 Domain Model + Global State Architecture
+        ↓
+03 User Flow Architecture
+        ↓
+04 Product Architecture
+        ↓
+05 Engineering Architecture
+        ↓
+06 Authoritative Screen Registry
+        ↓
+07 Screen Specifications
+        ↓
+08 API / Data Contracts
+        ↓
+09 Design System Mapping
+        ↓
+10 Implementation Plan
+        ↓
+11 QA / Acceptance Architecture
+```
+
+This ordering is part of the project discipline.
+
+---
+
+# 169. AEGIS DOMAIN NORTH STAR
+
+The domain model can be summarized as:
+
+```text
+OBSERVE
+  │
+  ▼
+OBSERVATION
+  │
+  ▼
+SIGNAL
+  │
+  ▼
+EVENT
+  │
+  ├──────────────► EVIDENCE
+  │                   │
+  │                   ▼
+  │              ASSESSMENT
+  │                   │
+  │                   ▼
+  │                DECISION
+  │                   │
+  │                   ▼
+  │                RESPONSE
+  │                   │
+  │                   ▼
+  │                 ACTION
+  │                   │
+  │                   ▼
+  │               VERIFICATION
+  │                   │
+  │                   ▼
+  │                RECOVERY
+  │                   │
+  │                   ▼
+  └──────────────► MEMORY
+                       │
+                       ▼
+                 RESILIENCE
+```
+
+---
+
+# 170. FINAL AEGIS GLOBAL STATE MODEL
+
+At any point in time, AEGIS should be able to answer:
+
+```text
+WHO
+    ↓
+is using the system?
+
+WHERE
+    ↓
+is the operational context?
+
+WHAT
+    ↓
+has been observed?
+
+WHAT CHANGED
+    ↓
+has been detected?
+
+WHAT EVENT
+    ↓
+is being managed?
+
+WHAT EVIDENCE
+    ↓
+supports the current understanding?
+
+WHAT DO WE THINK
+    ↓
+the event means?
+
+HOW CONFIDENT
+    ↓
+are we?
+
+WHAT IS THE POTENTIAL SIGNIFICANCE
+    ↓
+of the event?
+
+WHAT WAS DECIDED
+    ↓
+by whom?
+
+WHAT IS BEING DONE
+    ↓
+right now?
+
+DID IT HAPPEN
+    ↓
+as intended?
+
+DID IT WORK
+    ↓
+based on available evidence?
+
+WHAT IS THE CURRENT RECOVERY STATE
+    ↓
+of the situation?
+
+WHAT DID WE LEARN
+    ↓
+from the event?
+
+HOW TRUSTWORTHY IS THE DATA
+    ↓
+right now?
+
+HOW HEALTHY IS AEGIS
+    ↓
+itself?
+```
+
+If AEGIS cannot answer one of these questions, the missing information should be explicit.
+
+It should never be silently fabricated.
+
+---
+
+# 171. FINAL NON-NEGOTIABLE RULES
+
+These rules govern all subsequent AEGIS work.
+
+### 01
+**Domain truth lives outside the UI.**
+
+### 02
+**Every consequential state has an owner.**
+
+### 03
+**Every consequential state transition has a valid command.**
+
+### 04
+**Every consequential successful mutation produces an auditable domain event.**
+
+### 05
+**Observation is not interpretation.**
+
+### 06
+**Interpretation is not threat confirmation.**
+
+### 07
+**Confidence is not risk.**
+
+### 08
+**Evidence must remain inspectable.**
+
+### 09
+**Unknown must remain unknown.**
+
+### 10
+**Stale must remain visibly stale.**
+
+### 11
+**Recommendation is not authorization.**
+
+### 12
+**Authorization is not execution.**
+
+### 13
+**Execution is not verification.**
+
+### 14
+**Resolution is not learning.**
+
+### 15
+**Simulation is never silently represented as live operation.**
+
+### 16
+**The UI cannot bypass domain validation.**
+
+### 17
+**The UI cannot invent operational state.**
+
+### 18
+**Conflicting evidence must remain representable.**
+
+### 19
+**Historical state must remain reconstructable.**
+
+### 20
+**A system that cannot communicate its own degradation is not resilient.**
+
+---
+
+# 172. DOCUMENT COMPLETION STATUS
+
+## Defined
+
+- Domain philosophy
+- Domain boundaries
+- Entity catalog
+- Entity relationships
+- Observation model
+- Signal model
+- Event model
+- Evidence model
+- Assessment model
+- Decision model
+- Response model
+- Action model
+- Verification model
+- Recovery model
+- Institutional Memory model
+- Identity concepts
+- Permission concepts
+- Provenance
+- Audit
+- System health
+- Connectivity
+- Freshness
+- Simulation modes
+- Global state architecture
+- State ownership
+- UI state
+- Domain state
+- Derived state
+- Commands
+- Domain events
+- State transitions
+- Event propagation
+- Concurrency principles
+- Failure handling
+- Degraded-state handling
+- Unknown-state handling
+- Data-mode isolation
+- Core invariants
+- Acceptance criteria
+- Engineering boundaries
+
+## Deliberately Not Defined Yet
+
+- Exact 13-screen registry
+- Exact route structure
+- Exact API endpoints
+- Exact database schema
+- Exact frontend state-management library
+- Exact backend framework
+- Exact sensor types
+- Exact laboratory integrations
+- Exact pathogen taxonomy
+- Exact threat scoring formula
+- Exact clinical protocols
+- Exact response procedures
+- Exact alert thresholds
+- Exact freshness thresholds
+- Exact permission matrix
+- Exact visual layouts
+
+Those are intentionally deferred.
+
+---
+
+# 173. FINAL SOURCE-OF-TRUTH STATEMENT
+
+From this point forward:
+
+**AEGIS Master Architecture v1.0** defines what the system is.
+
+**AEGIS Domain Model + Global State Architecture v1.0** defines what exists inside the system and how its state behaves.
+
+The next documents must derive from these two.
+
+No screen should be designed first and then retrofitted into the domain model.
+
+No mock data should define the domain model.
+
+No route should define the product architecture.
+
+No component should define business logic.
+
+No AI output should silently become operational truth.
+
+No visual effect should imply a state that does not exist in the domain.
+
+The intended architecture is:
+
+```text
+ARCHITECTURE
+      ↓
+DOMAIN
+      ↓
+STATE
+      ↓
+FLOW
+      ↓
+PRODUCT
+      ↓
+SCREENS
+      ↓
+DESIGN
+      ↓
+ENGINEERING
+      ↓
+IMPLEMENTATION
+      ↓
+VALIDATION
+```
+
+And the operational loop remains:
+
+```text
+SENSE
+→ DETECT
+→ UNDERSTAND
+→ ASSESS
+→ DECIDE
+→ RESPOND
+→ VERIFY
+→ RECOVER
+→ REMEMBER
+→ RESILIENCE
+```
+
+**AEGIS DOMAIN MODEL + GLOBAL STATE ARCHITECTURE v1.0**
+
+**STATUS: BASELINE ESTABLISHED**
+
+**END OF DOCUMENT**
