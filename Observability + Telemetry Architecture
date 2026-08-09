@@ -1,0 +1,1828 @@
+# AEGIS
+# Observability + Telemetry Architecture
+
+**System:** AEGIS  
+**Document:** 12 — Observability + Telemetry Architecture  
+**Version:** 1.0  
+**Status:** Master Architecture  
+**Date:** August 2026
+
+---
+
+# 01. Purpose
+
+This document defines how AEGIS observes, records, monitors, and explains the behavior of:
+
+1. The AEGIS software platform
+2. AEGIS intelligence services
+3. AEGIS data pipelines
+4. AEGIS integrations
+5. Operational events and telemetry consumed by the platform
+
+The architecture exists to ensure that when something happens, AEGIS can answer:
+
+```text
+WHAT happened?
+WHEN did it happen?
+WHERE did it happen?
+WHY did it happen?
+WHAT was affected?
+WHO or WHAT caused it?
+HOW confident are we?
+IS the information trustworthy?
+WHAT happened before it?
+WHAT happened afterward?
+```
+
+---
+
+# 02. Critical Architectural Boundary
+
+AEGIS has two fundamentally different telemetry domains.
+
+## Domain A — System Observability
+
+Observes the health and behavior of the AEGIS platform itself.
+
+Examples:
+
+```text
+API latency
+database performance
+service availability
+errors
+CPU
+memory
+queue depth
+network failures
+AI inference latency
+authentication failures
+```
+
+## Domain B — Operational / Biological Telemetry
+
+Represents information AEGIS receives about the healthcare environment.
+
+Examples:
+
+```text
+environmental observations
+facility signals
+patient-related operational indicators
+laboratory results
+surveillance observations
+ventilation telemetry
+temperature
+occupancy
+other approved operational signals
+```
+
+These domains must remain conceptually separate.
+
+---
+
+# 03. Architecture Principle
+
+The core distinction is:
+
+```text
+OBSERVABILITY
+=
+Is AEGIS working correctly?
+
+TELEMETRY
+=
+What is happening in the environment AEGIS is observing?
+```
+
+Never collapse both into one generic event model.
+
+---
+
+# 04. Observability Architecture
+
+The AEGIS observability stack should conceptually follow:
+
+```text
+AEGIS SERVICES
+      │
+      ├── Logs
+      ├── Metrics
+      ├── Traces
+      └── Health Signals
+              │
+              ▼
+       OBSERVABILITY PIPELINE
+              │
+              ├── Collection
+              ├── Processing
+              ├── Storage
+              └── Retention
+              │
+              ▼
+       OBSERVABILITY PLATFORM
+              │
+              ├── Dashboards
+              ├── Alerts
+              ├── Diagnostics
+              └── Incident Investigation
+```
+
+---
+
+# 05. Three Core Observability Signals
+
+AEGIS should support:
+
+```text
+LOGS
+METRICS
+TRACES
+```
+
+Together they provide complementary visibility.
+
+---
+
+# 06. Logs
+
+Logs describe discrete events.
+
+Examples:
+
+```text
+service started
+request failed
+authentication rejected
+model inference completed
+data ingestion failed
+database connection lost
+```
+
+Logs should be structured rather than arbitrary text whenever possible.
+
+---
+
+# 07. Structured Log Model
+
+Conceptually:
+
+```text
+LogEvent {
+    id
+    timestamp
+    severity
+    service
+    environment
+    eventType
+    message
+    correlationId
+    traceId
+    actorReference
+    metadata
+}
+```
+
+Sensitive information must not be unnecessarily placed into logs.
+
+---
+
+# 08. Log Severity
+
+AEGIS should support consistent severity levels.
+
+```text
+DEBUG
+INFO
+WARN
+ERROR
+CRITICAL
+```
+
+Severity must represent operational significance, not developer preference.
+
+---
+
+# 09. Metrics
+
+Metrics represent measurable system behavior over time.
+
+Examples:
+
+```text
+request rate
+error rate
+latency
+throughput
+queue depth
+database connections
+service availability
+model inference time
+ingestion rate
+```
+
+---
+
+# 10. Metric Categories
+
+AEGIS should organize metrics into:
+
+```text
+SYSTEM
+APPLICATION
+DATA PIPELINE
+AI / INTELLIGENCE
+SECURITY
+INTEGRATION
+USER EXPERIENCE
+```
+
+---
+
+# 11. System Metrics
+
+Examples:
+
+```text
+CPU utilization
+memory utilization
+disk utilization
+network utilization
+container health
+process health
+resource saturation
+```
+
+---
+
+# 12. Application Metrics
+
+Examples:
+
+```text
+API request count
+API error count
+request latency
+active sessions
+failed operations
+background job failures
+queue depth
+```
+
+---
+
+# 13. Data Pipeline Metrics
+
+Examples:
+
+```text
+ingestion rate
+processing rate
+failed records
+processing latency
+stale data
+data-quality failures
+pipeline backlog
+```
+
+---
+
+# 14. Intelligence Metrics
+
+Examples:
+
+```text
+detection latency
+model inference latency
+model failure rate
+recommendation generation rate
+assessment generation rate
+AI availability
+AI output validation failures
+```
+
+These are system metrics.
+
+They must not be confused with the actual biological or healthcare signals being analyzed.
+
+---
+
+# 15. Security Metrics
+
+Examples:
+
+```text
+authentication failures
+authorization failures
+suspicious access attempts
+session anomalies
+rate-limit events
+security policy violations
+```
+
+Security observability must align with Document 10.
+
+---
+
+# 16. Integration Metrics
+
+Examples:
+
+```text
+integration availability
+connection failures
+request latency
+message delivery failures
+data synchronization delay
+schema mismatch
+```
+
+---
+
+# 17. User Experience Metrics
+
+Where appropriate and privacy-safe:
+
+```text
+screen load time
+interaction latency
+failed actions
+navigation errors
+client crashes
+API failure impact
+```
+
+AEGIS should measure whether the interface remains usable during high-pressure operations.
+
+---
+
+# 18. Distributed Tracing
+
+For complex operations, AEGIS should support distributed tracing.
+
+Example:
+
+```text
+User Action
+ ↓
+Frontend
+ ↓
+API Gateway
+ ↓
+Investigation Service
+ ↓
+Intelligence Service
+ ↓
+Database
+ ↓
+Response
+```
+
+A trace should allow engineers to reconstruct the journey.
+
+---
+
+# 19. Trace Model
+
+Conceptually:
+
+```text
+Trace
+ └── Span
+      ├── Service
+      ├── Operation
+      ├── Duration
+      ├── Status
+      └── Metadata
+```
+
+---
+
+# 20. Correlation IDs
+
+Important requests and workflows should carry correlation identifiers.
+
+Example:
+
+```text
+correlationId
+traceId
+requestId
+investigationId
+```
+
+This allows engineers to connect related system events.
+
+---
+
+# 21. Investigation Traceability
+
+Where appropriate, operational workflows should be traceable through:
+
+```text
+event
+→ investigation
+→ assessment
+→ recommendation
+→ decision
+```
+
+However, operational identifiers must not expose sensitive information unnecessarily.
+
+---
+
+# 22. Health Checks
+
+AEGIS services should expose appropriate health information.
+
+Conceptually:
+
+```text
+HEALTHY
+DEGRADED
+UNHEALTHY
+UNKNOWN
+```
+
+---
+
+# 23. Health Check Layers
+
+Health should be assessed at multiple levels:
+
+```text
+PROCESS HEALTH
+SERVICE HEALTH
+DEPENDENCY HEALTH
+DATA PIPELINE HEALTH
+INTELLIGENCE HEALTH
+SYSTEM HEALTH
+```
+
+---
+
+# 24. Dependency Health
+
+A service can be running while one of its dependencies is failing.
+
+Therefore:
+
+```text
+AEGIS API
+   │
+   ├── Database
+   ├── Cache
+   ├── Queue
+   ├── Intelligence service
+   └── External integration
+```
+
+must be observable individually.
+
+---
+
+# 25. Dependency Failure
+
+AEGIS must distinguish:
+
+```text
+SERVICE DOWN
+```
+
+from:
+
+```text
+DEPENDENCY DEGRADED
+```
+
+This distinction becomes important during incident response.
+
+---
+
+# 26. Operational Telemetry Architecture
+
+Operational telemetry should follow:
+
+```text
+SOURCE
+ ↓
+INGESTION
+ ↓
+VALIDATION
+ ↓
+NORMALIZATION
+ ↓
+QUALITY ASSESSMENT
+ ↓
+STORAGE
+ ↓
+INTELLIGENCE
+ ↓
+VISUALIZATION
+```
+
+This aligns with Documents 06, 07, and 11.
+
+---
+
+# 27. Telemetry Source
+
+Each operational telemetry source must have an identifiable origin.
+
+Conceptually:
+
+```text
+TelemetrySource {
+    id
+    type
+    name
+    location
+    status
+    configuration
+    provenance
+}
+```
+
+---
+
+# 28. Telemetry Record
+
+Conceptually:
+
+```text
+TelemetryRecord {
+    id
+    sourceId
+    timestamp
+    type
+    value
+    unit
+    location
+    quality
+    provenance
+}
+```
+
+The final schema must remain consistent with Document 06.
+
+---
+
+# 29. Telemetry Quality
+
+Every operational telemetry stream should be capable of expressing:
+
+```text
+VALID
+DEGRADED
+STALE
+MISSING
+INVALID
+UNKNOWN
+```
+
+---
+
+# 30. Telemetry Freshness
+
+AEGIS should know whether telemetry is current.
+
+Conceptually:
+
+```text
+CURRENT
+AGING
+STALE
+UNKNOWN
+```
+
+The actual thresholds depend on the telemetry type.
+
+They must not be globally assumed.
+
+---
+
+# 31. Telemetry Timestamp
+
+Where available, distinguish:
+
+```text
+event timestamp
+ingestion timestamp
+processing timestamp
+```
+
+These are not necessarily identical.
+
+---
+
+# 32. Clock Synchronization
+
+Time-dependent analysis requires reliable timestamps.
+
+The architecture should account for:
+
+```text
+clock drift
+timezone normalization
+timestamp validation
+late-arriving events
+duplicate events
+out-of-order events
+```
+
+---
+
+# 33. Late Data
+
+AEGIS must not automatically discard late-arriving data without an explicit policy.
+
+Late information may alter an investigation.
+
+The system should preserve arrival metadata.
+
+---
+
+# 34. Duplicate Telemetry
+
+Duplicate records should be detectable.
+
+Conceptually:
+
+```text
+incoming record
+ ↓
+deduplication logic
+ ↓
+new
+OR
+duplicate
+```
+
+Duplicate handling must preserve traceability.
+
+---
+
+# 35. Data Quality Monitoring
+
+AEGIS should continuously monitor:
+
+```text
+completeness
+timeliness
+validity
+consistency
+accuracy where measurable
+uniqueness
+```
+
+---
+
+# 36. Data Quality Events
+
+Examples:
+
+```text
+DATA_STALE
+DATA_MISSING
+DATA_INVALID
+SCHEMA_MISMATCH
+DUPLICATE_DATA
+SOURCE_UNAVAILABLE
+```
+
+These events should be visible to appropriate users and services.
+
+---
+
+# 37. Telemetry vs Alert
+
+A telemetry record is not automatically an alert.
+
+Correct:
+
+```text
+Telemetry
+ ↓
+Analysis
+ ↓
+Potential anomaly
+ ↓
+Assessment
+ ↓
+Alert
+```
+
+Not:
+
+```text
+Every telemetry event
+ ↓
+Alert
+```
+
+This prevents alert overload.
+
+---
+
+# 38. Alert Architecture
+
+AEGIS alerts should originate from meaningful conditions.
+
+Conceptually:
+
+```text
+Condition
+ ↓
+Evaluation
+ ↓
+Priority
+ ↓
+Alert
+ ↓
+Notification
+```
+
+---
+
+# 39. Alert Object
+
+Conceptually:
+
+```text
+Alert {
+    id
+    type
+    severity
+    priority
+    source
+    relatedEvent
+    status
+    createdAt
+    acknowledgedAt
+    resolvedAt
+}
+```
+
+---
+
+# 40. Alert States
+
+```text
+OPEN
+ACKNOWLEDGED
+INVESTIGATING
+RESOLVED
+SUPPRESSED
+EXPIRED
+```
+
+Exact states must align with the global state architecture.
+
+---
+
+# 41. Alert Lifecycle
+
+```text
+Detection
+ ↓
+Alert Created
+ ↓
+Alert Prioritized
+ ↓
+User Notified
+ ↓
+Acknowledged
+ ↓
+Investigation
+ ↓
+Resolved
+```
+
+---
+
+# 42. Alert Suppression
+
+Suppression may be used for:
+
+```text
+duplicate alerts
+maintenance
+known conditions
+noise reduction
+```
+
+Suppression must never erase historical evidence.
+
+---
+
+# 43. Alert Escalation
+
+If an alert remains unresolved according to policy:
+
+```text
+Alert
+ ↓
+Timer
+ ↓
+Escalation condition
+ ↓
+Escalation
+```
+
+Exact escalation rules require stakeholder validation.
+
+---
+
+# 44. Alert Fatigue
+
+AEGIS should monitor:
+
+```text
+alert volume
+repeat alerts
+acknowledgement time
+resolution time
+dismissal rate
+suppression rate
+false-alert rate
+```
+
+This allows the system itself to identify alert fatigue.
+
+---
+
+# 45. Observability Dashboard
+
+The engineering observability dashboard should provide:
+
+```text
+SYSTEM STATUS
+SERVICE HEALTH
+ERROR RATE
+LATENCY
+DATA PIPELINES
+INTEGRATIONS
+AI SERVICES
+SECURITY EVENTS
+ACTIVE INCIDENTS
+```
+
+This is an engineering/admin interface.
+
+It is not the same as the operational AEGIS monitoring dashboard used by healthcare and biosecurity stakeholders.
+
+---
+
+# 46. Operational Telemetry Dashboard
+
+The operational interface should prioritize:
+
+```text
+CURRENT CONDITIONS
+SIGNAL QUALITY
+ANOMALIES
+EVENTS
+THREATS
+INVESTIGATIONS
+```
+
+It should not expose unnecessary infrastructure metrics.
+
+---
+
+# 47. Separation of Dashboards
+
+AEGIS therefore contains conceptually:
+
+```text
+ENGINEERING OBSERVABILITY
+        +
+OPERATIONAL INTELLIGENCE
+```
+
+These are connected architecturally but separated in user experience.
+
+---
+
+# 48. Observability Access Control
+
+Access to observability information must follow authorization rules.
+
+For example:
+
+```text
+Engineer
+→ infrastructure health
+
+Security administrator
+→ security telemetry
+
+Operations user
+→ operational system health
+
+Clinical / response user
+→ relevant operational telemetry
+```
+
+Users should not automatically receive unrestricted observability access.
+
+---
+
+# 49. Privacy
+
+Observability systems can accidentally become repositories of sensitive information.
+
+Therefore:
+
+```text
+Do not log unnecessary personal data.
+Do not log credentials.
+Do not log authentication secrets.
+Do not log sensitive payloads by default.
+Do not duplicate sensitive operational data unnecessarily.
+```
+
+---
+
+# 50. Redaction
+
+Sensitive information should be redacted or excluded from logs and telemetry where appropriate.
+
+Examples:
+
+```text
+credentials
+tokens
+session secrets
+unnecessary identifiers
+sensitive payload fields
+```
+
+---
+
+# 51. Observability Retention
+
+Retention should be policy-driven.
+
+Different data types may require different retention periods:
+
+```text
+metrics
+logs
+traces
+audit events
+operational telemetry
+investigation records
+```
+
+Do not apply one universal retention rule.
+
+---
+
+# 52. Storage Tiers
+
+Conceptually:
+
+```text
+HOT
+ ↓
+RECENT OPERATIONAL DATA
+
+WARM
+ ↓
+HISTORICAL INVESTIGATION DATA
+
+COLD
+ ↓
+LONG-TERM ARCHIVAL
+```
+
+Actual storage technology is defined in the infrastructure architecture.
+
+---
+
+# 53. Observability Reliability
+
+Observability should not become a single point of failure.
+
+If the monitoring subsystem fails:
+
+```text
+AEGIS core operation
+```
+
+should not automatically fail with it.
+
+The system must define what happens when observability is degraded.
+
+---
+
+# 54. Observability Degraded Mode
+
+Possible state:
+
+```text
+OBSERVABILITY_DEGRADED
+```
+
+Meaning:
+
+```text
+core services may continue
+some diagnostics unavailable
+monitoring data may be incomplete
+operators are warned
+```
+
+---
+
+# 55. Telemetry Pipeline Failure
+
+If operational telemetry ingestion fails:
+
+```text
+source failure
+ ↓
+ingestion failure
+ ↓
+quality state changes
+ ↓
+system indicates stale/missing data
+```
+
+AEGIS must never silently continue presenting stale information as current.
+
+---
+
+# 56. Stale Data UX
+
+The UI should make stale data visually and semantically distinguishable.
+
+The user should be able to determine:
+
+```text
+Last received:
+timestamp
+
+Current status:
+STALE
+
+Source:
+source identifier
+```
+
+---
+
+# 57. Telemetry Provenance
+
+Every operational telemetry stream should maintain provenance.
+
+Conceptually:
+
+```text
+SOURCE
+ ↓
+COLLECTED
+ ↓
+TRANSMITTED
+ ↓
+INGESTED
+ ↓
+TRANSFORMED
+ ↓
+STORED
+ ↓
+ANALYZED
+```
+
+This creates an auditable data lineage.
+
+---
+
+# 58. Data Lineage
+
+AEGIS should be capable of answering:
+
+> Where did this value come from?
+
+and:
+
+> What transformations happened before it reached this screen?
+
+---
+
+# 59. Intelligence Observability
+
+The AI intelligence layer from Document 11 must itself be observable.
+
+Monitor:
+
+```text
+model availability
+model latency
+model errors
+input quality
+output quality checks
+confidence distribution
+model drift indicators
+recommendation volume
+human override rate
+```
+
+---
+
+# 60. AI Monitoring Boundary
+
+Monitoring AI performance is different from monitoring AI conclusions.
+
+For example:
+
+```text
+MODEL LATENCY = 800 ms
+```
+
+is an engineering observation.
+
+```text
+ASSESSMENT CONFIDENCE = MODERATE
+```
+
+is an intelligence-domain output.
+
+Do not confuse them.
+
+---
+
+# 61. Model Failure Alert
+
+If an intelligence model fails repeatedly:
+
+```text
+Model failure
+ ↓
+Engineering alert
+ ↓
+Intelligence degraded state
+ ↓
+Fallback workflow
+```
+
+---
+
+# 62. Fallback Architecture
+
+Where appropriate:
+
+```text
+AI Intelligence
+      │
+      ├── Available
+      │
+      └── Unavailable
+              ↓
+        Rule-based / manual workflow
+```
+
+Fallback behavior must be explicitly designed.
+
+It must never be improvised during production incidents.
+
+---
+
+# 63. Event Bus Consideration
+
+AEGIS may use an event-driven architecture for operational and internal system events.
+
+Conceptually:
+
+```text
+Producer
+ ↓
+Event Bus
+ ↓
+Consumers
+ ├── Intelligence
+ ├── Notifications
+ ├── Audit
+ ├── Analytics
+ └── Observability
+```
+
+The actual event infrastructure is defined in the infrastructure and API architecture.
+
+---
+
+# 64. Event Naming
+
+Events should use predictable names.
+
+Examples:
+
+```text
+telemetry.received
+telemetry.rejected
+telemetry.stale
+anomaly.detected
+investigation.created
+assessment.generated
+recommendation.created
+decision.recorded
+service.failed
+model.failed
+```
+
+The final event registry must be centralized.
+
+---
+
+# 65. Event Immutability
+
+Historical operational events and audit events should be treated as append-only records where appropriate.
+
+Do not silently rewrite history.
+
+Corrections should produce new events or explicit correction records.
+
+---
+
+# 66. Observability and Audit
+
+Observability answers:
+
+> What happened technically?
+
+Audit answers:
+
+> Who did what and under what authority?
+
+These systems overlap but are not identical.
+
+Document 10 remains authoritative for audit architecture.
+
+---
+
+# 67. Incident Correlation
+
+When a system incident occurs, engineers should be able to correlate:
+
+```text
+incident
+ ↓
+logs
+ ↓
+metrics
+ ↓
+traces
+ ↓
+deployments
+ ↓
+configuration changes
+```
+
+This reduces diagnosis time.
+
+---
+
+# 68. Deployment Observability
+
+Production deployments should generate observable events.
+
+Conceptually:
+
+```text
+deployment.started
+deployment.completed
+deployment.failed
+deployment.rolled_back
+```
+
+This makes it easier to correlate regressions with changes.
+
+---
+
+# 69. Configuration Observability
+
+Important configuration changes should be observable.
+
+Examples:
+
+```text
+threshold changed
+integration configuration changed
+feature flag changed
+model version changed
+service configuration changed
+```
+
+Changes must also follow the appropriate governance and audit processes.
+
+---
+
+# 70. Performance Targets
+
+AEGIS should eventually define measurable targets for:
+
+```text
+page load
+API response
+telemetry ingestion
+event processing
+intelligence generation
+notification delivery
+database operations
+```
+
+These values must be established through performance requirements and testing.
+
+They should not be invented arbitrarily at this architecture stage.
+
+---
+
+# 71. Service-Level Objectives
+
+For production deployment, define:
+
+```text
+availability target
+latency target
+error budget
+recovery target
+data freshness target
+```
+
+These should be established later using stakeholder and infrastructure requirements.
+
+---
+
+# 72. Reliability Signals
+
+The engineering team should monitor:
+
+```text
+availability
+latency
+errors
+saturation
+```
+
+These provide a baseline operational view of AEGIS health.
+
+---
+
+# 73. Telemetry Freshness Monitoring
+
+For each telemetry source:
+
+```text
+last received timestamp
+expected frequency
+current freshness
+failure state
+```
+
+should be available to authorized operators.
+
+---
+
+# 74. Source Health
+
+Each telemetry source should have a health state:
+
+```text
+ONLINE
+DEGRADED
+OFFLINE
+STALE
+UNKNOWN
+```
+
+---
+
+# 75. Source Failure Propagation
+
+A source failure should affect intelligence appropriately.
+
+Example:
+
+```text
+Sensor unavailable
+ ↓
+Telemetry stale
+ ↓
+Data quality degraded
+ ↓
+Detection confidence affected
+ ↓
+Assessment uncertainty increases
+```
+
+The failure should propagate semantically rather than merely displaying a red icon.
+
+---
+
+# 76. Confidence Propagation
+
+Where technically appropriate:
+
+```text
+poor data quality
+ ↓
+lower reliability
+ ↓
+higher uncertainty
+```
+
+The exact mathematical relationship belongs to the intelligence model and must be validated.
+
+---
+
+# 77. Observability for User Workflows
+
+Important user workflows should be measurable.
+
+Example:
+
+```text
+Open investigation
+ ↓
+Review evidence
+ ↓
+Review assessment
+ ↓
+Review recommendation
+ ↓
+Record decision
+```
+
+The system should detect where workflows fail technically.
+
+It should not monitor users in a way that violates organizational privacy policies.
+
+---
+
+# 78. Observability for 13 Screens
+
+Each AEGIS screen should eventually have defined:
+
+```text
+loading state
+error state
+empty state
+degraded state
+data freshness state
+permission failure state
+```
+
+This must align with the 13-screen specification from Document 04.
+
+---
+
+# 79. Frontend Observability
+
+The frontend should detect:
+
+```text
+JavaScript errors
+API failures
+slow requests
+failed navigation
+render failures
+network interruption
+authentication expiration
+```
+
+---
+
+# 80. Backend Observability
+
+Backend services should detect:
+
+```text
+request failures
+database errors
+queue failures
+integration errors
+validation failures
+authorization failures
+service crashes
+```
+
+---
+
+# 81. Database Observability
+
+Monitor:
+
+```text
+connection health
+query latency
+error rate
+connection pool
+storage capacity
+replication health where applicable
+```
+
+---
+
+# 82. Queue Observability
+
+If queues are used:
+
+```text
+queue depth
+processing latency
+failed messages
+retry count
+dead-letter count
+consumer health
+```
+
+---
+
+# 83. Retry Observability
+
+Repeated retries can hide system failure.
+
+Therefore monitor:
+
+```text
+retry count
+retry reason
+retry delay
+final failure
+```
+
+---
+
+# 84. Dead-Letter Handling
+
+Failed asynchronous messages should not disappear.
+
+Conceptually:
+
+```text
+Message
+ ↓
+Processing failure
+ ↓
+Retry
+ ↓
+Retry failure
+ ↓
+Dead-letter
+ ↓
+Investigation
+```
+
+---
+
+# 85. Incident Mode
+
+AEGIS should support an explicit operational incident state.
+
+Conceptually:
+
+```text
+NORMAL
+ ↓
+DEGRADED
+ ↓
+INCIDENT
+ ↓
+RECOVERY
+ ↓
+NORMAL
+```
+
+Exact state transitions must align with the global state model.
+
+---
+
+# 86. Incident Timeline
+
+An incident should provide a timeline containing:
+
+```text
+first detected event
+system changes
+alerts
+service failures
+operator actions
+recovery events
+```
+
+---
+
+# 87. Post-Incident Learning
+
+After a technical incident:
+
+```text
+Incident
+ ↓
+Investigation
+ ↓
+Root cause
+ ↓
+Corrective action
+ ↓
+Validation
+ ↓
+Institutional learning
+```
+
+This may feed the engineering knowledge base separately from biological/operational institutional memory.
+
+---
+
+# 88. Two Learning Loops
+
+AEGIS therefore contains two related but distinct learning loops.
+
+### Operational/Bio-Resilience Loop
+
+```text
+Biological/Operational Event
+ ↓
+Response
+ ↓
+Outcome
+ ↓
+Validated Lesson
+```
+
+### Engineering Reliability Loop
+
+```text
+Technical Incident
+ ↓
+Root Cause
+ ↓
+Fix
+ ↓
+Validation
+ ↓
+Engineering Lesson
+```
+
+Do not merge them into one generic "AI memory."
+
+---
+
+# 89. Observability Definition of Done
+
+This architecture is complete when AEGIS can demonstrate:
+
+```text
+✓ Logs are structured
+✓ Metrics are defined
+✓ Distributed traces are supported where needed
+✓ Services expose health state
+✓ Dependencies are observable
+✓ Data pipelines are observable
+✓ Operational telemetry has provenance
+✓ Telemetry freshness is visible
+✓ Missing data is distinguishable
+✓ Stale data cannot silently appear current
+✓ Alerts have lifecycle states
+✓ Alert fatigue can be measured
+✓ AI services are observable
+✓ AI failures create safe degraded states
+✓ Frontend failures are observable
+✓ Backend failures are observable
+✓ Integration failures are observable
+✓ Deployment changes are traceable
+✓ Security events align with Document 10
+✓ Audit remains distinct from observability
+✓ Sensitive information is protected
+✓ Technical incidents can be reconstructed
+✓ Learning can emerge from technical incidents
+```
+
+---
+
+# 90. Cross-Document Dependencies
+
+This document depends on and must remain consistent with:
+
+```text
+01 — AEGIS Master Architecture
+02 — AEGIS Domain Model + Global State Architecture
+03 — AEGIS User Flow + Operational Journey Architecture
+04 — AEGIS Functional Requirements + 13 Screen Master Specification
+05 — AEGIS Interaction + State Transition Specification
+06 — AEGIS Data Architecture + Data Contracts
+07 — AEGIS API Architecture + Service Contracts
+08 — AEGIS Frontend + Application Architecture
+09 — AEGIS Design System + UI Component Architecture
+10 — AEGIS Security + Authentication + Authorization + Audit Architecture
+11 — AEGIS AI Intelligence + Decision Support Architecture
+```
+
+---
+
+# 91. Architectural Consistency Rule
+
+If an implementation conflicts with one of these documents:
+
+```text
+STOP
+↓
+identify conflict
+↓
+determine authoritative document
+↓
+resolve architecture
+↓
+update documentation
+↓
+continue implementation
+```
+
+Do not silently work around the conflict in code.
+
+---
+
+# 92. What This Document Does NOT Define
+
+This document intentionally does not lock:
+
+```text
+specific cloud provider
+specific database vendor
+specific observability vendor
+specific container platform
+specific Kubernetes architecture
+specific hosting provider
+specific AI model
+specific production infrastructure
+```
+
+Those decisions belong to later architecture documents.
+
+This prevents premature technology decisions from contaminating the system architecture.
+
+---
+
+# 93. MASTER RULE
+
+The AEGIS observability architecture must preserve one fundamental distinction:
+
+```text
+SYSTEM TELEMETRY
+tells us whether AEGIS is working.
+
+OPERATIONAL TELEMETRY
+tells us what is happening in the environment.
+
+INTELLIGENCE
+interprets operational information.
+
+AUDIT
+records authoritative actions.
+
+```
+
+These four concepts must remain distinguishable throughout the implementation.
+
+---
+
+# 94. Final Architecture Principle
+
+AEGIS must never give the appearance of certainty simply because its dashboard is functioning.
+
+A beautifully rendered interface showing stale, incomplete, or corrupted information is more dangerous than an obvious system failure.
+
+Therefore:
+
+> **AEGIS must make the health, freshness, provenance, quality, uncertainty, and limitations of its information visible to the people relying on it.**
+
+The system should never merely say:
+
+```text
+DATA: 72
+```
+
+It should be capable of answering:
+
+```text
+What is 72?
+
+Where did it come from?
+
+When was it measured?
+
+Is the source healthy?
+
+Is the value current?
+
+Has it been transformed?
+
+Can we trust it?
+
+What does it mean?
+
+What does it NOT mean?
+```
+
+That is the standard required for a high-stakes bio-resilience system.
