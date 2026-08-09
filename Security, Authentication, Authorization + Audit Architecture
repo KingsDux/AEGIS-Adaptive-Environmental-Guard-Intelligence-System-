@@ -1,0 +1,2192 @@
+# AEGIS
+# Security, Authentication, Authorization + Audit Architecture
+
+**System:** AEGIS  
+**Document:** 10 — Security, Authentication, Authorization + Audit Architecture  
+**Version:** 1.0  
+**Status:** Master Security Architecture  
+**Date:** August 2026
+
+---
+
+# 01. Purpose
+
+This document defines the security architecture for AEGIS.
+
+It establishes the rules governing:
+
+```text
+identity
+authentication
+authorization
+roles
+permissions
+sessions
+privileged actions
+human approval
+audit logging
+data access
+service authentication
+security events
+incident response
+accountability
+```
+
+The purpose is to ensure that AEGIS remains:
+
+```text
+secure
+traceable
+accountable
+least-privileged
+resilient
+auditable
+human-governed
+```
+
+throughout its lifecycle.
+
+---
+
+# 02. Security Objective
+
+The primary security objective is:
+
+> **Ensure that the right person or service can perform the right action on the right resource at the right time, under the right authority, with an immutable record of what happened.**
+
+AEGIS must assume that:
+
+```text
+users can make mistakes
+credentials can be compromised
+services can fail
+data can become stale
+permissions can change
+systems can be attacked
+network connectivity can degrade
+```
+
+Security therefore cannot depend on a single control.
+
+---
+
+# 03. Security Principles
+
+AEGIS follows these principles.
+
+## 03.1 Zero Trust
+
+Never assume that:
+
+```text
+user = trusted
+device = trusted
+network = trusted
+service = trusted
+```
+
+Every sensitive request must be appropriately authenticated and authorized.
+
+---
+
+## 03.2 Least Privilege
+
+Users and services receive only the permissions necessary for their responsibilities.
+
+---
+
+## 03.3 Explicit Authorization
+
+Authentication answers:
+
+> Who are you?
+
+Authorization answers:
+
+> What are you allowed to do?
+
+These are separate concerns.
+
+---
+
+## 03.4 Human Accountability
+
+Consequential operational actions must have an identifiable human actor or explicitly authorized service actor.
+
+---
+
+## 03.5 Defense in Depth
+
+Security must exist across:
+
+```text
+browser
+frontend
+API
+service layer
+database
+infrastructure
+identity provider
+logging
+monitoring
+```
+
+---
+
+## 03.6 Secure by Default
+
+If a permission is not explicitly granted:
+
+```text
+DENY
+```
+
+---
+
+## 03.7 Fail Safely
+
+When security state becomes uncertain:
+
+```text
+do not guess
+do not silently authorize
+do not execute consequential actions
+```
+
+---
+
+# 04. Security Boundary
+
+AEGIS security architecture:
+
+```text
+                    USER
+                     │
+                     ▼
+              ┌──────────────┐
+              │ Identity      │
+              │ Provider      │
+              └──────┬───────┘
+                     │
+                Authentication
+                     │
+                     ▼
+              ┌──────────────┐
+              │ AEGIS Web App│
+              └──────┬───────┘
+                     │
+               Authenticated
+                  Request
+                     │
+                     ▼
+              ┌──────────────┐
+              │ API Gateway  │
+              └──────┬───────┘
+                     │
+             Authorization
+                     │
+                     ▼
+              ┌──────────────┐
+              │ Application  │
+              │ Services     │
+              └──────┬───────┘
+                     │
+          ┌──────────┼──────────┐
+          ▼          ▼          ▼
+       Database   Event Bus   External
+                               Services
+          │          │          │
+          └──────────┼──────────┘
+                     ▼
+              Audit Pipeline
+                     │
+                     ▼
+              Audit Storage
+```
+
+---
+
+# 05. Trust Zones
+
+AEGIS should conceptually separate:
+
+```text
+ZONE 1
+Untrusted client
+
+ZONE 2
+Authenticated application
+
+ZONE 3
+Protected API
+
+ZONE 4
+Internal services
+
+ZONE 5
+Protected data
+
+ZONE 6
+Audit infrastructure
+```
+
+Cross-zone communication must be controlled.
+
+---
+
+# 06. Authentication Architecture
+
+AEGIS should use a standards-based identity provider rather than implementing authentication from scratch.
+
+Preferred architecture:
+
+```text
+AEGIS
+ ↓
+OIDC / OAuth 2.0 compatible Identity Provider
+ ↓
+Authenticated Identity
+ ↓
+AEGIS Authorization Layer
+```
+
+Possible identity providers may include enterprise-grade providers such as:
+
+```text
+Keycloak
+Microsoft Entra ID
+Auth0
+Okta
+```
+
+The final provider is an infrastructure decision and must not be hard-coded into the domain model.
+
+---
+
+# 07. Authentication Requirements
+
+Authentication must support, where appropriate:
+
+```text
+username/email identity
+strong password policy
+multi-factor authentication
+session management
+account recovery
+account lockout/risk controls
+identity lifecycle
+logout
+credential revocation
+```
+
+---
+
+# 08. Multi-Factor Authentication
+
+MFA should be required for privileged AEGIS users.
+
+Higher-risk actions may require stronger authentication or step-up authentication.
+
+Conceptually:
+
+```text
+LOGIN
+ ↓
+AUTHENTICATED
+ ↓
+NORMAL ACCESS
+
+HIGH-RISK ACTION
+ ↓
+STEP-UP AUTHENTICATION
+ ↓
+AUTHORIZED ACTION
+```
+
+---
+
+# 09. Authentication Assurance
+
+AEGIS should distinguish between:
+
+```text
+authenticated
+strongly authenticated
+step-up authenticated
+```
+
+where the distinction affects authorization.
+
+---
+
+# 10. Session Architecture
+
+Sessions must be:
+
+```text
+time-limited
+revocable
+server-controlled
+securely stored
+protected against fixation
+protected against theft
+```
+
+Session lifetime should be determined according to organizational security policy and risk.
+
+---
+
+# 11. Session Expiration
+
+When a session expires:
+
+```text
+current sensitive action
+        ↓
+STOP
+        ↓
+request re-authentication
+        ↓
+restore safe application context
+```
+
+Never silently execute an action after session expiration.
+
+---
+
+# 12. Logout
+
+Logout must invalidate the appropriate session.
+
+For privileged environments, server-side session invalidation is required.
+
+---
+
+# 13. Device Trust
+
+Device trust may be introduced as an additional enterprise control.
+
+However:
+
+> Device trust must never replace user authorization.
+
+---
+
+# 14. Identity Model
+
+AEGIS identity should conceptually contain:
+
+```text
+User
+ ├── Identity
+ ├── Organization
+ ├── Role(s)
+ ├── Permissions
+ ├── Authentication state
+ ├── Session(s)
+ └── Audit identity
+```
+
+---
+
+# 15. Organization / Tenant Boundary
+
+If AEGIS is deployed across multiple organizations, tenant isolation must be explicit.
+
+Example:
+
+```text
+Organization A
+ ├── Users
+ ├── Facilities
+ ├── Events
+ └── Data
+
+Organization B
+ ├── Users
+ ├── Facilities
+ ├── Events
+ └── Data
+```
+
+A user from Organization A must never access Organization B data unless an explicit cross-organization authorization model exists.
+
+---
+
+# 16. Role-Based Access Control
+
+AEGIS should use RBAC as the baseline authorization model.
+
+Roles define broad responsibilities.
+
+Examples:
+
+```text
+SYSTEM_ADMIN
+SECURITY_ADMIN
+GLOBAL_HEALTH_ANALYST
+BIOSECURITY_ANALYST
+CLINICAL_OPERATOR
+RESPONSE_COORDINATOR
+DECISION_AUTHORITY
+AUDITOR
+READ_ONLY_OBSERVER
+```
+
+These are architectural examples.
+
+The final production role registry must be approved with stakeholders.
+
+---
+
+# 17. Permission-Based Authorization
+
+Roles should map to granular permissions.
+
+Example:
+
+```text
+ROLE
+Response Coordinator
+
+PERMISSIONS
+threat.read
+investigation.read
+investigation.update
+response.read
+response.prepare
+```
+
+This is preferable to embedding authorization logic directly around role names.
+
+---
+
+# 18. Permission Naming
+
+Permissions should follow:
+
+```text
+resource.action
+```
+
+Examples:
+
+```text
+threat.read
+threat.update
+
+investigation.read
+investigation.update
+
+response.read
+response.prepare
+response.execute
+
+audit.read
+user.manage
+```
+
+---
+
+# 19. Authorization Layers
+
+Authorization should occur at multiple levels.
+
+```text
+Layer 1
+Route authorization
+
+Layer 2
+API authorization
+
+Layer 3
+Resource authorization
+
+Layer 4
+Action authorization
+
+Layer 5
+High-risk action authorization
+```
+
+Frontend visibility is never sufficient security.
+
+---
+
+# 20. Frontend Authorization
+
+The frontend may hide or disable controls based on permissions.
+
+This improves UX.
+
+But:
+
+> **Frontend authorization is not a security boundary.**
+
+Every protected operation must be authorized by the backend.
+
+---
+
+# 21. Backend Authorization
+
+The backend must independently verify:
+
+```text
+identity
+permission
+resource
+organization
+action
+current state
+```
+
+before executing protected operations.
+
+---
+
+# 22. Resource-Level Authorization
+
+Permission to access a resource does not automatically imply permission to modify it.
+
+Example:
+
+```text
+threat.read
+```
+
+does not grant:
+
+```text
+threat.update
+```
+
+---
+
+# 23. State-Aware Authorization
+
+Some actions depend on system state.
+
+Example:
+
+```text
+Investigation = CLOSED
+```
+
+may mean:
+
+```text
+update investigation
+→ DENIED
+```
+
+even if the user has:
+
+```text
+investigation.update
+```
+
+---
+
+# 24. Authorization Model
+
+A protected action should conceptually evaluate:
+
+```text
+Can User U
+perform Action A
+on Resource R
+within Organization O
+given Current State S
+under Policy P?
+```
+
+Only if the answer is valid should execution proceed.
+
+---
+
+# 25. High-Risk Actions
+
+AEGIS must distinguish between ordinary actions and consequential actions.
+
+Examples:
+
+```text
+view data
+filter data
+create investigation
+update classification
+authorize response
+execute response
+close incident
+modify system configuration
+```
+
+The higher the consequence, the stronger the control.
+
+---
+
+# 26. Human-in-the-Loop Rule
+
+AEGIS should not autonomously perform consequential interventions solely because an algorithm or AI recommendation exists.
+
+The system may:
+
+```text
+detect
+analyze
+prioritize
+recommend
+simulate
+prepare
+```
+
+but consequential execution must follow defined human authorization rules.
+
+---
+
+# 27. Recommendation vs Authorization
+
+These are different states.
+
+```text
+AI / System Recommendation
+        ↓
+Human Review
+        ↓
+Authorization
+        ↓
+Execution
+        ↓
+Verification
+```
+
+Never collapse them into:
+
+```text
+AI says → execute
+```
+
+---
+
+# 28. High-Risk Action Flow
+
+```text
+USER
+ │
+ ▼
+ACTION REQUEST
+ │
+ ▼
+PERMISSION CHECK
+ │
+ ├── DENIED → STOP
+ │
+ ▼
+RESOURCE STATE CHECK
+ │
+ ├── INVALID → STOP
+ │
+ ▼
+REQUIRED AUTHORITY CHECK
+ │
+ ├── INSUFFICIENT → ESCALATE
+ │
+ ▼
+STEP-UP AUTHENTICATION
+ │
+ ▼
+EXPLICIT CONFIRMATION
+ │
+ ▼
+ACTION EXECUTION
+ │
+ ▼
+RESULT
+ │
+ ▼
+AUDIT EVENT
+```
+
+---
+
+# 29. Dual Authorization
+
+Certain organizational deployments may require two-person authorization for particularly consequential actions.
+
+Example:
+
+```text
+Operator prepares action
+        ↓
+Authorized decision maker approves
+        ↓
+Action becomes executable
+```
+
+This should be configurable by organizational policy.
+
+---
+
+# 30. Separation of Duties
+
+AEGIS should support separation of duties.
+
+For example:
+
+```text
+Analyst
+→ investigates
+
+Decision Authority
+→ authorizes
+
+Operator
+→ executes
+
+Auditor
+→ reviews
+```
+
+The exact separation depends on deployment policy.
+
+---
+
+# 31. Privileged Operations
+
+Administrative operations require elevated authorization.
+
+Examples:
+
+```text
+manage users
+change roles
+change permissions
+modify security settings
+change integrations
+modify retention configuration
+```
+
+---
+
+# 32. Administrative Isolation
+
+Administrative interfaces should be clearly separated from normal operational workflows.
+
+A user should not accidentally perform system administration while managing an operational event.
+
+---
+
+# 33. Audit Architecture
+
+Auditability is a first-class AEGIS capability.
+
+The system must be able to answer:
+
+```text
+WHO
+did WHAT
+to WHICH RESOURCE
+WHEN
+FROM WHERE
+UNDER WHAT AUTHORITY
+WITH WHAT RESULT
+```
+
+---
+
+# 34. Audit Event Model
+
+Conceptual event:
+
+```text
+AuditEvent {
+    id
+    timestamp
+    actor
+    actorType
+    organization
+    action
+    resourceType
+    resourceId
+    previousState
+    resultingState
+    authorizationContext
+    authenticationContext
+    source
+    result
+    reason
+    correlationId
+}
+```
+
+The production schema must align with Document 06.
+
+---
+
+# 35. Audit Event Categories
+
+Audit events should include:
+
+```text
+AUTHENTICATION
+AUTHORIZATION
+DATA_ACCESS
+DATA_CHANGE
+INVESTIGATION
+THREAT
+RESPONSE
+ADMINISTRATION
+CONFIGURATION
+SECURITY
+SYSTEM
+```
+
+---
+
+# 36. Authentication Audit Events
+
+Examples:
+
+```text
+login.success
+login.failure
+logout
+mfa.success
+mfa.failure
+session.created
+session.revoked
+credential.reset
+```
+
+---
+
+# 37. Authorization Audit Events
+
+Examples:
+
+```text
+authorization.granted
+authorization.denied
+privileged.action.requested
+privileged.action.approved
+privileged.action.rejected
+```
+
+---
+
+# 38. Data Access Audit
+
+Sensitive data access should be auditable where required by deployment policy.
+
+Example:
+
+```text
+user
+viewed
+patient-related operational record
+```
+
+The exact data categories requiring audit must be determined by applicable privacy and organizational requirements.
+
+---
+
+# 39. Data Modification Audit
+
+Every important state-changing operation should produce an audit event.
+
+Examples:
+
+```text
+threat.classified
+investigation.updated
+response.prepared
+response.authorized
+response.executed
+incident.closed
+```
+
+---
+
+# 40. Immutable Audit Principle
+
+Audit records should be protected from ordinary modification or deletion.
+
+The application should not provide a normal user interface allowing users to rewrite historical audit records.
+
+---
+
+# 41. Audit Storage
+
+Audit data should be stored separately from normal transactional data where practical.
+
+Conceptually:
+
+```text
+Application Database
+        │
+        ├── operational data
+        │
+        ▼
+Audit/Event Pipeline
+        │
+        ▼
+Protected Audit Store
+```
+
+---
+
+# 42. Audit Integrity
+
+Audit infrastructure should provide mechanisms to detect:
+
+```text
+tampering
+deletion
+unexpected modification
+missing events
+```
+
+The exact implementation may include append-only storage, integrity verification, controlled retention, and restricted administrative access.
+
+---
+
+# 43. Audit Search
+
+Authorized auditors should be able to search:
+
+```text
+actor
+action
+resource
+time
+organization
+event type
+result
+correlation ID
+```
+
+---
+
+# 44. Correlation IDs
+
+A single operational journey may generate many events.
+
+Example:
+
+```text
+Detection
+ ↓
+Investigation
+ ↓
+Classification
+ ↓
+Response Recommendation
+ ↓
+Authorization
+ ↓
+Execution
+ ↓
+Verification
+```
+
+These events should be connected through a correlation identifier.
+
+---
+
+# 45. Operational Trace
+
+An auditor should be able to reconstruct:
+
+```text
+initial signal
+→ investigation
+→ interpretation
+→ decision
+→ authorization
+→ action
+→ result
+```
+
+without manually searching unrelated logs.
+
+---
+
+# 46. Audit vs Application Logs
+
+These are different.
+
+### Application Logs
+
+Used primarily for:
+
+```text
+debugging
+performance
+system health
+errors
+```
+
+### Audit Logs
+
+Used primarily for:
+
+```text
+accountability
+security
+compliance
+forensics
+operational traceability
+```
+
+Do not treat ordinary console logs as the audit system.
+
+---
+
+# 47. Security Logging
+
+Security-relevant events include:
+
+```text
+repeated login failures
+suspicious access
+permission denial spikes
+privilege changes
+session anomalies
+unexpected service activity
+```
+
+These should feed security monitoring.
+
+---
+
+# 48. Secrets Management
+
+Secrets must never be stored in:
+
+```text
+source code
+Git repositories
+frontend bundles
+public configuration
+```
+
+Use a proper secret-management mechanism.
+
+Examples include:
+
+```text
+environment secret stores
+cloud secret managers
+Vault-style systems
+```
+
+---
+
+# 49. Environment Separation
+
+AEGIS must distinguish:
+
+```text
+development
+testing
+staging
+production
+```
+
+Credentials, databases, API keys, and sensitive data must not be casually shared between environments.
+
+---
+
+# 50. Production Data Rule
+
+Real sensitive operational data must never be copied into development simply for convenience.
+
+Use:
+
+```text
+synthetic data
+anonymized data
+approved test datasets
+```
+
+---
+
+# 51. Database Security
+
+Database access should be:
+
+```text
+authenticated
+authorized
+encrypted in transit
+restricted by network policy
+least privileged
+audited
+```
+
+Application users should not receive direct database credentials.
+
+---
+
+# 52. Service-to-Service Authentication
+
+Internal services must authenticate to each other.
+
+Do not assume:
+
+```text
+internal network = trusted
+```
+
+---
+
+# 53. Service Identity
+
+Each protected service should have its own identity.
+
+Conceptually:
+
+```text
+Threat Service
+Response Service
+Audit Service
+Notification Service
+```
+
+must not all authenticate using one shared credential.
+
+---
+
+# 54. API Security
+
+APIs must enforce:
+
+```text
+authentication
+authorization
+input validation
+rate controls
+request size limits
+secure error handling
+audit requirements
+```
+
+---
+
+# 55. Input Validation
+
+All externally supplied input is untrusted.
+
+Validate:
+
+```text
+type
+format
+length
+range
+allowed values
+relationships
+```
+
+on the server.
+
+---
+
+# 56. Output Handling
+
+Avoid exposing:
+
+```text
+stack traces
+database errors
+internal paths
+secrets
+service credentials
+```
+
+to users.
+
+---
+
+# 57. Error Security
+
+User-facing errors should communicate enough to recover without revealing sensitive implementation details.
+
+---
+
+# 58. Encryption
+
+Sensitive information should be protected:
+
+```text
+in transit
+at rest
+```
+
+using modern, appropriately configured cryptographic mechanisms.
+
+Exact algorithms and key-management policy belong to infrastructure/security implementation.
+
+---
+
+# 59. Key Management
+
+Cryptographic keys must have:
+
+```text
+controlled access
+rotation strategy
+secure storage
+revocation process
+ownership
+```
+
+---
+
+# 60. Personal and Health Data
+
+If AEGIS handles patient or health-related information, the deployment must implement appropriate privacy controls according to the jurisdictions and organizational requirements involved.
+
+The architecture must therefore support:
+
+```text
+data minimization
+purpose limitation
+access control
+auditability
+retention controls
+secure deletion where required
+```
+
+AEGIS must not collect personal data merely because it is technically possible.
+
+---
+
+# 61. Data Minimization
+
+For every sensitive field ask:
+
+> Does AEGIS actually need this information to perform its defined function?
+
+If not:
+
+```text
+do not collect it
+```
+
+---
+
+# 62. Sensitive Data Visibility
+
+Users should only see sensitive information required for their role and operational responsibility.
+
+---
+
+# 63. Privacy by Design
+
+Privacy should be considered during:
+
+```text
+schema design
+UI design
+API design
+logging
+analytics
+testing
+deployment
+```
+
+not added after implementation.
+
+---
+
+# 64. Security Headers
+
+Production web deployment should use appropriate security headers.
+
+The exact configuration belongs to the deployment architecture but should cover relevant protections such as:
+
+```text
+Content Security Policy
+frame restrictions
+MIME sniffing protection
+referrer controls
+transport security
+```
+
+---
+
+# 65. Browser Security
+
+The frontend must protect against common web threats including:
+
+```text
+XSS
+CSRF
+session theft
+clickjacking
+unsafe redirects
+injection
+```
+
+using appropriate framework and infrastructure controls.
+
+---
+
+# 66. Dependency Security
+
+Dependencies must be:
+
+```text
+tracked
+updated
+scanned
+reviewed
+```
+
+Security vulnerabilities must have an explicit remediation process.
+
+---
+
+# 67. Supply Chain Security
+
+AEGIS should treat:
+
+```text
+npm packages
+Docker images
+AI-generated code
+third-party libraries
+external APIs
+```
+
+as potential supply-chain dependencies.
+
+Do not blindly trust AI-generated or copied code.
+
+---
+
+# 68. AI-Generated Code Security
+
+AI-generated code must pass the same review standards as human-written code.
+
+AI is not a security reviewer.
+
+Before merging:
+
+```text
+generate
+↓
+inspect
+↓
+test
+↓
+security review
+↓
+approve
+```
+
+---
+
+# 69. AI Data Boundary
+
+Sensitive operational data must not be sent to external AI services unless explicitly authorized by organizational policy and appropriate safeguards.
+
+This is especially important for:
+
+```text
+patient information
+security-sensitive data
+restricted operational information
+```
+
+---
+
+# 70. AI Recommendation Auditability
+
+If AI recommendations are introduced, AEGIS should preserve:
+
+```text
+model/version identifier
+input context reference
+recommendation
+timestamp
+confidence where applicable
+human reviewer
+human decision
+final action
+```
+
+where organizational policy requires it.
+
+---
+
+# 71. AI Does Not Become the Authority
+
+The architecture must maintain:
+
+```text
+AI recommendation
+        ≠
+human authorization
+```
+
+---
+
+# 72. Authorization State Machine
+
+Conceptually:
+
+```text
+PROPOSED
+   │
+   ▼
+UNDER REVIEW
+   │
+   ├───────────────┐
+   ▼               ▼
+APPROVED         REJECTED
+   │
+   ▼
+AUTHORIZED
+   │
+   ▼
+EXECUTED
+   │
+   ▼
+VERIFIED
+```
+
+An action must not jump directly from:
+
+```text
+PROPOSED
+→ EXECUTED
+```
+
+when human authorization is required.
+
+---
+
+# 73. Security State Model
+
+A user session may move through:
+
+```text
+UNAUTHENTICATED
+      ↓
+AUTHENTICATED
+      ↓
+AUTHORIZED
+      ↓
+PRIVILEGED
+      ↓
+STEP-UP VERIFIED
+```
+
+Loss of authentication or authorization must immediately reduce available privileges.
+
+---
+
+# 74. Permission Revocation
+
+When a user's permission changes:
+
+```text
+old authorization
+→ invalid
+```
+
+The system should not rely solely on a stale frontend session.
+
+---
+
+# 75. Emergency Access
+
+Some deployments may require emergency access mechanisms.
+
+If implemented, emergency access must:
+
+```text
+be explicitly enabled
+require appropriate justification
+be strongly audited
+be time-limited
+generate security alerts
+```
+
+Emergency access must not become a permanent bypass.
+
+---
+
+# 76. Break-Glass Principle
+
+Emergency access should mean:
+
+> exceptional access under exceptional circumstances.
+
+It must not mean:
+
+> administrator shortcut.
+
+---
+
+# 77. Audit Retention
+
+Audit retention must follow:
+
+```text
+organizational policy
+legal requirements
+regulatory requirements
+security requirements
+```
+
+Do not hard-code arbitrary retention periods into the product without stakeholder approval.
+
+---
+
+# 78. Audit Access
+
+Audit records should generally be:
+
+```text
+read-only
+restricted
+searchable
+exportable where authorized
+```
+
+---
+
+# 79. Audit Export
+
+Authorized auditors may need to export records.
+
+Exports should themselves be auditable.
+
+---
+
+# 80. Audit-of-Audit Principle
+
+Access to audit records should itself generate audit events.
+
+Example:
+
+```text
+Auditor views audit record
+        ↓
+AUDIT ACCESS EVENT
+```
+
+---
+
+# 81. Security Monitoring
+
+AEGIS should expose security telemetry to an appropriate monitoring system.
+
+Monitor:
+
+```text
+authentication anomalies
+authorization failures
+privilege changes
+service failures
+unexpected access
+audit pipeline failures
+```
+
+---
+
+# 82. Audit Pipeline Failure
+
+Audit failure must never silently disappear.
+
+If the audit system is unavailable during a critical action, the system must follow an explicit policy.
+
+Possible policies:
+
+```text
+deny action
+queue securely
+allow with heightened monitoring
+```
+
+The final policy must be determined according to action criticality and organizational requirements.
+
+---
+
+# 83. Fail-Closed Rule
+
+For security-sensitive authorization:
+
+```text
+uncertain authorization
+→ DENY
+```
+
+---
+
+# 84. Availability vs Security
+
+Not every failure should make AEGIS completely unusable.
+
+AEGIS should degrade by capability.
+
+Example:
+
+```text
+Audit unavailable
+→ block privileged actions
+
+External analytics unavailable
+→ preserve core monitoring
+
+Notification provider unavailable
+→ retain event locally and expose failure
+
+Non-critical visualization unavailable
+→ preserve operational data
+```
+
+---
+
+# 85. Security Incident Flow
+
+If a security incident is detected:
+
+```text
+DETECT
+ ↓
+CLASSIFY
+ ↓
+CONTAIN
+ ↓
+INVESTIGATE
+ ↓
+RECOVER
+ ↓
+VERIFY
+ ↓
+LEARN
+```
+
+This mirrors AEGIS's resilience model without turning security response into the same thing as pathogen response.
+
+---
+
+# 86. Security Incident Audit
+
+Security incidents should preserve:
+
+```text
+initial detection
+actions taken
+actors
+timestamps
+affected resources
+containment actions
+recovery actions
+final disposition
+```
+
+---
+
+# 87. Account Compromise Flow
+
+Conceptually:
+
+```text
+Suspicious activity
+ ↓
+Security detection
+ ↓
+Session revocation
+ ↓
+Credential reset
+ ↓
+MFA verification
+ ↓
+Investigation
+ ↓
+Restore access
+```
+
+---
+
+# 88. Privilege Escalation Protection
+
+Users must not be able to manipulate:
+
+```text
+role
+permission
+organization
+authority
+```
+
+through client-side state.
+
+All privilege changes must occur through protected backend operations.
+
+---
+
+# 89. Frontend State Security
+
+Never trust:
+
+```text
+localStorage
+React state
+URL parameters
+hidden fields
+disabled buttons
+client-side roles
+```
+
+as proof of authorization.
+
+The server is authoritative.
+
+---
+
+# 90. URL Security
+
+Routes such as:
+
+```text
+/admin
+/audit
+/threat/123
+/response/123
+```
+
+must enforce authorization server-side.
+
+Knowing a URL must never grant access.
+
+---
+
+# 91. Object-Level Authorization
+
+Prevent unauthorized access through predictable IDs.
+
+Example:
+
+```text
+/threat/AEGIS-0042
+```
+
+must not allow a user to access another organization's threat merely by changing:
+
+```text
+AEGIS-0042
+→ AEGIS-0043
+```
+
+---
+
+# 92. Rate Limiting
+
+Rate controls should protect:
+
+```text
+login
+password reset
+sensitive API endpoints
+search
+resource creation
+high-volume operations
+```
+
+The exact limits should be established through testing and deployment requirements.
+
+---
+
+# 93. Abuse Prevention
+
+AEGIS should monitor for:
+
+```text
+credential attacks
+enumeration
+automated scraping
+permission probing
+API abuse
+```
+
+---
+
+# 94. Security Testing
+
+Security testing must include:
+
+```text
+authentication tests
+authorization tests
+session tests
+API security tests
+input validation tests
+dependency scanning
+secret scanning
+penetration testing
+access-control testing
+audit integrity testing
+```
+
+---
+
+# 95. Authorization Test Matrix
+
+Every protected action should have tests for:
+
+```text
+authorized user
+unauthorized user
+wrong organization
+wrong role
+wrong resource state
+expired session
+revoked permission
+missing permission
+```
+
+---
+
+# 96. Audit Test Matrix
+
+For every important state transition:
+
+```text
+action executed
+→ audit event exists
+→ correct actor
+→ correct resource
+→ correct timestamp
+→ correct result
+→ correct correlation ID
+```
+
+---
+
+# 97. Security Acceptance Criteria
+
+AEGIS security architecture is not complete until:
+
+```text
+✓ Authentication is centralized
+✓ MFA strategy exists
+✓ Sessions are controlled
+✓ RBAC exists
+✓ Permissions are explicit
+✓ Backend authorization exists
+✓ Resource authorization exists
+✓ Organization boundaries exist
+✓ High-risk actions require explicit authorization
+✓ Privileged actions are auditable
+✓ Audit records are protected
+✓ Audit access is itself audited
+✓ Secrets are externalized
+✓ Environments are separated
+✓ Sensitive data is minimized
+✓ Service identities exist
+✓ API security exists
+✓ Dependency security exists
+✓ AI data boundaries exist
+✓ Security incidents are traceable
+✓ Authorization failures fail safely
+```
+
+---
+
+# 98. Security Invariants
+
+These rules must not be violated.
+
+### INVARIANT 01
+
+Authentication never implies authorization.
+
+### INVARIANT 02
+
+Frontend controls never constitute security.
+
+### INVARIANT 03
+
+Default authorization is deny.
+
+### INVARIANT 04
+
+Consequential actions require explicit authority.
+
+### INVARIANT 05
+
+AI recommendations never automatically become human authorization.
+
+### INVARIANT 06
+
+Every important state-changing operation is auditable.
+
+### INVARIANT 07
+
+Audit records cannot be casually rewritten.
+
+### INVARIANT 08
+
+Users cannot elevate their own privileges.
+
+### INVARIANT 09
+
+Tenant boundaries are enforced server-side.
+
+### INVARIANT 10
+
+Expired or revoked authorization cannot execute protected operations.
+
+### INVARIANT 11
+
+Sensitive information is not sent to external services without authorization.
+
+### INVARIANT 12
+
+Security uncertainty never results in silent privileged execution.
+
+---
+
+# 99. AEGIS Security Architecture
+
+The complete security model is:
+
+```text
+                    IDENTITY
+                       │
+                       ▼
+                AUTHENTICATION
+                       │
+                       ▼
+                 SESSION STATE
+                       │
+                       ▼
+                 AUTHORIZATION
+                       │
+             ┌─────────┴─────────┐
+             ▼                   ▼
+        RESOURCE ACCESS      ACTION ACCESS
+             │                   │
+             └─────────┬─────────┘
+                       ▼
+                STATE VALIDATION
+                       │
+                       ▼
+               HUMAN AUTHORITY
+                       │
+                       ▼
+                HIGH-RISK GATE
+                       │
+                       ▼
+                   EXECUTE
+                       │
+                       ▼
+                    RESULT
+                       │
+                       ▼
+                  AUDIT EVENT
+                       │
+                       ▼
+               PROTECTED AUDIT
+                       │
+                       ▼
+              SECURITY MONITORING
+```
+
+---
+
+# 100. Relationship to AEGIS Architecture
+
+Security does not exist beside the AEGIS architecture.
+
+It crosses the entire system:
+
+```text
+Document 01
+Master Architecture
+        ↓
+Security Boundary
+
+Document 02
+Domain Model
+        ↓
+Identity / ownership / authorization context
+
+Document 03
+Operational Journey
+        ↓
+Authorized state transitions
+
+Document 04
+Functional Requirements
+        ↓
+Permission requirements
+
+Document 05
+Interaction + State
+        ↓
+Secure state transitions
+
+Document 06
+Data Architecture
+        ↓
+Data classification / protection
+
+Document 07
+API Architecture
+        ↓
+Authentication / authorization
+
+Document 08
+Frontend Architecture
+        ↓
+Protected routes / secure UI
+
+Document 09
+Design System
+        ↓
+Permission / status / confirmation patterns
+
+Document 10
+Security Architecture
+        ↓
+CROSS-CUTTING CONTROL
+```
+
+---
+
+# 101. Implementation Boundary
+
+AEGIS implementation should never begin by creating:
+
+```text
+login page
+admin dashboard
+role dropdown
+```
+
+without first implementing the underlying security model.
+
+The correct order is:
+
+```text
+Identity model
+ ↓
+Authentication integration
+ ↓
+Authorization model
+ ↓
+Permission registry
+ ↓
+Protected API
+ ↓
+Protected frontend routes
+ ↓
+Audit infrastructure
+ ↓
+Privileged action gates
+ ↓
+Security testing
+```
+
+---
+
+# 102. AI Development Rule
+
+When using AI development tools:
+
+```text
+ChatGPT
+→ research / standards / threat modeling
+
+Claude
+→ architecture / security reasoning / specification review
+
+v0
+→ visual authentication and authorization interfaces
+
+OpenCode
+→ implementation
+
+Human review
+→ security approval
+```
+
+No AI tool should be treated as the final security authority.
+
+---
+
+# 103. OpenCode Security Implementation Contract
+
+OpenCode must not invent:
+
+```text
+roles
+permissions
+authorization states
+audit events
+security boundaries
+```
+
+If implementation encounters an undefined security decision:
+
+```text
+STOP
+→ identify ambiguity
+→ consult architecture
+→ resolve explicitly
+→ implement
+```
+
+Do not silently choose a behavior.
+
+---
+
+# 104. Security Definition of Done
+
+The security layer is complete only when the system can demonstrate:
+
+```text
+WHO
+can access
+
+WHAT
+resource
+
+WHY
+through which permission
+
+WHEN
+under what session
+
+UNDER WHICH AUTHORITY
+for what action
+
+WITH WHAT RESULT
+and
+
+WHO CAN PROVE IT
+through the audit trail.
+```
+
+---
+
+# 105. Final Security Principle
+
+AEGIS must never operate on the assumption:
+
+> "The user is probably authorized."
+
+The system must know.
+
+And when it cannot know:
+
+> **It must not execute the consequential action.**
+
+That is the security standard required for a serious biosecurity and pandemic-preparedness operational platform.
