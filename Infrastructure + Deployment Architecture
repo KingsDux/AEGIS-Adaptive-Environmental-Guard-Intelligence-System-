@@ -1,0 +1,2586 @@
+# AEGIS
+
+## Document 15 — Infrastructure + Deployment Architecture
+
+**System:** AEGIS  
+**Document:** 15 — Infrastructure + Deployment Architecture  
+**Version:** 1.0  
+**Status:** Master Architecture  
+**Date:** August 2026
+
+---
+
+# 01. Purpose
+
+This document defines the infrastructure architecture required to develop, test, deploy, operate, scale, monitor, recover, and maintain AEGIS.
+
+AEGIS is designed as a high-stakes healthcare and biosecurity decision-support platform.
+
+Infrastructure therefore cannot be treated as an afterthought.
+
+The infrastructure must preserve:
+
+```text
+Availability
+Data integrity
+Security
+Traceability
+Observability
+Reproducibility
+Recoverability
+Scalability
+Controlled change
+```
+
+The infrastructure architecture must support the complete AEGIS lifecycle:
+
+```text
+Developer
+   ↓
+Local
+   ↓
+Development
+   ↓
+Test
+   ↓
+Staging
+   ↓
+Production
+   ↓
+Monitoring
+   ↓
+Incident Response
+   ↓
+Recovery
+   ↓
+Continuous Improvement
+```
+
+---
+
+# 02. Infrastructure Principles
+
+AEGIS infrastructure follows these principles.
+
+## 02.1 Infrastructure must serve the architecture
+
+Infrastructure must implement the requirements established by Documents 01–14.
+
+It must not create a second architecture.
+
+---
+
+## 02.2 Production must be reproducible
+
+A production environment should be reproducible from:
+
+```text
+Source Code
++
+Configuration
++
+Infrastructure Definition
++
+Database Migration
++
+Container Images
++
+Secrets
++
+Deployment Configuration
+```
+
+---
+
+## 02.3 Environment separation
+
+AEGIS must not treat development as a miniature production environment with uncontrolled differences.
+
+The environments must be intentionally separated while maintaining architectural parity.
+
+---
+
+## 02.4 Secure by default
+
+Infrastructure should assume:
+
+```text
+Every network boundary matters.
+Every credential matters.
+Every service boundary matters.
+Every deployment is potentially risky.
+```
+
+---
+
+## 02.5 Human-controlled consequential operations
+
+Infrastructure must never create an accidental path where an AI system can independently bypass:
+
+```text
+authentication
+authorization
+audit
+human approval
+```
+
+---
+
+## 02.6 Observable by design
+
+Infrastructure components must expose sufficient telemetry to determine:
+
+```text
+What happened?
+When?
+Where?
+Why?
+Which component?
+Which version?
+Which request?
+Which user/session where appropriate?
+```
+
+---
+
+# 03. Established Technology Baseline
+
+The current AEGIS architecture establishes:
+
+```text
+Backend:
+Python
+FastAPI
+
+Primary Database:
+PostgreSQL
+
+MVP Event / Streaming Layer:
+Redis Streams
+
+Containerization:
+Docker
+
+Orchestration:
+Kubernetes-ready
+
+Future Event Streaming:
+Kafka migration readiness
+```
+
+These are architectural constraints for this document.
+
+No alternative infrastructure technology is silently substituted.
+
+---
+
+# 04. Infrastructure Architecture
+
+The conceptual infrastructure topology is:
+
+```text
+                         AEGIS USERS
+                              │
+                              ▼
+                       ┌─────────────┐
+                       │ Web Client  │
+                       └──────┬──────┘
+                              │
+                              ▼
+                       ┌─────────────┐
+                       │ API / Edge  │
+                       └──────┬──────┘
+                              │
+                 ┌────────────┼────────────┐
+                 ▼            ▼            ▼
+          ┌──────────┐ ┌──────────┐ ┌────────────┐
+          │ FastAPI  │ │ Identity │ │ Intelligence│
+          │ Services │ │ Boundary │ │ Services   │
+          └────┬─────┘ └──────────┘ └──────┬─────┘
+               │                           │
+       ┌───────┼───────────┐               │
+       ▼       ▼           ▼               ▼
+ PostgreSQL Redis Streams  Storage       AI / Model
+       │       │           │             Boundary
+       │       │           │
+       └───────┼───────────┘
+               ▼
+        Observability Layer
+               │
+               ▼
+        Audit / Operational
+             Evidence
+```
+
+This is a conceptual architecture.
+
+Actual cloud provider, regions, instance sizes, and managed services must be selected during implementation planning rather than invented here.
+
+---
+
+# 05. Deployment Model
+
+AEGIS should use a containerized deployment model.
+
+The primary deployment unit is a container image.
+
+Conceptually:
+
+```text
+Source
+ ↓
+Build
+ ↓
+Test
+ ↓
+Container Image
+ ↓
+Registry
+ ↓
+Deployment
+ ↓
+Environment
+```
+
+---
+
+# 06. Docker Architecture
+
+Every deployable AEGIS service should have a reproducible container definition.
+
+At minimum:
+
+```text
+Frontend
+Backend/API
+Worker/Processing Services
+Supporting Services
+```
+
+where those services actually exist in the approved application architecture.
+
+---
+
+# 07. Container Requirements
+
+Production containers should:
+
+```text
+run as non-root where practical
+use pinned dependencies
+have predictable startup behavior
+have health checks
+avoid embedded secrets
+produce structured logs
+handle graceful shutdown
+```
+
+---
+
+# 08. Container Immutability
+
+A running production container should not be manually modified.
+
+The correct process is:
+
+```text
+Code Change
+ ↓
+Build New Image
+ ↓
+Test
+ ↓
+Deploy New Version
+```
+
+not:
+
+```text
+SSH into container
+ ↓
+Modify files
+ ↓
+Hope nothing breaks
+```
+
+---
+
+# 09. Image Versioning
+
+Container images must be identifiable.
+
+Example:
+
+```text
+aegis-api:<version>
+```
+
+The exact tagging convention should eventually include a traceable release identifier.
+
+Avoid relying exclusively on:
+
+```text
+latest
+```
+
+for production deployments.
+
+---
+
+# 10. Software Supply Chain
+
+Production builds should be traceable to:
+
+```text
+Git commit
+Dependency versions
+Build process
+Container image
+Release version
+Deployment
+```
+
+This allows AEGIS to answer:
+
+> Which exact software produced this result?
+
+---
+
+# 11. Environment Architecture
+
+AEGIS uses five logical environments:
+
+```text
+LOCAL
+DEVELOPMENT
+TEST
+STAGING
+PRODUCTION
+```
+
+Each environment has a different purpose.
+
+---
+
+# 12. LOCAL
+
+Purpose:
+
+```text
+rapid development
+experimentation
+component development
+debugging
+```
+
+Typical characteristics:
+
+```text
+Docker
+local PostgreSQL
+local Redis Streams
+local FastAPI
+local frontend
+synthetic data
+```
+
+Local infrastructure must never depend on production credentials.
+
+---
+
+# 13. DEVELOPMENT
+
+Purpose:
+
+```text
+team integration
+feature integration
+service integration
+early workflow testing
+```
+
+Development should approximate the production architecture without requiring production scale.
+
+---
+
+# 14. TEST
+
+Purpose:
+
+```text
+automated tests
+integration tests
+contract tests
+security tests
+E2E tests
+regression tests
+```
+
+Test infrastructure must be isolated from development data.
+
+---
+
+# 15. STAGING
+
+Purpose:
+
+```text
+production-like validation
+release candidate testing
+operational journey testing
+stakeholder validation
+deployment verification
+```
+
+Staging should be as architecturally similar to production as practical.
+
+---
+
+# 16. PRODUCTION
+
+Production is the authoritative operational environment.
+
+Production must have:
+
+```text
+strict access control
+protected secrets
+persistent storage
+backup strategy
+monitoring
+audit
+alerting
+recovery procedures
+controlled deployment
+```
+
+---
+
+# 17. Environment Isolation
+
+The following must never be casually shared between environments:
+
+```text
+production database
+production credentials
+production secrets
+production access tokens
+production storage
+```
+
+---
+
+# 18. Configuration Architecture
+
+Configuration must be externalized.
+
+Conceptually:
+
+```text
+Application Code
+       +
+Environment Configuration
+       +
+Secrets
+       ↓
+Runtime
+```
+
+Do not hard-code environment-specific configuration into application code.
+
+---
+
+# 19. Configuration Categories
+
+Separate:
+
+```text
+Application Configuration
+Infrastructure Configuration
+Environment Configuration
+Security Secrets
+Feature Configuration
+External Integration Configuration
+```
+
+---
+
+# 20. Secrets
+
+Secrets include:
+
+```text
+database credentials
+API keys
+authentication secrets
+encryption keys
+external service credentials
+AI provider credentials
+```
+
+Secrets must not be committed to Git.
+
+They must be injected securely at runtime.
+
+---
+
+# 21. Secret Lifecycle
+
+Secrets should support:
+
+```text
+creation
+storage
+access control
+rotation
+revocation
+replacement
+audit
+```
+
+---
+
+# 22. Database Architecture
+
+PostgreSQL is the primary AEGIS relational data store.
+
+It is responsible for durable system state.
+
+Conceptually:
+
+```text
+FastAPI
+   ↓
+Domain / Service Layer
+   ↓
+PostgreSQL
+```
+
+---
+
+# 23. PostgreSQL Responsibilities
+
+PostgreSQL should hold authoritative structured state such as:
+
+```text
+users
+roles
+permissions
+facilities
+entities
+events
+alerts
+investigations
+assessments
+recommendations
+decisions
+audit records
+configuration
+```
+
+The exact tables and relationships remain governed by Document 06.
+
+---
+
+# 24. Database Ownership
+
+The application architecture must define which service owns which data.
+
+Services should not casually modify another service's internal tables.
+
+Preferred pattern:
+
+```text
+Service
+ ↓
+Owns domain data
+ ↓
+Exposes contract
+```
+
+rather than:
+
+```text
+Service A
+ ↓
+directly edits
+ ↓
+Service B's tables
+```
+
+---
+
+# 25. Database Migrations
+
+Database changes must be version-controlled.
+
+Conceptually:
+
+```text
+Migration 001
+Migration 002
+Migration 003
+...
+```
+
+Deployment must know which database schema version is active.
+
+---
+
+# 26. Migration Safety
+
+Before production migration:
+
+```text
+backup
+ ↓
+migration validation
+ ↓
+staging test
+ ↓
+production migration
+ ↓
+verification
+```
+
+Destructive schema changes require special planning.
+
+---
+
+# 27. Database Backups
+
+Production PostgreSQL must have a defined backup strategy.
+
+The strategy should address:
+
+```text
+backup frequency
+retention
+encryption
+storage isolation
+restore procedure
+restore testing
+```
+
+---
+
+# 28. Backup Principle
+
+A backup that has never been restored successfully is not sufficient evidence of recoverability.
+
+Therefore:
+
+```text
+Backup
+ ↓
+Restore Test
+ ↓
+Validation
+```
+
+must be part of the operational lifecycle.
+
+---
+
+# 29. Redis Streams
+
+Redis Streams is the MVP event/streaming mechanism.
+
+It should support asynchronous event processing where required by the architecture.
+
+Conceptually:
+
+```text
+Producer
+ ↓
+Redis Stream
+ ↓
+Consumer
+ ↓
+Processing
+ ↓
+Persistent State
+```
+
+---
+
+# 30. Redis Responsibilities
+
+Redis should not silently become the authoritative permanent store for data that belongs in PostgreSQL.
+
+Use Redis Streams for appropriate:
+
+```text
+events
+queues
+stream processing
+temporary coordination
+```
+
+while PostgreSQL remains the primary durable relational source of truth.
+
+---
+
+# 31. Redis Failure
+
+The system must define behavior when Redis becomes unavailable.
+
+Potential behavior:
+
+```text
+stream processing pauses
+ ↓
+events remain protected according to architecture
+ ↓
+service recovers
+ ↓
+processing resumes
+```
+
+The exact recovery semantics must be implemented and tested.
+
+---
+
+# 32. Redis Consumer Architecture
+
+Consumers must support:
+
+```text
+acknowledgement
+retry
+failure handling
+dead-letter strategy where required
+idempotency
+observability
+```
+
+---
+
+# 33. Duplicate Event Handling
+
+AEGIS must assume that event delivery may sometimes be repeated.
+
+Consumers should therefore use idempotent processing wherever the event architecture requires it.
+
+---
+
+# 34. Kafka Migration Readiness
+
+The MVP uses Redis Streams.
+
+The architecture must remain capable of eventually migrating high-volume or more complex event streaming to Kafka.
+
+The application should therefore avoid deeply coupling business logic to Redis-specific semantics.
+
+Prefer:
+
+```text
+Domain Event Contract
+       ↓
+Event Adapter
+       ↓
+Redis Streams
+```
+
+rather than embedding Redis behavior throughout business logic.
+
+---
+
+# 35. Future Kafka Migration
+
+The desired migration path is:
+
+```text
+Application
+     ↓
+Event Contract
+     ↓
+Streaming Abstraction
+     ↓
+Redis Streams
+```
+
+Later:
+
+```text
+Application
+     ↓
+Same Event Contract
+     ↓
+Streaming Abstraction
+     ↓
+Kafka
+```
+
+The goal is to minimize business-domain changes during migration.
+
+---
+
+# 36. Object Storage
+
+AEGIS may require durable storage for objects such as:
+
+```text
+documents
+reports
+evidence files
+exports
+artifacts
+```
+
+Only requirements explicitly approved by the product and data architecture should be implemented.
+
+Object storage must not become an uncontrolled second database.
+
+---
+
+# 37. Storage Security
+
+Stored objects should have:
+
+```text
+access control
+encryption where required
+retention rules
+auditability
+```
+
+---
+
+# 38. Frontend Deployment
+
+The frontend should be deployed independently from backend services where practical.
+
+Conceptually:
+
+```text
+User
+ ↓
+Frontend
+ ↓
+API
+```
+
+The frontend must not directly bypass the API security boundary to access protected backend resources.
+
+---
+
+# 39. Backend Deployment
+
+FastAPI services should run as containerized workloads.
+
+Conceptually:
+
+```text
+Client
+ ↓
+API Boundary
+ ↓
+FastAPI
+ ↓
+Domain Services
+ ↓
+PostgreSQL / Redis / external systems
+```
+
+---
+
+# 40. Worker Architecture
+
+Where asynchronous processing is required:
+
+```text
+FastAPI
+ ↓
+Redis Stream
+ ↓
+Worker
+ ↓
+Processing
+ ↓
+PostgreSQL
+```
+
+Workers must have:
+
+```text
+health checks
+retry behavior
+failure handling
+structured logs
+metrics
+```
+
+---
+
+# 41. Health Checks
+
+Every production service should expose meaningful health information.
+
+Separate:
+
+```text
+Liveness
+Readiness
+Dependency Health
+```
+
+---
+
+# 42. Liveness
+
+Liveness answers:
+
+> Is the process alive?
+
+A liveness failure should trigger appropriate orchestration behavior.
+
+---
+
+# 43. Readiness
+
+Readiness answers:
+
+> Can this instance safely receive traffic?
+
+A service may be alive while not being ready.
+
+---
+
+# 44. Dependency Health
+
+Dependency health should help determine:
+
+```text
+database available?
+Redis available?
+external service available?
+AI service available?
+```
+
+without falsely claiming that the entire application is healthy when a critical dependency is unavailable.
+
+---
+
+# 45. Networking
+
+The production architecture should separate:
+
+```text
+Public Access
+Application Network
+Data Network
+Management Access
+```
+
+where applicable.
+
+Databases should not be unnecessarily exposed to the public internet.
+
+---
+
+# 46. API Boundary
+
+External users should reach AEGIS through a controlled application/API boundary.
+
+The architecture should enforce:
+
+```text
+authentication
+authorization
+rate controls where appropriate
+TLS
+request validation
+logging
+```
+
+---
+
+# 47. TLS
+
+Production communication involving sensitive AEGIS data should use encrypted transport.
+
+The infrastructure must manage certificate lifecycle appropriately.
+
+---
+
+# 48. Kubernetes Readiness
+
+AEGIS should be Kubernetes-ready without requiring Kubernetes complexity prematurely.
+
+The architecture should support eventual deployment of:
+
+```text
+Frontend
+API
+Workers
+Supporting Services
+```
+
+as orchestrated workloads.
+
+---
+
+# 49. MVP Orchestration Principle
+
+Do not introduce Kubernetes merely because the architecture is Kubernetes-ready.
+
+The MVP should use the simplest infrastructure that can:
+
+```text
+run reliably
+be reproduced
+be tested
+be secured
+be monitored
+```
+
+while preserving the architectural boundaries required for future orchestration.
+
+---
+
+# 50. Kubernetes Migration Path
+
+Conceptually:
+
+```text
+Docker
+ ↓
+Containerized Services
+ ↓
+Deployment Definitions
+ ↓
+Kubernetes
+```
+
+The application should not require a complete rewrite when orchestration changes.
+
+---
+
+# 51. Scaling Model
+
+AEGIS should scale according to actual bottlenecks.
+
+Potential scaling dimensions include:
+
+```text
+API instances
+worker instances
+database capacity
+stream consumers
+AI workloads
+storage
+```
+
+---
+
+# 52. Horizontal Scaling
+
+Stateless services should be designed to support multiple instances.
+
+Example:
+
+```text
+             ┌── API 1
+Load Balancer┼── API 2
+             └── API 3
+```
+
+assuming the application's state management supports this.
+
+---
+
+# 53. Stateful Scaling
+
+PostgreSQL and Redis require different scaling strategies from stateless application services.
+
+Do not treat:
+
+```text
+API
+Database
+Stream Infrastructure
+```
+
+as interchangeable workloads.
+
+---
+
+# 54. Autoscaling
+
+Autoscaling should be introduced only where useful.
+
+Possible signals include:
+
+```text
+CPU
+memory
+request rate
+latency
+queue depth
+stream backlog
+```
+
+The exact thresholds must come from measured workload characteristics.
+
+---
+
+# 55. AI Infrastructure
+
+AI must remain behind an explicit service boundary.
+
+Conceptually:
+
+```text
+AEGIS Application
+       ↓
+AI Intelligence Service
+       ↓
+Model / Provider
+```
+
+The frontend should not directly control model infrastructure.
+
+---
+
+# 56. AI Infrastructure Principles
+
+AI infrastructure must support:
+
+```text
+model versioning
+configuration versioning
+request tracing
+output validation
+failure handling
+timeout handling
+cost monitoring where applicable
+```
+
+---
+
+# 57. AI Availability Failure
+
+If AI becomes unavailable, AEGIS must not silently fabricate intelligence.
+
+The system should transition to an explicit state such as:
+
+```text
+AI_UNAVAILABLE
+```
+
+or another approved degraded state.
+
+---
+
+# 58. AI Infrastructure Security
+
+AI credentials must be isolated from frontend code.
+
+The architecture should prevent users from extracting provider credentials through browser inspection or API responses.
+
+---
+
+# 59. External Services
+
+External integrations must be treated as unreliable dependencies.
+
+Every integration should define:
+
+```text
+timeout
+retry
+failure state
+authentication
+rate behavior
+observability
+```
+
+---
+
+# 60. Retry Policy
+
+Retries must be controlled.
+
+Blind retries can create:
+
+```text
+duplicate operations
+traffic amplification
+event duplication
+cascading failure
+```
+
+Retry only operations that are safe to retry.
+
+---
+
+# 61. Circuit Breaking
+
+Where external dependency failure could cascade into AEGIS, appropriate circuit-breaking or equivalent failure isolation should be considered.
+
+---
+
+# 62. Timeout Architecture
+
+Every network-dependent operation should have an intentional timeout.
+
+Never allow an external dependency to hang indefinitely.
+
+---
+
+# 63. CI/CD Architecture
+
+The deployment pipeline should eventually follow:
+
+```text
+Developer
+ ↓
+Git
+ ↓
+Pull Request
+ ↓
+Automated Checks
+ ↓
+Build
+ ↓
+Test
+ ↓
+Security
+ ↓
+Container Image
+ ↓
+Environment Deployment
+ ↓
+Validation
+```
+
+---
+
+# 64. Pull Request Gate
+
+A merge should require appropriate automated checks:
+
+```text
+lint
+type checks
+unit tests
+component tests
+contract tests
+security checks
+build
+```
+
+as defined by Document 14.
+
+---
+
+# 65. Build Pipeline
+
+The build process should:
+
+```text
+install dependencies
+validate code
+run tests
+build artifacts
+build container
+scan dependencies/image
+publish versioned artifact
+```
+
+---
+
+# 66. Deployment Pipeline
+
+Deployment should be environment-aware.
+
+Conceptually:
+
+```text
+Commit
+ ↓
+CI
+ ↓
+Test
+ ↓
+Development
+ ↓
+Test
+ ↓
+Staging
+ ↓
+Approval
+ ↓
+Production
+```
+
+---
+
+# 67. Production Deployment
+
+Production deployments should be controlled.
+
+At minimum:
+
+```text
+approved release
+known artifact
+known configuration
+migration plan
+rollback plan
+post-deployment validation
+```
+
+---
+
+# 68. Deployment Strategies
+
+AEGIS should support controlled deployment strategies as operational maturity increases.
+
+Potential patterns include:
+
+```text
+rolling deployment
+blue/green deployment
+canary deployment
+```
+
+The selected method should depend on infrastructure maturity and actual availability requirements.
+
+---
+
+# 69. MVP Deployment Strategy
+
+For the first implementation, prioritize:
+
+```text
+simplicity
+reproducibility
+rollback capability
+observability
+```
+
+over unnecessary deployment complexity.
+
+---
+
+# 70. Rollback
+
+Every production release must have a rollback strategy.
+
+Conceptually:
+
+```text
+Version N
+ ↓
+Version N+1
+ ↓
+Failure
+ ↓
+Rollback
+ ↓
+Version N
+ ↓
+Validation
+```
+
+---
+
+# 71. Database Rollback
+
+Application rollback and database rollback are not automatically equivalent.
+
+Database migrations must be designed carefully.
+
+Prefer migration strategies that allow safe application rollback where practical.
+
+---
+
+# 72. Zero-Downtime Consideration
+
+If production availability requirements eventually require zero or near-zero downtime:
+
+```text
+backward-compatible changes
+rolling deployment
+health checks
+connection draining
+```
+
+must be incorporated.
+
+---
+
+# 73. Infrastructure as Code
+
+Infrastructure should eventually be represented as code.
+
+Conceptually:
+
+```text
+Infrastructure Definition
+ ↓
+Version Control
+ ↓
+Review
+ ↓
+Validation
+ ↓
+Deployment
+```
+
+Manual infrastructure changes should be minimized.
+
+---
+
+# 74. Infrastructure Change Control
+
+Infrastructure changes must follow the same discipline as application changes:
+
+```text
+change
+ ↓
+review
+ ↓
+test
+ ↓
+deploy
+ ↓
+observe
+```
+
+---
+
+# 75. Production Access
+
+Production access must be restricted.
+
+Access should be:
+
+```text
+role-based
+auditable
+minimal
+time-appropriate
+```
+
+where technically feasible.
+
+---
+
+# 76. Administrative Access
+
+Administrative access should not rely on shared credentials.
+
+Individual identity should be maintained where possible.
+
+---
+
+# 77. Production Database Access
+
+Developers should not casually connect directly to the production database.
+
+Normal application operations should go through controlled service interfaces.
+
+---
+
+# 78. Auditability
+
+Infrastructure events should be traceable where appropriate:
+
+```text
+deployment
+configuration change
+database migration
+access
+security event
+failure
+rollback
+```
+
+---
+
+# 79. Observability Integration
+
+Document 12 defines AEGIS observability.
+
+Infrastructure must feed that architecture.
+
+The infrastructure layer should expose:
+
+```text
+application logs
+infrastructure logs
+metrics
+health status
+deployment events
+resource utilization
+dependency status
+```
+
+---
+
+# 80. Structured Logging
+
+Logs should be machine-readable where practical.
+
+Important contextual fields may include:
+
+```text
+timestamp
+service
+environment
+version
+request ID
+trace ID
+event type
+severity
+```
+
+Sensitive data must not be logged unnecessarily.
+
+---
+
+# 81. Correlation
+
+A request should be traceable across relevant services.
+
+Conceptually:
+
+```text
+User Action
+ ↓
+API Request
+ ↓
+Service
+ ↓
+Stream Event
+ ↓
+Worker
+ ↓
+Database
+```
+
+The system should preserve enough correlation information to investigate the workflow.
+
+---
+
+# 82. Infrastructure Metrics
+
+Monitor meaningful infrastructure signals:
+
+```text
+CPU
+memory
+storage
+network
+request volume
+latency
+error rate
+database connections
+stream backlog
+worker health
+```
+
+---
+
+# 83. Alerting
+
+Infrastructure alerts should distinguish:
+
+```text
+warning
+critical
+informational
+```
+
+Avoid creating alert noise that causes operators to ignore important signals.
+
+---
+
+# 84. Alert Fatigue
+
+AEGIS infrastructure itself must not become an alert-generation problem.
+
+Alerts should have:
+
+```text
+clear condition
+severity
+owner
+expected action
+```
+
+where operationally relevant.
+
+---
+
+# 85. Data Retention
+
+Retention policies must be defined according to:
+
+```text
+data type
+purpose
+regulatory requirements
+security requirements
+storage constraints
+```
+
+Do not invent retention periods without stakeholder, legal, regulatory, or organizational requirements.
+
+---
+
+# 86. Disaster Recovery
+
+Disaster recovery must address:
+
+```text
+application failure
+database failure
+storage failure
+infrastructure failure
+deployment failure
+credential compromise
+regional infrastructure failure
+```
+
+where relevant to the final deployment environment.
+
+---
+
+# 87. Recovery Objectives
+
+AEGIS should eventually define:
+
+```text
+RPO — Recovery Point Objective
+RTO — Recovery Time Objective
+```
+
+These must be stakeholder-approved.
+
+Do not invent numerical targets before requirements exist.
+
+---
+
+# 88. Disaster Recovery Flow
+
+Conceptually:
+
+```text
+Failure
+ ↓
+Detection
+ ↓
+Incident Declaration
+ ↓
+Containment
+ ↓
+Recovery
+ ↓
+Validation
+ ↓
+Service Restoration
+ ↓
+Post-Incident Review
+```
+
+---
+
+# 89. Backup Strategy
+
+Backups should be:
+
+```text
+automated
+protected
+encrypted where required
+retained
+tested
+recoverable
+```
+
+---
+
+# 90. Recovery Testing
+
+Recovery tests must eventually verify:
+
+```text
+database restoration
+application restoration
+configuration restoration
+storage restoration
+service restoration
+```
+
+---
+
+# 91. Failure Domains
+
+Infrastructure design should recognize different failure domains:
+
+```text
+application
+container
+host
+database
+network
+availability zone
+region
+external provider
+```
+
+The actual supported failure domains depend on the final infrastructure provider.
+
+---
+
+# 92. Dependency Mapping
+
+Each critical service should document:
+
+```text
+depends on
+used by
+failure impact
+recovery behavior
+```
+
+This should correspond to the service architecture established earlier.
+
+---
+
+# 93. Infrastructure Dependency Graph
+
+Conceptually:
+
+```text
+Frontend
+   ↓
+API
+   ↓
+Domain Services
+ ┌─┴───────────┐
+ ↓             ↓
+PostgreSQL   Redis
+               ↓
+             Workers
+               ↓
+         Intelligence
+```
+
+The exact graph must follow the implementation architecture rather than being invented independently.
+
+---
+
+# 94. Capacity Planning
+
+Before production scaling decisions:
+
+```text
+measure
+ ↓
+establish baseline
+ ↓
+identify bottleneck
+ ↓
+scale
+ ↓
+measure again
+```
+
+Do not prematurely optimize infrastructure based on theoretical traffic.
+
+---
+
+# 95. Cost Awareness
+
+Infrastructure should be designed with operational cost visibility.
+
+Track major cost drivers where applicable:
+
+```text
+compute
+database
+storage
+network
+AI inference
+observability
+external services
+```
+
+---
+
+# 96. Resource Limits
+
+Services should eventually have explicit resource expectations.
+
+For containerized workloads:
+
+```text
+CPU
+memory
+storage
+```
+
+should be defined based on measurements.
+
+---
+
+# 97. Resource Exhaustion
+
+The system must be tested for:
+
+```text
+memory exhaustion
+disk exhaustion
+connection exhaustion
+stream backlog
+database saturation
+```
+
+and must produce observable failure behavior.
+
+---
+
+# 98. Graceful Shutdown
+
+Services must handle termination correctly.
+
+Conceptually:
+
+```text
+Shutdown Signal
+ ↓
+Stop accepting new work
+ ↓
+Finish safe work
+ ↓
+Close connections
+ ↓
+Exit
+```
+
+This is particularly important for workers and event consumers.
+
+---
+
+# 99. Deployment Safety
+
+Never deploy blindly into production.
+
+Required chain:
+
+```text
+Build
+ ↓
+Test
+ ↓
+Review
+ ↓
+Stage
+ ↓
+Validate
+ ↓
+Deploy
+ ↓
+Observe
+```
+
+---
+
+# 100. Environment Parity
+
+The environments should share:
+
+```text
+same architecture
+same service boundaries
+same contracts
+same container behavior
+```
+
+while differing appropriately in:
+
+```text
+scale
+credentials
+data
+external endpoints
+security boundaries
+```
+
+---
+
+# 101. Local-to-Production Principle
+
+The developer should be able to understand:
+
+```text
+what runs locally
+what runs in CI
+what runs in staging
+what runs in production
+```
+
+without discovering major architectural differences only during deployment.
+
+---
+
+# 102. Development Bootstrap
+
+A new developer should eventually be able to:
+
+```text
+clone repository
+ ↓
+install prerequisites
+ ↓
+configure local environment
+ ↓
+start containers
+ ↓
+run migrations
+ ↓
+seed synthetic data
+ ↓
+start application
+ ↓
+run tests
+```
+
+with documented commands.
+
+---
+
+# 103. Reproducible Development
+
+The local environment should minimize:
+
+```text
+"works on my machine"
+```
+
+problems.
+
+Docker should be used to make core infrastructure reproducible.
+
+---
+
+# 104. Seed Data
+
+Development and testing should have controlled synthetic datasets.
+
+Example categories:
+
+```text
+normal operations
+alerts
+investigations
+assessment states
+response states
+failure scenarios
+```
+
+These must remain synthetic unless approved data is explicitly introduced.
+
+---
+
+# 105. Production Data Protection
+
+Production data must not automatically flow into:
+
+```text
+developer machines
+AI development environments
+test environments
+local databases
+```
+
+---
+
+# 106. Data Promotion
+
+The normal direction should be:
+
+```text
+Synthetic Data
+ ↓
+Development
+ ↓
+Test
+ ↓
+Staging
+```
+
+not:
+
+```text
+Production
+ ↓
+Developer Laptop
+```
+
+---
+
+# 107. Release Artifact
+
+Every release should have a traceable artifact consisting conceptually of:
+
+```text
+Source Version
++
+Container Image
++
+Database Migration
++
+Configuration Version
++
+Infrastructure Version
+```
+
+---
+
+# 108. Release Manifest
+
+A release should identify:
+
+```text
+application version
+API version
+database schema version
+AI configuration version
+infrastructure version
+```
+
+where applicable.
+
+---
+
+# 109. Compatibility
+
+Services must define compatibility expectations.
+
+For example:
+
+```text
+Frontend Version
+ ↕
+API Version
+ ↕
+Database Schema
+```
+
+Changes must not silently break downstream consumers.
+
+---
+
+# 110. API Deployment Compatibility
+
+Before deploying backend changes:
+
+```text
+existing frontend
++
+new backend
+```
+
+should remain compatible when required by the deployment strategy.
+
+---
+
+# 111. Event Compatibility
+
+Because Redis Streams may later migrate to Kafka, event schemas must be versioned and stable.
+
+Conceptually:
+
+```text
+Event
+ ↓
+Schema Version
+ ↓
+Consumer
+```
+
+---
+
+# 112. Infrastructure Security Baseline
+
+Production infrastructure should enforce:
+
+```text
+encrypted transport
+least privilege
+secret protection
+network isolation
+dependency security
+container security
+auditability
+controlled administrative access
+```
+
+---
+
+# 113. Vulnerability Management
+
+The engineering pipeline should eventually scan:
+
+```text
+dependencies
+container images
+infrastructure definitions
+```
+
+for known vulnerabilities.
+
+---
+
+# 114. Patch Management
+
+Infrastructure dependencies must have a controlled update process.
+
+Do not automatically update critical infrastructure packages in production without validation.
+
+---
+
+# 115. Infrastructure Testing
+
+Infrastructure itself must be tested.
+
+Examples:
+
+```text
+container starts
+health checks work
+database migration works
+service connects to database
+Redis stream processing works
+secrets load correctly
+deployment succeeds
+rollback works
+backup restores
+```
+
+---
+
+# 116. Deployment Test
+
+A staging deployment should prove:
+
+```text
+artifact
+ ↓
+deployment
+ ↓
+startup
+ ↓
+health
+ ↓
+database
+ ↓
+Redis
+ ↓
+API
+ ↓
+frontend
+ ↓
+critical journey
+```
+
+---
+
+# 117. Infrastructure Failure Testing
+
+Controlled failures should eventually include:
+
+```text
+kill API instance
+stop worker
+disconnect Redis
+simulate database failure
+simulate external dependency timeout
+```
+
+The expected behavior must be documented.
+
+---
+
+# 118. Production Incident Architecture
+
+When infrastructure fails:
+
+```text
+Detection
+ ↓
+Triage
+ ↓
+Containment
+ ↓
+Recovery
+ ↓
+Verification
+ ↓
+Communication
+ ↓
+Post-Incident Review
+```
+
+---
+
+# 119. Incident Evidence
+
+Preserve appropriate evidence:
+
+```text
+logs
+metrics
+deployment version
+configuration
+timeline
+affected services
+actions taken
+recovery actions
+```
+
+---
+
+# 120. Post-Incident Learning
+
+Every significant infrastructure failure should feed the AEGIS feedback loop:
+
+```text
+Incident
+ ↓
+Root Cause
+ ↓
+Architecture Improvement
+ ↓
+New Test
+ ↓
+New Monitoring
+ ↓
+Updated Runbook
+```
+
+This is the infrastructure equivalent of AEGIS's biological resilience principle.
+
+---
+
+# 121. Operational Runbooks
+
+Critical infrastructure operations should eventually have runbooks.
+
+Examples:
+
+```text
+Database Failure
+Redis Failure
+API Failure
+Deployment Failure
+Rollback
+Backup Restore
+Credential Rotation
+AI Provider Failure
+High Resource Usage
+Stream Backlog
+```
+
+---
+
+# 122. Runbook Principle
+
+A runbook should tell an operator:
+
+```text
+What happened?
+How do I confirm it?
+What should I do?
+What should I avoid?
+How do I verify recovery?
+```
+
+---
+
+# 123. Production Readiness Gate
+
+AEGIS infrastructure is production-ready only when:
+
+```text
+✓ Production environment exists
+✓ Environment isolation exists
+✓ Containers are reproducible
+✓ PostgreSQL is secured
+✓ Redis Streams is operational
+✓ Secrets are protected
+✓ TLS is configured
+✓ Health checks work
+✓ Logging works
+✓ Metrics work
+✓ Alerting works
+✓ Audit architecture works
+✓ CI/CD works
+✓ Database migrations are controlled
+✓ Backups exist
+✓ Restore has been tested
+✓ Rollback exists
+✓ Security checks pass
+✓ Critical operational journey works
+✓ Incident procedures exist
+```
+
+---
+
+# 124. Infrastructure Definition of Done
+
+Infrastructure work is not complete when:
+
+```text
+"the application is deployed."
+```
+
+It is complete when:
+
+```text
+it can be deployed
++
+observed
++
+secured
++
+tested
++
+recovered
++
+rolled back
++
+explained
+```
+
+---
+
+# 125. Master Infrastructure Lifecycle
+
+The final infrastructure lifecycle is:
+
+```text
+CODE
+ ↓
+BUILD
+ ↓
+TEST
+ ↓
+SECURITY VALIDATION
+ ↓
+CONTAINERIZE
+ ↓
+PUBLISH ARTIFACT
+ ↓
+DEPLOY DEVELOPMENT
+ ↓
+INTEGRATION TEST
+ ↓
+DEPLOY TEST
+ ↓
+REGRESSION
+ ↓
+DEPLOY STAGING
+ ↓
+STAKEHOLDER VALIDATION
+ ↓
+RELEASE APPROVAL
+ ↓
+DEPLOY PRODUCTION
+ ↓
+SMOKE TEST
+ ↓
+OBSERVE
+ ↓
+OPERATE
+ ↓
+BACKUP
+ ↓
+RECOVER
+ ↓
+LEARN
+ ↓
+IMPROVE
+```
+
+---
+
+# 126. AEGIS Infrastructure Architecture Summary
+
+The infrastructure can therefore be represented as:
+
+```text
+                         USERS
+                           │
+                           ▼
+                    ┌─────────────┐
+                    │  FRONTEND   │
+                    └──────┬──────┘
+                           │
+                           ▼
+                    ┌─────────────┐
+                    │ API BOUNDARY│
+                    └──────┬──────┘
+                           │
+                           ▼
+                    ┌─────────────┐
+                    │   FASTAPI   │
+                    │   SERVICES  │
+                    └──┬─────┬────┘
+                       │     │
+             ┌─────────┘     └──────────┐
+             ▼                          ▼
+      ┌─────────────┐            ┌─────────────┐
+      │ PostgreSQL  │            │Redis Streams│
+      │ SOURCE OF   │            │     MVP     │
+      │   TRUTH     │            └──────┬──────┘
+      └─────────────┘                   │
+                                        ▼
+                                 ┌─────────────┐
+                                 │   WORKERS   │
+                                 └──────┬──────┘
+                                        │
+                                        ▼
+                                ┌──────────────┐
+                                │ INTELLIGENCE │
+                                │   SERVICES   │
+                                └──────┬───────┘
+                                       │
+                                       ▼
+                                ┌──────────────┐
+                                │ AI / MODELS  │
+                                └──────────────┘
+
+
+             ┌───────────────────────────────────┐
+             │       OBSERVABILITY LAYER         │
+             │ logs • metrics • traces • alerts  │
+             └───────────────────────────────────┘
+
+
+             ┌───────────────────────────────────┐
+             │        SECURITY + AUDIT           │
+             └───────────────────────────────────┘
+
+
+             ┌───────────────────────────────────┐
+             │      CI/CD + ARTIFACTS             │
+             └───────────────────────────────────┘
+```
+
+---
+
+# 127. Strategic Infrastructure Decision
+
+AEGIS should deliberately follow:
+
+```text
+MVP
+ ↓
+Docker
+ ↓
+Python / FastAPI
+ ↓
+PostgreSQL
+ ↓
+Redis Streams
+ ↓
+Controlled deployment
+ ↓
+Strong observability
+ ↓
+Kubernetes-ready boundaries
+ ↓
+Kafka migration readiness
+```
+
+The project should **not** jump directly into infrastructure complexity simply because the eventual system may operate at global scale.
+
+Global-scale architecture is not created by prematurely deploying dozens of technologies.
+
+It is created by establishing clean boundaries that can scale.
+
+---
+
+# 128. What This Document Does NOT Decide
+
+To prevent architectural hallucination, this document intentionally does not invent:
+
+```text
+cloud provider
+region
+instance sizes
+exact Kubernetes cluster topology
+exact database size
+exact traffic capacity
+exact RPO
+exact RTO
+regulatory certification
+production user count
+production event volume
+specific third-party vendors
+```
+
+Those decisions require evidence, stakeholder requirements, deployment constraints, and measured workloads.
+
+They belong in implementation and deployment planning when the necessary facts are available.
+
+---
+
+# 129. Cross-Document Dependency Map
+
+Document 15 consumes:
+
+```text
+01 — Master Architecture
+02 — Domain Model + Global State
+03 — User Flow + Operational Journey
+04 — Functional Requirements + 13 Screens
+05 — Interaction + State Transition
+06 — Data Architecture + Data Contracts
+07 — API Architecture + Service Contracts
+08 — Frontend + Application Architecture
+09 — Design System + Component Architecture
+10 — Security + Authentication + Authorization + Audit
+11 — AI Intelligence + Decision Support
+12 — Observability + Telemetry
+13 — Threat Modeling + Risk
+14 — Testing + Quality Assurance
+```
+
+Document 15 now provides the runtime foundation for all of them.
+
+---
+
+# 130. Final Architecture Principle
+
+The infrastructure of AEGIS must embody one rule:
+
+> **Every important system capability must have a defined place to run, a defined way to communicate, a defined way to fail, a defined way to recover, and a defined way to be observed.**
+
+That is what turns an architecture document into an operational system.
+
+AEGIS should therefore never reach the stage where the team says:
+
+```text
+"We built the application.
+Now let's figure out deployment."
+```
+
+Deployment is part of the architecture.
+
+Security is part of the architecture.
+
+Recovery is part of the architecture.
+
+Observability is part of the architecture.
+
+Testing is part of the architecture.
+
+The infrastructure must be designed alongside the product rather than attached to it at the end.
