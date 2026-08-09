@@ -1,0 +1,2313 @@
+# AEGIS
+
+# Document 16 — Development + Implementation Architecture
+
+**System:** AEGIS  
+**Document:** 16 — Development + Implementation Architecture  
+**Version:** 1.0  
+**Status:** Master Implementation Specification  
+**Purpose:** Define exactly how AEGIS moves from architecture to a working, testable, deployable product.
+
+---
+
+# 01. Purpose
+
+This document defines the implementation strategy for AEGIS.
+
+It answers:
+
+> How do we build AEGIS correctly from an empty or clean repository into a functioning high-stakes healthcare and biosecurity decision-support system?
+
+This document converts the previous architecture documents into an ordered engineering execution system.
+
+It establishes:
+
+```text
+what gets built
+in what order
+by which layer
+with which dependencies
+with which validation gates
+using which development tools
+```
+
+The objective is to prevent:
+
+```text
+feature drift
+architecture drift
+AI hallucination
+duplicate implementation
+broken state
+inconsistent components
+premature backend complexity
+premature AI integration
+screen-by-screen isolation
+```
+
+---
+
+# 02. Core Implementation Principle
+
+AEGIS must be built **progressively from foundations upward**.
+
+The implementation hierarchy is:
+
+```text
+ARCHITECTURE
+     ↓
+DOMAIN
+     ↓
+DATA
+     ↓
+SERVICES
+     ↓
+STATE
+     ↓
+APPLICATION
+     ↓
+INTERFACE
+     ↓
+INTELLIGENCE
+     ↓
+INTEGRATION
+     ↓
+TESTING
+     ↓
+DEPLOYMENT
+```
+
+The team must not reverse this order casually.
+
+---
+
+# 03. The AEGIS Build Law
+
+The following rule is mandatory:
+
+> **Never ask an AI coding agent to implement something whose architectural contract has not already been defined.**
+
+For example:
+
+Wrong:
+
+```text
+"Build the Threat Intelligence screen."
+```
+
+Correct:
+
+```text
+Architecture
+ ↓
+Domain model
+ ↓
+Data contract
+ ↓
+API contract
+ ↓
+State transitions
+ ↓
+Screen specification
+ ↓
+Component specification
+ ↓
+Implementation
+ ↓
+Tests
+```
+
+AI tools should execute established architecture.
+
+They should not invent architecture during implementation.
+
+---
+
+# 04. Source of Truth Hierarchy
+
+When documents conflict, the following authority order applies:
+
+```text
+1. AEGIS Master Architecture
+2. AEGIS Domain Model + Global State Architecture
+3. AEGIS User Flow + Operational Journey Architecture
+4. AEGIS Functional Requirements + 13 Screen Master Specification
+5. AEGIS Interaction + State Transition Specification
+6. AEGIS Data Architecture + Data Contracts
+7. AEGIS API Architecture + Service Contracts
+8. AEGIS Frontend Architecture + Application Architecture
+9. AEGIS Design System + UI Component Architecture
+10. AEGIS Security Architecture
+11. AEGIS AI Intelligence Architecture
+12. AEGIS Observability Architecture
+13. AEGIS Threat/Risk Architecture
+14. AEGIS Testing Architecture
+15. AEGIS Infrastructure Architecture
+16. This Development + Implementation Architecture
+```
+
+If implementation reveals a genuine contradiction, stop and resolve the architecture.
+
+Do not silently patch around it.
+
+---
+
+# 05. Implementation Authority
+
+The implementation repository becomes the executable representation of the architecture.
+
+Therefore:
+
+```text
+Architecture Documents
+        ↓
+Repository Structure
+        ↓
+Source Code
+        ↓
+Tests
+        ↓
+Deployment
+```
+
+The repository must never become disconnected from the architecture.
+
+---
+
+# 06. AI Development Principle
+
+AI is an implementation accelerator.
+
+AI is not the system architect.
+
+The human-controlled architecture remains authoritative.
+
+The AI workflow is:
+
+```text
+Human Architecture
+        ↓
+AI Interpretation
+        ↓
+AI Implementation
+        ↓
+Human Review
+        ↓
+Automated Tests
+        ↓
+Integration Validation
+```
+
+Never:
+
+```text
+AI
+ ↓
+"figure everything out"
+ ↓
+entire application
+```
+
+---
+
+# 07. Recommended AI Tool Division
+
+The tools previously identified should have distinct responsibilities.
+
+## ChatGPT
+
+Primary role:
+
+```text
+Research
+reasoning
+requirements clarification
+architecture analysis
+documentation
+technical investigation
+source verification
+design critique
+```
+
+ChatGPT should not be used as the uncontrolled primary code generator for the entire repository.
+
+---
+
+## Claude
+
+Primary role:
+
+```text
+architecture refinement
+system reasoning
+complex specification analysis
+implementation planning
+code review
+cross-document consistency
+technical decision analysis
+```
+
+Claude should work from the approved AEGIS architecture documents.
+
+---
+
+## v0
+
+Primary role:
+
+```text
+high-fidelity interface exploration
+visual composition
+component layout
+interaction prototypes
+frontend visual direction
+```
+
+v0 is a UI generation tool.
+
+It must not become the source of truth for:
+
+```text
+domain logic
+security
+database architecture
+state architecture
+API contracts
+AI decision logic
+```
+
+---
+
+## OpenCode
+
+Primary role:
+
+```text
+repository execution
+implementation
+refactoring
+integration
+test creation
+bug fixing
+architecture-preserving code changes
+```
+
+OpenCode becomes the primary coding execution environment.
+
+---
+
+# 08. AI Workflow
+
+The intended workflow is:
+
+```text
+CHATGPT
+Research + Architecture + Specification
+          ↓
+CLAUDE
+Reasoning + Architecture Review
+          ↓
+v0
+High-Fidelity UI Exploration
+          ↓
+OPENCode
+Engineering Implementation
+          ↓
+TESTING
+Automated + Human Validation
+          ↓
+CHATGPT / CLAUDE
+Review + Debug + Refinement
+```
+
+The tools complement each other.
+
+They should not compete to redefine the same system.
+
+---
+
+# 09. AI Context Rule
+
+Every AI coding session must receive enough context to understand:
+
+```text
+what AEGIS is
+what is already implemented
+what is currently being built
+what must not change
+what documents govern the work
+```
+
+Never assume an AI coding agent remembers previous conversations.
+
+The repository must carry the project memory.
+
+---
+
+# 10. Repository as Project Memory
+
+The repository should contain the authoritative project documentation.
+
+Recommended:
+
+```text
+/docs
+```
+
+with architecture documents stored there.
+
+Example:
+
+```text
+docs/
+├── architecture/
+│   ├── 01-master-architecture.md
+│   ├── 02-domain-model-global-state.md
+│   ├── 03-user-flow-operational-journey.md
+│   ├── 04-functional-requirements-13-screens.md
+│   ├── 05-interaction-state-transitions.md
+│   ├── 06-data-architecture-data-contracts.md
+│   ├── 07-api-service-contracts.md
+│   ├── 08-frontend-application-architecture.md
+│   ├── 09-design-system-component-architecture.md
+│   ├── 10-security-auth-audit.md
+│   ├── 11-ai-intelligence.md
+│   ├── 12-observability-telemetry.md
+│   ├── 13-threat-risk.md
+│   ├── 14-testing-qa.md
+│   ├── 15-infrastructure-deployment.md
+│   └── 16-development-implementation.md
+```
+
+This directory becomes a critical architectural control mechanism.
+
+---
+
+# 11. Repository Structure
+
+The implementation should evolve toward a structure similar to:
+
+```text
+aegis/
+│
+├── apps/
+│   ├── web/
+│   └── api/
+│
+├── services/
+│   ├── intelligence/
+│   ├── processing/
+│   └── workers/
+│
+├── packages/
+│   ├── domain/
+│   ├── contracts/
+│   ├── config/
+│   └── shared/
+│
+├── database/
+│   ├── migrations/
+│   └── seeds/
+│
+├── infrastructure/
+│
+├── tests/
+│   ├── unit/
+│   ├── integration/
+│   ├── contract/
+│   ├── e2e/
+│   ├── security/
+│   └── fixtures/
+│
+├── docs/
+│   └── architecture/
+│
+├── scripts/
+│
+├── .env.example
+├── docker-compose.yml
+├── README.md
+└── ...
+```
+
+This is a target architecture.
+
+Exact folders must be reconciled against the final repository before implementation.
+
+---
+
+# 12. Implementation Layers
+
+AEGIS should be implemented in layers.
+
+```text
+Layer 1 — Foundation
+Layer 2 — Domain
+Layer 3 — Data
+Layer 4 — Services
+Layer 5 — API
+Layer 6 — State
+Layer 7 — Frontend
+Layer 8 — Intelligence
+Layer 9 — Integration
+Layer 10 — Validation
+Layer 11 — Deployment
+```
+
+---
+
+# 13. Phase 0 — Repository Audit
+
+Before writing code:
+
+```text
+inspect repository
+inspect package files
+inspect dependencies
+inspect configuration
+inspect existing components
+inspect existing routes
+inspect database
+inspect tests
+inspect documentation
+```
+
+Produce:
+
+```text
+CURRENT_REPOSITORY_STATE.md
+```
+
+No implementation begins before the current state is understood.
+
+---
+
+# 14. Phase 0 Completion Gate
+
+The repository audit is complete when we can answer:
+
+```text
+What exists?
+What works?
+What is broken?
+What is incomplete?
+What should be retained?
+What should be deleted?
+What conflicts with AEGIS architecture?
+```
+
+---
+
+# 15. Phase 1 — Repository Foundation
+
+Establish:
+
+```text
+repository structure
+package management
+environment configuration
+linting
+formatting
+type checking
+testing framework
+Git conventions
+Docker foundation
+documentation structure
+```
+
+No product features yet.
+
+---
+
+# 16. Foundation Gate
+
+Before continuing:
+
+```text
+✓ repository builds
+✓ development environment starts
+✓ tests execute
+✓ linting works
+✓ type checks work
+✓ Docker works
+✓ environment configuration works
+```
+
+---
+
+# 17. Phase 2 — Design System Foundation
+
+Implement the AEGIS design tokens first.
+
+This includes:
+
+```text
+color tokens
+typography
+spacing
+radius
+borders
+elevation
+motion
+icons
+layout primitives
+```
+
+The visual system established in Document 09 is authoritative.
+
+---
+
+# 18. Design System Principle
+
+Do not manually style every screen independently.
+
+Build:
+
+```text
+tokens
+ ↓
+primitives
+ ↓
+components
+ ↓
+patterns
+ ↓
+screens
+```
+
+---
+
+# 19. Phase 3 — Application Shell
+
+Build the global application frame:
+
+```text
+navigation
+header
+workspace
+sidebar
+status areas
+responsive behavior
+routing
+global notifications
+```
+
+At this stage, screens can remain placeholders.
+
+---
+
+# 20. Shell Completion Gate
+
+Verify:
+
+```text
+navigation works
+routing works
+layout works
+theme works
+responsive behavior works
+global state provider works
+authentication boundary exists
+```
+
+---
+
+# 21. Phase 4 — Domain Foundation
+
+Implement domain entities from Document 02.
+
+The domain layer must be independent from visual presentation.
+
+Example:
+
+```text
+Facility
+Patient Context
+Signal
+Observation
+Threat
+Investigation
+Assessment
+Response
+Decision
+Event
+Feedback
+```
+
+Only entities actually approved by the domain architecture should be implemented.
+
+---
+
+# 22. Domain Rule
+
+UI terminology does not automatically become domain terminology.
+
+For example:
+
+```text
+Card
+Panel
+Badge
+Drawer
+```
+
+are interface concepts.
+
+They are not domain entities.
+
+---
+
+# 23. Phase 5 — Data Architecture
+
+Implement PostgreSQL according to Document 06.
+
+Sequence:
+
+```text
+schema
+ ↓
+migrations
+ ↓
+constraints
+ ↓
+indexes
+ ↓
+repositories
+ ↓
+seed data
+ ↓
+database tests
+```
+
+---
+
+# 24. Data Integrity
+
+Database constraints should protect important invariants wherever practical.
+
+Do not rely entirely on frontend validation.
+
+---
+
+# 25. Phase 6 — API Foundation
+
+Implement API contracts from Document 07.
+
+Start with:
+
+```text
+authentication
+health
+core domain endpoints
+event endpoints
+operational workflow endpoints
+```
+
+Only implement endpoints that have a defined purpose.
+
+---
+
+# 26. API Rule
+
+Do not create:
+
+```text
+random endpoints
+duplicate endpoints
+screen-specific endpoints with no domain meaning
+```
+
+The API represents system capabilities, not individual UI elements.
+
+---
+
+# 27. Phase 7 — Global State Engine
+
+Implement the global state architecture from Document 02 and Document 05.
+
+The state engine must define:
+
+```text
+initial state
+valid transitions
+events
+derived state
+failure states
+reset behavior
+persistence requirements
+```
+
+---
+
+# 28. State First, Screens Second
+
+The correct sequence is:
+
+```text
+State Model
+ ↓
+Events
+ ↓
+Transitions
+ ↓
+API
+ ↓
+UI
+```
+
+not:
+
+```text
+UI
+ ↓
+invent state later
+```
+
+---
+
+# 29. Phase 8 — Operational Event Model
+
+Implement the event flow.
+
+Conceptually:
+
+```text
+Detection
+ ↓
+Observation
+ ↓
+Anomaly
+ ↓
+Threat Assessment
+ ↓
+Classification
+ ↓
+Recommendation
+ ↓
+Human Decision
+ ↓
+Response
+ ↓
+Containment
+ ↓
+Monitoring
+ ↓
+Recovery
+ ↓
+Learning
+```
+
+This represents the central AEGIS operational journey.
+
+---
+
+# 30. Phase 9 — Build the 13 Screens
+
+The 13 screens must be implemented from Document 04.
+
+Do not invent additional primary screens without architectural approval.
+
+Each screen must have:
+
+```text
+route
+purpose
+data
+components
+states
+interactions
+navigation
+loading state
+empty state
+error state
+success state
+permission behavior
+completion criteria
+```
+
+---
+
+# 31. Screen Implementation Order
+
+Do not build screens according to visual convenience.
+
+Build them according to dependency and operational journey.
+
+The preferred pattern is:
+
+```text
+Application Shell
+ ↓
+Global Monitoring
+ ↓
+Threat Intelligence
+ ↓
+Investigation / Classification
+ ↓
+Response Decision
+ ↓
+Response Execution
+ ↓
+Monitoring / Feedback
+ ↓
+Recovery
+ ↓
+Institutional Memory
+```
+
+The exact sequence must follow the authoritative 13-screen registry.
+
+---
+
+# 32. Screen Completion Rule
+
+A screen is not complete because:
+
+```text
+"it looks correct."
+```
+
+It is complete when:
+
+```text
+visual
++
+data
++
+state
++
+interaction
++
+navigation
++
+error handling
++
+permissions
++
+tests
+```
+
+work correctly.
+
+---
+
+# 33. Phase 10 — Realistic Synthetic Data
+
+Before connecting real external data:
+
+```text
+synthetic signals
+synthetic patients
+synthetic facilities
+synthetic alerts
+synthetic threats
+synthetic response events
+```
+
+must drive the application.
+
+This gives AEGIS a realistic operational environment without prematurely introducing sensitive or uncontrolled data.
+
+---
+
+# 34. Synthetic Scenario Engine
+
+Create repeatable scenarios such as:
+
+```text
+Scenario A — Normal Operations
+Scenario B — Environmental Anomaly
+Scenario C — Suspected Outbreak
+Scenario D — Confirmed High-Threat Event
+Scenario E — Response Execution
+Scenario F — Recovery
+Scenario G — System Failure
+```
+
+These scenarios become development and testing fixtures.
+
+---
+
+# 35. Phase 11 — Backend Integration
+
+Connect:
+
+```text
+Frontend
+ ↓
+API
+ ↓
+Domain Services
+ ↓
+Database
+```
+
+Then add:
+
+```text
+Redis Streams
+ ↓
+Workers
+```
+
+Only after the synchronous core is stable.
+
+---
+
+# 36. Integration Principle
+
+Do not introduce asynchronous infrastructure simply because it exists in the architecture.
+
+Introduce it when the relevant workflow requires it.
+
+---
+
+# 37. Phase 12 — Intelligence Integration
+
+Only after deterministic AEGIS workflows work should AI intelligence be integrated.
+
+The sequence is:
+
+```text
+Deterministic Data
+ ↓
+Rules / Structured Analysis
+ ↓
+AI Intelligence
+ ↓
+Validation
+ ↓
+Human Decision
+```
+
+AI must augment the system.
+
+It must not become an uncontrolled replacement for deterministic system logic.
+
+---
+
+# 38. AI Output Boundary
+
+Every AI output should pass through an explicit boundary.
+
+Conceptually:
+
+```text
+Raw AI Output
+ ↓
+Schema Validation
+ ↓
+Safety / Policy Validation
+ ↓
+Evidence / Context Validation
+ ↓
+Confidence / Uncertainty
+ ↓
+Decision Support Object
+ ↓
+Human Interface
+```
+
+---
+
+# 39. AI Failure Behavior
+
+If AI fails:
+
+```text
+AEGIS continues operating
+```
+
+where the underlying deterministic workflow permits it.
+
+Never allow:
+
+```text
+AI unavailable
+ ↓
+entire system becomes unusable
+```
+
+unless the specific capability genuinely requires AI.
+
+---
+
+# 40. Phase 13 — End-to-End Operational Journey
+
+The first true system milestone is not:
+
+```text
+"all 13 screens are built."
+```
+
+It is:
+
+> A complete operational journey works from detection through response and learning.
+
+Example:
+
+```text
+Environmental anomaly
+ ↓
+Global Monitoring
+ ↓
+Threat Intelligence
+ ↓
+Threat classification
+ ↓
+Recommended response
+ ↓
+Human decision
+ ↓
+Response Execution
+ ↓
+Containment state
+ ↓
+Monitoring
+ ↓
+Recovery
+ ↓
+Biological Feedback
+ ↓
+Institutional Memory
+```
+
+---
+
+# 41. Journey Completion Gate
+
+The journey must preserve state across every transition.
+
+The system must not lose:
+
+```text
+event
+ ↓
+investigation
+ ↓
+assessment
+ ↓
+decision
+ ↓
+response
+ ↓
+outcome
+ ↓
+learning
+```
+
+---
+
+# 42. Phase 14 — Testing
+
+Testing follows Document 14.
+
+Implement progressively:
+
+```text
+unit
+ ↓
+component
+ ↓
+integration
+ ↓
+contract
+ ↓
+E2E
+ ↓
+security
+ ↓
+performance
+```
+
+---
+
+# 43. Test Pyramid
+
+Prefer:
+
+```text
+        E2E
+       /   \
+  Integration
+     /       \
+   Unit      Contract
+```
+
+Large numbers of end-to-end tests should not replace foundational unit and integration tests.
+
+---
+
+# 44. Phase 15 — Observability
+
+Integrate Document 12.
+
+Add:
+
+```text
+structured logging
+metrics
+traces
+request IDs
+event correlation
+health checks
+alerts
+```
+
+before production deployment.
+
+---
+
+# 45. Phase 16 — Security Hardening
+
+Implement Document 10 and Document 13.
+
+Validate:
+
+```text
+authentication
+authorization
+session handling
+input validation
+secret management
+audit
+rate controls
+dependency security
+container security
+```
+
+---
+
+# 46. Phase 17 — Infrastructure
+
+Implement Document 15.
+
+Sequence:
+
+```text
+Docker
+ ↓
+Development deployment
+ ↓
+Test deployment
+ ↓
+Staging
+ ↓
+Production
+```
+
+---
+
+# 47. Phase 18 — Production Readiness
+
+Before production:
+
+```text
+functional validation
+security validation
+performance validation
+backup validation
+restore validation
+deployment validation
+rollback validation
+observability validation
+operational journey validation
+```
+
+---
+
+# 48. Implementation Dependency Graph
+
+The entire build can be represented as:
+
+```text
+ARCHITECTURE
+      │
+      ▼
+REPOSITORY FOUNDATION
+      │
+      ▼
+DESIGN SYSTEM
+      │
+      ▼
+APPLICATION SHELL
+      │
+      ▼
+DOMAIN MODEL
+      │
+      ▼
+DATABASE
+      │
+      ▼
+API
+      │
+      ▼
+GLOBAL STATE
+      │
+      ▼
+EVENT SYSTEM
+      │
+      ▼
+13 SCREENS
+      │
+      ▼
+SYNTHETIC DATA
+      │
+      ▼
+BACKEND INTEGRATION
+      │
+      ▼
+OPERATIONAL JOURNEY
+      │
+      ▼
+AI INTELLIGENCE
+      │
+      ▼
+TESTING
+      │
+      ▼
+OBSERVABILITY
+      │
+      ▼
+SECURITY
+      │
+      ▼
+DEPLOYMENT
+      │
+      ▼
+PRODUCTION
+```
+
+---
+
+# 49. Vertical Slice Strategy
+
+AEGIS should not be developed purely horizontally.
+
+Avoid:
+
+```text
+Build all frontend
+ ↓
+Build all backend
+ ↓
+Connect everything
+```
+
+Instead use vertical slices.
+
+Example:
+
+```text
+ONE OPERATIONAL CAPABILITY
+
+UI
+ ↓
+State
+ ↓
+API
+ ↓
+Domain
+ ↓
+Database
+ ↓
+Events
+ ↓
+Tests
+```
+
+Then move to the next capability.
+
+---
+
+# 50. Why Vertical Slices Matter
+
+This exposes architectural problems early.
+
+If you build the entire frontend before testing the backend contract, you can spend weeks generating interfaces around an incorrect data model.
+
+Vertical slices prevent that.
+
+---
+
+# 51. First Vertical Slice
+
+The first meaningful vertical slice should prove:
+
+```text
+User
+ ↓
+Global Monitoring
+ ↓
+Synthetic environmental signal
+ ↓
+Anomaly generated
+ ↓
+API
+ ↓
+Domain event
+ ↓
+Database persistence
+ ↓
+UI update
+ ↓
+Audit
+```
+
+This proves that the architecture is actually connected.
+
+---
+
+# 52. Second Vertical Slice
+
+Then prove:
+
+```text
+Anomaly
+ ↓
+Threat Intelligence
+ ↓
+Threat assessment
+ ↓
+Classification
+ ↓
+Persisted assessment
+ ↓
+UI state update
+```
+
+---
+
+# 53. Third Vertical Slice
+
+Then:
+
+```text
+Threat
+ ↓
+Response Recommendation
+ ↓
+Human Review
+ ↓
+Decision
+ ↓
+Audit
+```
+
+---
+
+# 54. Fourth Vertical Slice
+
+Then:
+
+```text
+Decision
+ ↓
+Response Execution
+ ↓
+Execution state
+ ↓
+Monitoring
+```
+
+---
+
+# 55. Fifth Vertical Slice
+
+Then:
+
+```text
+Response
+ ↓
+Outcome
+ ↓
+Feedback
+ ↓
+Institutional Memory
+```
+
+---
+
+# 56. Progressive Build Model
+
+The project therefore progresses:
+
+```text
+SLICE 1
+Detection
+
+SLICE 2
+Identification
+
+SLICE 3
+Decision
+
+SLICE 4
+Response
+
+SLICE 5
+Recovery
+
+SLICE 6
+Learning
+```
+
+This directly reflects the biological resilience architecture.
+
+---
+
+# 57. Definition of Ready
+
+Before implementation begins for a capability, verify:
+
+```text
+✓ requirement exists
+✓ domain object exists
+✓ state transitions exist
+✓ data contract exists
+✓ API contract exists
+✓ UI specification exists
+✓ dependencies are known
+✓ security implications are known
+✓ tests can be defined
+```
+
+If several are missing, stop.
+
+---
+
+# 58. Definition of Done
+
+A capability is done only when:
+
+```text
+✓ implemented
+✓ tested
+✓ integrated
+✓ observable
+✓ accessible where required
+✓ secure
+✓ error states handled
+✓ documented
+✓ reviewed
+✓ operational journey verified
+```
+
+---
+
+# 59. AI Coding Task Format
+
+Every OpenCode implementation task should follow this structure:
+
+```text
+TASK
+Implement [specific capability].
+
+CONTEXT
+AEGIS is a high-stakes healthcare and biosecurity decision-support platform.
+
+AUTHORITATIVE DOCUMENTS
+[List exact documents]
+
+CURRENT STATE
+[What already exists]
+
+TARGET STATE
+[What must exist after implementation]
+
+FILES IN SCOPE
+[List files/directories]
+
+FILES OUT OF SCOPE
+[List files/directories]
+
+REQUIREMENTS
+[Exact requirements]
+
+STATE CHANGES
+[Exact state transitions]
+
+DATA CONTRACT
+[Relevant contract]
+
+API CONTRACT
+[Relevant contract]
+
+UI REQUIREMENTS
+[Relevant UI specification]
+
+TEST REQUIREMENTS
+[Exact tests]
+
+CONSTRAINTS
+Do not:
+- invent requirements
+- change architecture
+- create duplicate abstractions
+- modify unrelated files
+- introduce new dependencies without justification
+
+COMPLETION CRITERIA
+[Exact measurable criteria]
+
+VALIDATION
+Run:
+[commands/tests]
+```
+
+---
+
+# 60. OpenCode Operating Rule
+
+OpenCode must work in small controlled units.
+
+Prefer:
+
+```text
+one capability
+one bounded change
+one validation cycle
+```
+
+over:
+
+```text
+"Build the entire AEGIS application."
+```
+
+---
+
+# 61. AI Change Boundary
+
+When an AI agent proposes changes outside the requested scope:
+
+```text
+STOP
+```
+
+Review why.
+
+Possible reasons:
+
+```text
+hidden dependency
+architecture flaw
+unnecessary refactor
+AI hallucination
+missing requirement
+```
+
+Do not automatically accept the changes.
+
+---
+
+# 62. No Blind Refactoring
+
+AI coding agents must not perform broad refactors while implementing unrelated functionality.
+
+For example:
+
+```text
+Implement alert filtering
+```
+
+does not authorize:
+
+```text
+rewrite state management
+replace routing
+change database architecture
+replace component library
+```
+
+---
+
+# 63. Dependency Rule
+
+New dependencies require justification.
+
+Before adding one:
+
+```text
+What problem does it solve?
+Why can't existing dependencies solve it?
+Does it introduce security risk?
+Does it increase maintenance?
+Does it duplicate an existing capability?
+```
+
+---
+
+# 64. Git Strategy
+
+Use Git continuously.
+
+Recommended:
+
+```text
+main
+ ↓
+feature branch
+ ↓
+implementation
+ ↓
+tests
+ ↓
+review
+ ↓
+merge
+```
+
+Avoid accumulating enormous unreviewed changes.
+
+---
+
+# 65. Commit Strategy
+
+Commits should describe meaningful changes.
+
+Examples:
+
+```text
+feat: add anomaly domain model
+feat: add monitoring event contract
+feat: implement threat assessment API
+test: add response transition tests
+fix: preserve investigation state during navigation
+```
+
+---
+
+# 66. Pull Request Principle
+
+A pull request should answer:
+
+```text
+What changed?
+Why?
+Which architecture documents govern it?
+What tests were added?
+What risks exist?
+What remains?
+```
+
+---
+
+# 67. Architecture Decision Records
+
+When a meaningful architectural decision changes, create an ADR.
+
+Example:
+
+```text
+docs/decisions/
+```
+
+Possible decisions:
+
+```text
+ADR-001 Redis Streams for MVP
+ADR-002 PostgreSQL as system of record
+ADR-003 AI service boundary
+ADR-004 Kubernetes readiness strategy
+```
+
+---
+
+# 68. Architecture Drift Detection
+
+Periodically compare:
+
+```text
+Architecture Documents
+        ↕
+Repository
+```
+
+Look for:
+
+```text
+missing implementation
+unapproved implementation
+duplicated implementation
+changed contracts
+obsolete documentation
+```
+
+---
+
+# 69. Documentation Synchronization
+
+When architecture changes:
+
+```text
+Architecture
+ ↓
+Update document
+ ↓
+Update implementation
+ ↓
+Update tests
+```
+
+Never update only the code.
+
+---
+
+# 70. Research Workflow
+
+ChatGPT should be used to research:
+
+```text
+technical standards
+healthcare UX
+biosecurity workflows
+pandemic preparedness
+software architecture
+security standards
+AI safety
+observability
+infrastructure
+```
+
+Research must distinguish:
+
+```text
+verified fact
+design decision
+assumption
+hypothesis
+```
+
+---
+
+# 71. Research Evidence Rule
+
+External research should not automatically become an AEGIS requirement.
+
+The process is:
+
+```text
+Research
+ ↓
+Evidence
+ ↓
+Relevance
+ ↓
+Design Decision
+ ↓
+Requirement
+```
+
+---
+
+# 72. No Hallucination Rule
+
+When information is unavailable:
+
+```text
+UNKNOWN
+```
+
+is preferable to invented information.
+
+This is especially important for:
+
+```text
+clinical workflows
+regulatory requirements
+pathogen behavior
+healthcare protocols
+security requirements
+stakeholder requirements
+```
+
+---
+
+# 73. Stakeholder Validation
+
+Stakeholder feedback should be captured as:
+
+```text
+feedback
+ ↓
+requirement candidate
+ ↓
+impact analysis
+ ↓
+architecture decision
+ ↓
+approved change
+```
+
+Not:
+
+```text
+stakeholder says something
+ ↓
+AI immediately changes code
+```
+
+---
+
+# 74. Expert Validation
+
+AEGIS must eventually be reviewed by relevant experts.
+
+Potential validation groups:
+
+```text
+healthcare professionals
+biosecurity experts
+pandemic preparedness teams
+clinical operations stakeholders
+public health experts
+security professionals
+UX/HCI experts
+software engineers
+AI safety experts
+```
+
+---
+
+# 75. Prototype Validation
+
+Before production claims are made, the system should distinguish:
+
+```text
+simulation
+prototype
+decision support
+operational deployment
+```
+
+AEGIS must never imply that a simulated workflow is a clinically validated operational protocol.
+
+---
+
+# 76. Synthetic Simulation
+
+Early AEGIS demonstrations should use explicit synthetic data.
+
+The interface should make simulation status obvious.
+
+Example:
+
+```text
+SIMULATION MODE
+```
+
+where applicable.
+
+---
+
+# 77. Implementation Safety Boundary
+
+AEGIS is a decision-support system.
+
+The implementation must not silently turn interface recommendations into autonomous real-world biological interventions.
+
+High-consequence actions require the approval model defined by the security, authorization, and decision-support architectures.
+
+---
+
+# 78. AI + Human Decision Boundary
+
+The system should represent:
+
+```text
+AI recommendation
+        ≠
+Human decision
+        ≠
+Executed response
+```
+
+These are separate system states.
+
+---
+
+# 79. Operational Traceability
+
+For a consequential workflow, AEGIS should be able to reconstruct:
+
+```text
+signal
+ ↓
+analysis
+ ↓
+recommendation
+ ↓
+human decision
+ ↓
+execution
+ ↓
+outcome
+```
+
+This is a fundamental implementation requirement.
+
+---
+
+# 80. Progressive Delivery Roadmap
+
+The complete implementation roadmap is:
+
+```text
+PHASE 0
+Repository Audit
+
+PHASE 1
+Engineering Foundation
+
+PHASE 2
+Design System
+
+PHASE 3
+Application Shell
+
+PHASE 4
+Domain Foundation
+
+PHASE 5
+Database
+
+PHASE 6
+API
+
+PHASE 7
+Global State
+
+PHASE 8
+Event System
+
+PHASE 9
+13 Screens
+
+PHASE 10
+Synthetic Scenario Engine
+
+PHASE 11
+Backend Integration
+
+PHASE 12
+Operational Vertical Slices
+
+PHASE 13
+AI Intelligence
+
+PHASE 14
+Testing
+
+PHASE 15
+Observability
+
+PHASE 16
+Security Hardening
+
+PHASE 17
+Infrastructure
+
+PHASE 18
+Staging
+
+PHASE 19
+Stakeholder Validation
+
+PHASE 20
+Production Readiness
+
+PHASE 21
+Controlled Deployment
+```
+
+---
+
+# 81. Recommended Build Milestones
+
+AEGIS should have explicit milestones.
+
+## M0 — Architecture Locked
+
+```text
+Documents 01–16
+```
+
+reviewed and internally consistent.
+
+---
+
+## M1 — Engineering Foundation
+
+```text
+repository
+tooling
+Docker
+testing
+documentation
+```
+
+working.
+
+---
+
+## M2 — UI Foundation
+
+```text
+design system
+application shell
+routing
+```
+
+working.
+
+---
+
+## M3 — Domain Foundation
+
+```text
+domain
+database
+API
+state
+```
+
+working.
+
+---
+
+## M4 — Detection Slice
+
+Detection journey works end-to-end.
+
+---
+
+## M5 — Identification Slice
+
+Threat identification works end-to-end.
+
+---
+
+## M6 — Response Slice
+
+Decision and response workflow works.
+
+---
+
+## M7 — Learning Slice
+
+Feedback and institutional memory works.
+
+---
+
+## M8 — Full 13-Screen System
+
+All screens integrated into the operational journey.
+
+---
+
+## M9 — Intelligence
+
+AI decision-support layer integrated safely.
+
+---
+
+## M10 — Production Candidate
+
+Security, testing, observability and deployment requirements satisfied.
+
+---
+
+# 82. What Must Never Happen
+
+The following development patterns are prohibited:
+
+```text
+AI generates entire application in one prompt
+```
+
+```text
+UI is built without data contracts
+```
+
+```text
+API is invented after UI
+```
+
+```text
+database is designed around screenshots
+```
+
+```text
+AI decides domain architecture
+```
+
+```text
+new dependencies are added casually
+```
+
+```text
+production data is copied into development
+```
+
+```text
+security is postponed until launch
+```
+
+```text
+tests are written only after everything is finished
+```
+
+```text
+all 13 screens are developed as isolated pages
+```
+
+```text
+a beautiful dashboard is mistaken for a functioning system
+```
+
+---
+
+# 83. What Success Looks Like
+
+The final AEGIS implementation should behave as one system.
+
+Not:
+
+```text
+13 beautiful screens
+```
+
+but:
+
+```text
+ONE OPERATIONAL SYSTEM
+```
+
+where:
+
+```text
+data
+ ↓
+state
+ ↓
+intelligence
+ ↓
+decision
+ ↓
+action
+ ↓
+feedback
+```
+
+remain connected.
+
+---
+
+# 84. Master Implementation Equation
+
+AEGIS implementation can be reduced to:
+
+```text
+Architecture
++
+Domain Model
++
+Data Contracts
++
+State Machine
++
+Service Contracts
++
+UI System
++
+AI Boundary
++
+Testing
++
+Infrastructure
+=
+Executable AEGIS
+```
+
+---
+
+# 85. Final Implementation Rule
+
+The team must optimize for:
+
+```text
+coherence > speed
+correctness > volume
+traceability > convenience
+simplicity > unnecessary complexity
+validated behavior > impressive demos
+```
+
+The fastest way to build AEGIS is not to generate more code.
+
+It is to prevent the wrong code from being generated.
+
+---
+
+# 86. Final Build Loop
+
+Every capability follows:
+
+```text
+UNDERSTAND
+   ↓
+SPECIFY
+   ↓
+DESIGN
+   ↓
+IMPLEMENT
+   ↓
+TEST
+   ↓
+INTEGRATE
+   ↓
+OBSERVE
+   ↓
+REVIEW
+   ↓
+VALIDATE
+   ↓
+DOCUMENT
+```
+
+Then:
+
+```text
+NEXT CAPABILITY
+```
+
+---
+
+# 87. AEGIS Implementation Doctrine
+
+AEGIS is not to be built as a collection of AI-generated screens.
+
+It is to be engineered as a coherent operational system whose:
+
+```text
+architecture
+domain
+data
+state
+services
+interface
+intelligence
+security
+observability
+testing
+infrastructure
+```
+
+all agree with one another.
+
+The implementation is successful only when the system's behavior matches its architecture.
+
+That is the standard.
+
+# END OF DOCUMENT 16
