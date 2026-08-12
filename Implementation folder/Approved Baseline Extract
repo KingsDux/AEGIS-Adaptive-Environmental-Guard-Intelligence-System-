@@ -1,0 +1,65 @@
+# Approved Baseline Extract
+
+**Source repository:** `https://github.com/KingsDux/AEGIS-Adaptive-Environmental-Guard-Intelligence-System-`
+
+**Use:** Implementation-repository guardrail. This is an index of confirmed authority and decisions; it is not a replacement for the source documents.
+
+## System boundary
+
+AEGIS is a decision-support system for biosecurity and health-system threat surveillance. It separates observation, inference, recommendation, authorization, execution, and verification. It is not an autonomous clinical or biosecurity authority; consequential actions require human authorization.
+
+The approved experience is one continuous operational journey across 13 authoritative screens, backed by a shared domain model and global state model.
+
+## Document authority
+
+| Document | Authority |
+| --- | --- |
+| 01 | Master architecture and foundational constraints |
+| 02 | Canonical domain vocabulary and global state semantics |
+| 03–04 | Authoritative 13-screen registry and functional specification |
+| 05 | Interaction and state-transition behavior |
+| 06 | Concrete data architecture and data contracts |
+| 07 | API architecture and service contracts |
+| 08 | Frontend and application architecture |
+| 09 | Design system and UI component architecture |
+| 10 | Authentication, authorization, security, and audit |
+| 11 | AI intelligence and decision-support boundaries |
+| 12 | Observability and telemetry |
+| 13 | Threat modeling and risk architecture |
+| 14 | Testing and quality assurance architecture |
+| 15 | Infrastructure and deployment architecture |
+| 16 | Development and implementation architecture; its alternate roadmap is historical/reference |
+| 17 | AI development workflow and tool orchestration |
+| 18 | Repository constitution and AI-agent rules |
+| 19 | Authoritative implementation roadmap |
+| 20 | Verification and traceability |
+
+## Explicitly locked technology
+
+Document 15 locks the backend architecture to:
+
+- Python
+- FastAPI
+- PostgreSQL
+- Redis Streams
+
+No frontend framework, package manager, database schema, API route, deployment topology, or dependency version is selected here without the corresponding source contract.
+
+## Reconciled decisions
+
+- Document 02 defines what the domain means; Document 06 defines concrete persisted and transported representations.
+- Specialized data representations such as `RiskAssessment`, `TransmissionAssessment`, and `RecoveryAssessment` do not replace canonical `Assessment`.
+- `PreparednessLesson`, `ResilienceGap`, `ImprovementItem`, and `ResearchFinding` are data representations supporting canonical `InstitutionalMemory`.
+- Document 19 controls implementation order; Document 16's alternate roadmap does not.
+- Document 02 controls global state semantics; narrative sequences elsewhere do not create a second state machine.
+- Documents 03 and 04 control screen names; illustrative names elsewhere do not add screens.
+
+## Unresolved items preserved as `UNKNOWN`
+
+- Exact domain mapping for `Threat` and `Anomaly`.
+- Exact domain mapping for `Investigation`, `Case`, and `Finding`.
+- Exact relationship between canonical `User` and data-layer `Actor`.
+- Exact composition or inheritance of `ContainmentAction` and `ResponseAction` under `Action` and `Response`.
+- Any source detail not available to the implementation workspace at scaffold time.
+
+These items must be resolved from the approved contracts before their corresponding code is created.
