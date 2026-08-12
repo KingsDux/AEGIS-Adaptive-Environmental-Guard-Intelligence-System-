@@ -1,0 +1,17 @@
+# Repository Source Record
+
+**Documentation source:** [AEGIS architecture repository](https://github.com/KingsDux/AEGIS-Adaptive-Environmental-Guard-Intelligence-System-)
+
+**Role of source repository:** Documentation repository containing the approved AEGIS architecture baseline, Documents 01–20. It is not the implementation repository.
+
+**Implementation repository:** This directory, maintained separately so architecture records and executable application code cannot be confused.
+
+## Access record
+
+The GitHub connection is confirmed for this session with low-risk read access. Repository-content retrieval is not exposed to the current coding thread, and direct Git transport is unavailable. The baseline extract in `docs/approved-baseline-extract.md` is therefore based on the approved architecture review already present in the referenced task context.
+
+This record must be updated with file-level paths and commit identity when the source repository is made available to the coding workspace.
+
+## Safety consequence
+
+No source document has been copied, rewritten, or treated as executable code. No implementation decision is made solely because a technology or entity name appears in an incomplete context.
