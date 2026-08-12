@@ -1,0 +1,40 @@
+# Architecture Alignment Record
+
+**Repository:** AEGIS implementation repository
+
+**Status:** Scaffold verified against the approved baseline extract; full file-by-file Phase 0 verification remains pending because repository-content retrieval is not exposed to this coding thread.
+
+## Evidence available during creation
+
+The local workspace contains no copied AEGIS architecture files and no pre-existing implementation repository. The user-provided source repository and the referenced architecture review establish the following constraints:
+
+| Authority | Confirmed constraint | Scaffold response |
+| --- | --- | --- |
+| Documents 01–20 | Approved architecture baseline | Indexed in `docs/approved-baseline-extract.md`; source remains separate |
+| Document 02 | Canonical domain vocabulary and state semantics | No domain model or state machine created |
+| Documents 03–04 | Authoritative 13-screen registry | No screens or routes created |
+| Document 06 | Concrete data architecture | No schemas or data entities created |
+| Document 07 | API architecture and service contracts | No API created |
+| Document 08 | Frontend/application architecture | Frontend reserved but not initialized |
+| Document 10 | Security, authorization, audit architecture | No auth or audit mechanism created |
+| Document 11 | Human-in-the-loop AI decision support | No AI implementation created |
+| Document 15 | Python, FastAPI, PostgreSQL, Redis Streams backend | Backend and infrastructure boundaries reserved without premature configuration |
+| Document 18 | Repository constitution and agent rules | Repository preserves no-fabrication and human-approval constraints |
+| Document 19 | Authoritative implementation roadmap | No Phase 1 work started |
+| Document 21 | Phase 0 audit protocol | This record is a pre-audit scaffold record, not a completed Phase 0 audit |
+| Document 22 | Reconciliation decisions | Known unresolved mappings remain `UNKNOWN` |
+
+## Explicit UNKNOWN items
+
+1. The frontend technology stack and build tooling.
+2. Exact backend module boundaries and package/dependency versions.
+3. Database schema, migrations, and Redis Streams topology.
+4. API routes, request/response contracts, errors, and concurrency behavior.
+5. The exact 13 screen names and routes.
+6. Authentication, authorization, audit, observability, deployment, CI/CD, and test configuration details.
+7. `Threat`/`Anomaly`, `Investigation`/`Case`/`Finding`, `User`/`Actor`, and action/response relationship mappings described in Document 22.
+8. File-level paths and commit identity from the source repository.
+
+## Verification result
+
+The repository structure does not contradict the confirmed constraints. It is not a substitute for the full Documents 01–22 review and must not be treated as Phase 0 completion.
